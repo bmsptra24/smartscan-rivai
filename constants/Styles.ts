@@ -19,7 +19,7 @@ export const Color = {
   black: '#07314A',
   semiblack: '#9A9DB4',
   grey: '#6E777C',
-  greyLight: "#DCDEDF",
+  greyLight: "#F0F0F0",
 
   accent1: '#A2E1FE',
   accent2: '#FFD16C',
@@ -94,6 +94,8 @@ export const ScreenContentHeight = Dimensions.get("window").height - 49
 export const Size = {
   screen: Dimensions.get('window'),
 }
+
+export const TABBAR_HEIGHT = 49
 
 export const IsMobileScreen = Size.screen.width <= 900
 

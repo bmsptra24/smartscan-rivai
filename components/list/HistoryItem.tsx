@@ -1,8 +1,9 @@
 import React from "react";
-import { View } from "react-native";
+import { Pressable, TouchableOpacity, View } from "react-native";
 import TextBase from "@/components/base/Text";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { AccentColors, BorderRadius } from "@/constants/Styles";
+import { router } from "expo-router";
 
 interface HistoryItemProps {
   id: string;
@@ -23,7 +24,16 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
   const iconColor = AccentColors[index % AccentColors.length];
 
   return (
-    <View style={{ flexDirection: "row", gap: 10 }}>
+    <Pressable
+      android_ripple={{ color: "rgba(0, 0, 0, 0.1)" }}
+      onPress={() => router.push("/(subtab)/detail")}
+      style={{
+        flexDirection: "row",
+        gap: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+      }}
+    >
       <Ionicons
         style={{
           backgroundColor: iconColor,
@@ -53,7 +63,7 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
           <TextBase variant="subcontent">{time}</TextBase>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

@@ -65,23 +65,26 @@ const historyData = [
 export class HomeHistory extends PureComponent {
   render() {
     return (
-      <View style={{ padding: 25, gap: 25 }}>
-        <TextBase variant="header">Riwayat</TextBase>
+      <View>
+        <TextBase
+          style={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10 }}
+          variant="header"
+        >
+          Riwayat
+        </TextBase>
 
-        <FlatList
-          data={historyData}
-          keyExtractor={(item) => item.index.toString()}
-          renderItem={({ item }) => (
+        <View style={{}}>
+          {historyData.map((item) => (
             <HistoryItem
+              key={item.index.toString()}
               id={item.id}
               fileCount={item.fileCount}
               date={item.date}
               time={item.time}
               index={item.index}
             />
-          )}
-          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-        />
+          ))}
+        </View>
       </View>
     );
   }

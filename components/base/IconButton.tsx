@@ -1,11 +1,9 @@
 import React from "react";
 import {
   Pressable,
-  Text,
   StyleSheet,
   PressableProps,
   ViewStyle,
-  TextStyle,
   View,
 } from "react-native";
 import {
@@ -13,34 +11,47 @@ import {
   BorderRadius,
   Color,
   LoadingStyle,
-  ResponsiveComponent,
 } from "@/constants/Styles";
 
-// Props untuk kustomisasi
-interface ButtonBaseProps extends PressableProps {
-  title: string;
+interface IconButtonProps extends PressableProps {
   onPress?: () => void;
   style?: ViewStyle;
-  textStyle?: TextStyle;
   isLoading?: boolean;
-  icon?: React.ReactNode;
+  icon: React.ReactNode;
+  size?: "small" | "medium" | "large";
 }
 
-const ButtonBase: React.FC<ButtonBaseProps> = ({
-  title,
+const IconButton: React.FC<IconButtonProps> = ({
   onPress,
   style,
-  textStyle,
   isLoading = false,
   icon,
+  size = "medium",
   ...restProps
 }) => {
+  // Determine button size
+  let buttonSize: number;
+  switch (size) {
+    case "small":
+      buttonSize = 40;
+      break;
+    case "large":
+      buttonSize = 64;
+      break;
+    default:
+      buttonSize = 52;
+  }
+
   return (
     <Pressable
       {...restProps}
       disabled={isLoading}
       style={({ pressed }) => [
         styles.button,
+        {
+          width: buttonSize,
+          height: buttonSize,
+        },
         style,
         pressed ? styles.pressed : null,
         isLoading ? LoadingStyle : null,
@@ -48,17 +59,7 @@ const ButtonBase: React.FC<ButtonBaseProps> = ({
       onPress={onPress}
       android_ripple={ANDROID_RIPPLE}
     >
-      <View
-        style={[
-          styles.contentContainer,
-          { justifyContent: icon ? "space-between" : "center" },
-        ]}
-      >
-        <Text style={[styles.text, textStyle]}>
-          {!isLoading ? title : "Loading..."}
-        </Text>
-        {icon && icon}
-      </View>
+      <View style={styles.iconContainer}>{icon}</View>
     </Pressable>
   );
 };
@@ -66,23 +67,17 @@ const ButtonBase: React.FC<ButtonBaseProps> = ({
 const styles = StyleSheet.create({
   button: {
     backgroundColor: Color.primary,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    width: ResponsiveComponent.width,
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: BorderRadius.full,
   },
-  contentContainer: {
-    flexDirection: "row",
+  iconContainer: {
+    justifyContent: "center",
     alignItems: "center",
   },
   pressed: {
-    opacity: 0.7, // Efek sentuh untuk iOS
-  },
-  text: {
-    color: Color.background,
-    fontSize: 16,
-    fontWeight: "bold",
+    opacity: 0.7,
   },
 });
 
-export default ButtonBase;
+export default IconButton;

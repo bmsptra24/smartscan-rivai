@@ -1,12 +1,11 @@
-import { router, Tabs } from "expo-router";
-import React, { useEffect } from "react";
+import { Tabs } from "expo-router";
+import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Color } from "@/constants/Styles";
 import { scannerService } from "@/services/Scanner";
-import { useFonts } from "expo-font";
 
 export default function TabLayout() {
   return (

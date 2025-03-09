@@ -4,7 +4,7 @@ import { StyleProp, Text, TextStyle } from "react-native";
 
 interface TextBaseProps {
   children: ReactNode;
-  variant?: "title" | "header" | "content" | "subcontent";
+  variant?: "title" | "header" | "content" | "subcontent" | "titlepage";
   style?: StyleProp<TextStyle>;
 }
 
@@ -20,6 +20,10 @@ export default class TextBase extends Component<TextBaseProps> {
       case "title":
         fontSize = 24;
         fontFamily = "OpenSansSemiBold";
+        break;
+      case "titlepage":
+        fontSize = 16;
+        fontFamily = "OpenSansBold";
         break;
       case "header":
         fontSize = 14;
