@@ -2,18 +2,27 @@ import { Group } from "@/services/Group";
 import { create } from "zustand";
 
 interface GroupState {
+  groups: Group[];
   selectedGroup: Group;
 }
 
 interface GroupActions {
   setSelectedGroup: (group: Group) => void;
   clearSelectedGroup: () => void;
+  setGroups: (groups: Group[]) => void;
+  updateGrup: (group: Group) => void;
 }
 
 type GroupStore = GroupState & GroupActions;
 
 const useGroupStore = create<GroupStore>((set) => ({
   selectedGroup: {} as Group,
+  groups: [],
+  setGroups: (groups: Group[]) => set({ groups }),
+  updateGrup: (group: Group) =>
+    set((state) => ({
+      groups: state.groups.map((g) => (g.id === group.id ? group : g)),
+    })),
   setSelectedGroup: (group: Group) => set({ selectedGroup: group }),
   clearSelectedGroup: () => set({ selectedGroup: {} as Group }),
 }));

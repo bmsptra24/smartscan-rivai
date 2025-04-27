@@ -219,6 +219,35 @@ class DocumentService {
     }
 
     /**
+ * Delete all documents by group ID
+ * @param groupId Group ID of documents to delete
+ * @returns Promise with boolean indicating success
+ */
+    public async deleteDocumentsByGroupId(groupId: string): Promise<boolean> {
+        try {
+            // Query all documents with the specified groupId
+            const q = query(
+                collection(this.db, this.collectionName).withConverter(documentConverter),
+                where('groupId', '==', groupId)
+            );
+
+            const querySnapshot = await getDocs(q);
+
+            // Create an array of delete promises
+            const deletePromises = querySnapshot.docs.map(async (docSnapshot) => {
+                await deleteDoc(docSnapshot.ref);
+            });
+
+            // Execute all delete operations
+            await Promise.all(deletePromises);
+
+            return true;
+        } catch (error) {
+            throw new Error(`Error deleting documents by groupId: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
      * Search documents by group ID
      * @param groupId Group ID to search for
      * @returns Promise with array of matching documents

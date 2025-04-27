@@ -1,16 +1,43 @@
-import { Text, View } from "react-native";
-import React, { PureComponent } from "react";
+import { View } from "react-native";
+import React, { Component } from "react";
 import { BorderRadius, Color } from "@/constants/Styles";
 import { Image } from "expo-image";
 import TextBase from "@/components/base/Text";
 import InputBase from "@/components/base/Input";
-import { userService } from "@/services";
-import { UserProfile } from "@/services/User";
+import { groupService, userService } from "@/services";
+import { StoreProps, useStore } from "@/stores";
 
-export class HomeHeader extends PureComponent {
+export class HomeHeader extends Component<StoreProps> {
   state = {
     userData: userService.getCurrentUser(),
   };
+
+  handleSearch = (() => {
+    let debounceTimeout: NodeJS.Timeout;
+
+    return async (text: string) => {
+      clearTimeout(debounceTimeout);
+
+      debounceTimeout = setTimeout(async () => {
+        // If the search text is empty, fetch all groups created by the user
+        if (!text.trim()) {
+          const userId = this.state.userData?.id;
+
+          if (!userId) {
+            console.error("User ID is undefined");
+            return;
+          }
+
+          const allGroups = await groupService.getGroupsByCreator(userId);
+          this.props.groupStore.setGroups(allGroups);
+          return;
+        }
+
+        const groups = await groupService.searchGroups(text);
+        this.props.groupStore.setGroups(groups);
+      }, 300); // 300ms debounce delay
+    };
+  })();
 
   render() {
     return (
@@ -55,10 +82,14 @@ export class HomeHeader extends PureComponent {
         </View>
 
         {/* Cari File Input */}
-        <InputBase placeholder="Cari file..." style={{ width: "100%" }} />
+        <InputBase
+          placeholder="Cari file..."
+          style={{ width: "100%" }}
+          onChangeText={this.handleSearch}
+        />
       </View>
     );
   }
 }
 
-export default HomeHeader;
+export default useStore(HomeHeader);

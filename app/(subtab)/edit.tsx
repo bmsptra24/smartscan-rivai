@@ -7,7 +7,6 @@ import {
   Distance,
   BorderRadius,
   ASPECT_RATIO,
-  ANDROID_RIPPLE,
 } from "@/constants/Styles";
 import ButtonBase from "@/components/base/Button";
 import { router } from "expo-router";
@@ -42,21 +41,26 @@ export class Edit extends Component<StoreProps> {
 
     try {
       // Update group info
+      const updatedData = {
+        ...this.props.groupStore.selectedGroup,
+        documentCount: this.props.documentStore.documents.length,
+      };
+
       const groupResponse = await groupService.upsertGroup(
         this.props.groupStore.selectedGroup.id,
-        this.props.groupStore.selectedGroup
+        updatedData
       );
 
       if (!groupResponse) return console.error("Failed to update group");
-      this.props.groupStore.setSelectedGroup({
-        ...groupResponse,
-        documentCount: this.props.documentStore.documents.length,
-      });
+      this.props.groupStore.setSelectedGroup(groupResponse);
 
       // Update documents
       this.props.documentStore.documents.forEach(async (doc) => {
         await documentService.upsertDocument(doc.id as string, doc);
       });
+
+      // Update list groups in home page
+      this.props.groupStore.updateGrup(groupResponse);
     } catch (error) {
       console.error("Failed to save changes", error);
     } finally {

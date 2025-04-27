@@ -3,10 +3,11 @@ import React, { Component } from "react";
 import TextBase from "@/components/base/Text";
 import HistoryItem from "@/components/list/HistoryItem";
 import { dateFormatter, timeFormatter } from "@/utils/formatter";
-import { groupService, userService } from "@/services";
+import { documentService, groupService, userService } from "@/services";
 import { Group } from "@/services/Group";
 import useGroupStore from "@/stores/Group";
 import { router } from "expo-router";
+import { StoreProps, useStore } from "@/stores";
 
 // const historyData = [
 //   {
@@ -67,21 +68,15 @@ import { router } from "expo-router";
 //   },
 // ];
 
-export class HomeHistory extends Component {
-  state = {
-    historyData: [] as Group[],
-  };
-
+export class HomeHistory extends Component<StoreProps> {
   async componentDidMount() {
     const userData = userService.getCurrentUser();
     if (!userData || !userData.id)
       return console.error("User data is missing or incomplete.");
 
-    const historyData = await groupService.getGroupsByCreator(userData.id);
-
-    this.setState({
-      historyData,
-    });
+    const groups = await groupService.getGroupsByCreator(userData.id);
+    if (!groups) return console.error("No groups found.");
+    this.props.groupStore.setGroups(groups);
   }
 
   render() {
@@ -95,13 +90,13 @@ export class HomeHistory extends Component {
         </TextBase>
 
         <View style={{}}>
-          {this.state.historyData &&
-            this.state.historyData?.map((item, index) => (
+          {this.props.groupStore.groups &&
+            this.props.groupStore.groups?.map((item, index) => (
               <HistoryItem
                 key={index.toString()}
                 id={item.customerId ?? ""}
                 fileCount={item.documentCount}
-                // fileCount={this.state.historyData.length}
+                // fileCount={this.props.groupStore.groups.length}
                 date={dateFormatter.format(
                   item.createdAt instanceof Date
                     ? item.createdAt
@@ -121,4 +116,4 @@ export class HomeHistory extends Component {
   }
 }
 
-export default HomeHistory;
+export default useStore(HomeHistory);

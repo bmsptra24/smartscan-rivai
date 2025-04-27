@@ -127,7 +127,6 @@ class GroupService {
             const q = query(
                 collection(this.db, this.collectionName).withConverter(groupConverter),
                 where('customerId', '==', customerId),
-                orderBy('createdAt', 'desc')
             );
 
             const querySnapshot = await getDocs(q);
@@ -140,6 +139,32 @@ class GroupService {
             return groups;
         } catch (error) {
             throw new Error(`Error fetching groups: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
+     * Search groups by customer ID
+     * @param customerId Customer ID to search groups for
+     * @returns Promise with array of groups
+     */
+    public async searchGroups(customerId: string): Promise<Group[]> {
+        try {
+            const q = query(
+                collection(this.db, this.collectionName).withConverter(groupConverter),
+                where('customerId', '>=', customerId),
+                where('customerId', '<=', customerId + '\uf8ff'),
+            );
+
+            const querySnapshot = await getDocs(q);
+            const groups: Group[] = [];
+
+            querySnapshot.forEach((doc) => {
+                groups.push(doc.data());
+            });
+
+            return groups;
+        } catch (error) {
+            throw new Error(`Error searching groups: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
