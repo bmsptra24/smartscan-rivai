@@ -1,10 +1,9 @@
-import { FlatList, View } from "react-native";
-import React, { PureComponent } from "react";
+import { View } from "react-native";
+import React, { Component } from "react";
 import TextBase from "@/components/base/Text";
 import HistoryItem from "@/components/list/HistoryItem";
-import { Document } from "@/services/Document";
 import { dateFormatter, timeFormatter } from "@/utils/formatter";
-import { documentService, groupService, userService } from "@/services";
+import { groupService, userService } from "@/services";
 import { Group } from "@/services/Group";
 import useGroupStore from "@/stores/Group";
 import { router } from "expo-router";
@@ -68,7 +67,7 @@ import { router } from "expo-router";
 //   },
 // ];
 
-export class HomeHistory extends PureComponent {
+export class HomeHistory extends Component {
   state = {
     historyData: [] as Group[],
   };

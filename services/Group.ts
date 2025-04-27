@@ -16,8 +16,6 @@ import {
     SnapshotOptions,
     DocumentData,
     WithFieldValue,
-    arrayUnion,
-    arrayRemove,
     DocumentReference
 } from 'firebase/firestore';
 import firebaseInstance from './Firebase';

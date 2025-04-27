@@ -25,14 +25,9 @@ export interface UserProfile {
     displayName?: string;
     username?: string;
     password?: string;
-    photoURL?: string;
-    phoneNumber?: string;
     createdAt?: Date | Timestamp;
     updatedAt?: Date | Timestamp;
     role?: 'admin' | 'user' | 'superadmin';
-    isActive?: boolean;
-    lastLogin?: Date | Timestamp;
-    metadata?: Record<string, any>;
 }
 
 // Type for creating a new user profile
@@ -48,12 +43,8 @@ const userProfileConverter: FirestoreDataConverter<UserProfile> = {
             displayName: userProfile.displayName,
             username: userProfile.username,
             password: userProfile.password,
-            photoURL: userProfile.photoURL,
-            phoneNumber: userProfile.phoneNumber,
             updatedAt: serverTimestamp(),
             role: userProfile.role || 'user',
-            isActive: userProfile.isActive !== undefined ? userProfile.isActive : true,
-            metadata: userProfile.metadata || {}
         };
 
         // Only add createdAt if it exists
@@ -61,13 +52,6 @@ const userProfileConverter: FirestoreDataConverter<UserProfile> = {
             data.createdAt = userProfile.createdAt instanceof Date
                 ? Timestamp.fromDate(userProfile.createdAt)
                 : userProfile.createdAt;
-        }
-
-        // Only add lastLogin if it exists
-        if (userProfile.lastLogin) {
-            data.lastLogin = userProfile.lastLogin instanceof Date
-                ? Timestamp.fromDate(userProfile.lastLogin)
-                : userProfile.lastLogin;
         }
 
         return data;
@@ -82,14 +66,9 @@ const userProfileConverter: FirestoreDataConverter<UserProfile> = {
             displayName: data.displayName,
             username: data.username,
             password: data.password,
-            photoURL: data.photoURL,
-            phoneNumber: data.phoneNumber,
             createdAt: data.createdAt,
             updatedAt: data.updatedAt,
             role: data.role || 'user',
-            isActive: data.isActive !== undefined ? data.isActive : true,
-            lastLogin: data.lastLogin,
-            metadata: data.metadata || {}
         };
     }
 };
