@@ -1,0 +1,1 @@
+export const DOCUMENT_TYPE = ["Surat Tugas", "Surat Tambah Daya"]

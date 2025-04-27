@@ -9,6 +9,7 @@ export const BorderRadius = {
 };
 
 export const Distance = {
+  small: 8,
   default: 15,
   medium: 20,
   large: 35,
@@ -37,6 +38,7 @@ export const Color = {
 
   shadow: '#F0F0F0',
   placeholder: '#63667E',
+  success: '#B6F399',
   danger: '#F66666',
   primaryGradient: ["#40D5CD", "#A2E1FE"],
   primaryBackdropGradient: ["#1F6B85", "#357F79"]
@@ -111,4 +113,8 @@ export const ANDROID_RIPPLE = {
 export const LoadingStyle = {
   opacity: 0.5,
   pointerEvents: "none",
+}
+
+export const ASPECT_RATIO = {
+  A4: "1/1.414"
 }

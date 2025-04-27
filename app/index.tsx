@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   BorderRadius,
@@ -13,29 +13,30 @@ import InputBase from "@/components/base/Input";
 import { Image } from "expo-image";
 import { Images } from "@/constants/Images";
 import ButtonBase from "@/components/base/Button";
-import { authService } from "@/services/Auth";
 import { router } from "expo-router";
+import LottieView from "lottie-react-native";
+import { BlurView } from "expo-blur";
+import { authService, userService } from "@/services";
 
 class LoginScreen extends Component {
+  animation = React.createRef<LottieView>();
+
   state = {
-    username: "",
-    password: "",
+    username: "bima",
+    password: "123",
     isLoading: false,
     isLoggedIn: false,
   };
 
   componentDidMount(): void {
-    // Replace this with actual auth check
     if (true) {
-      // Temporary false for demonstration
       this.setState({ isLoggedIn: true });
     }
   }
 
   componentDidUpdate(prevProps: any, prevState: any) {
-    // Handle navigation after state update
     if (this.state.isLoggedIn && !prevState.isLoggedIn) {
-      router.replace("/(tabs)");
+      // router.replace("/(tabs)");
     }
   }
 
@@ -49,6 +50,20 @@ class LoginScreen extends Component {
 
   handleLogin = async () => {
     try {
+      // buat data dummy pengguna
+      // userService.setUserProfile("1dsadasda", {
+      //   id: "1dsadasda",
+      //   displayName: "Bima Putra",
+      //   username: "bima",
+      //   password: "123",
+      //   photoURL: "https://example.com/photo.jpg",
+      //   phoneNumber: "+628123456789",
+      //   createdAt: new Date(),
+      //   role: "superadmin",
+      //   isActive: true,
+      //   lastLogin: new Date(),
+      //   metadata: { additionalInfo: "Dummy user for testing" },
+      // });
       this.setState({ isLoading: true });
 
       const { username, password } = this.state;
@@ -65,128 +80,81 @@ class LoginScreen extends Component {
 
     return (
       <ScrollView style={{ backgroundColor: Color.background }}>
-        <LinearGradient
+        {/* HERO */}
+        <BlurView
+          experimentalBlurMethod="dimezisBlurView"
+          intensity={80}
           style={{
-            height: Size.screen.height,
-            justifyContent: "center",
-            alignItems: "center",
+            position: "absolute",
+            width: Size.screen.width,
+            height: IsMobileScreen ? 430 : Size.screen.height,
+            zIndex: 2,
           }}
-          colors={[
-            Color.primaryBackdropGradient[0],
-            Color.primaryBackdropGradient[1],
-          ]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+        ></BlurView>
+        <LottieView
+          autoPlay
+          ref={this.animation}
+          style={{
+            width: Size.screen.width,
+            height: IsMobileScreen ? 395 : Size.screen.height * 2,
+          }}
+          source={{
+            uri: IsMobileScreen
+              ? "https://lottie.host/85cf047f-e2c1-43ae-b7ef-b546903ce7df/yvShlRd481.lottie"
+              : "https://lottie.host/316df1b7-790a-40a7-9d94-a53ae05412f7/cTlRiCy5Ub.lottie",
+          }}
+          loop={true}
+        />
+
+        {/* Form Input */}
+        <View
+          style={{
+            marginTop: IsMobileScreen ? 30 : "auto",
+            position: IsMobileScreen ? "static" : "absolute",
+            zIndex: 2,
+            alignItems: "center",
+            justifyContent: "center",
+            flex: 1,
+            width: IsMobileScreen ? "auto" : Size.screen.width,
+            height: IsMobileScreen ? "auto" : Size.screen.height,
+          }}
         >
           <View
             style={{
-              flexDirection: IsMobileScreen ? "column" : "row",
-              shadowColor: Color.black,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.25,
-              shadowRadius: 60,
-              borderRadius: BorderRadius.large,
-              height: IsMobileScreen ? "100%" : "auto",
+              width: IsMobileScreen ? Size.screen.width : 378,
+              paddingHorizontal: Distance.default,
+              paddingVertical: Distance.default,
+              alignItems: "center",
             }}
           >
-            {/* HERO */}
-            <LinearGradient
+            <View
               style={{
-                height: IsMobileScreen ? "auto" : 543,
-                width: IsMobileScreen ? Size.screen.width : 488,
-                borderTopLeftRadius: IsMobileScreen ? 0 : BorderRadius.large,
-                borderBottomLeftRadius: IsMobileScreen ? 0 : BorderRadius.large,
+                gap: 20,
               }}
-              colors={[Color.primaryGradient[0], Color.primaryGradient[1]]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
             >
-              <TextBase
-                style={{
-                  marginLeft: 45,
-                  marginTop: 45,
-                  color: Color.background,
-                }}
-                variant={IsMobileScreen ? "header" : "title"}
-              >
-                {"Selamat\nDatang!"}
-              </TextBase>
-              <Image
-                source={Images.hero_login.src}
-                style={{
-                  height: IsMobileScreen ? 200 : 410,
-                  width: IsMobileScreen ? "auto" : 575,
-                }}
-                contentFit="contain"
-                placeholder={{ blurhash: Images.hero_login.placeholder }}
-              />
-            </LinearGradient>
-
-            {/* Form Input */}
-            <View style={{ position: "relative", flex: 1 }}>
-              {/* This gradient for hide the backgound corner*/}
-              <LinearGradient
-                style={{
-                  opacity: IsMobileScreen ? 1 : 0,
-                  position: "absolute",
-                  height: 100,
-                  top: -1,
-                  left: 0,
-                  right: 0,
-                }}
-                colors={["#37CDD6", "#20B8EB"]}
-                start={{ x: 0, y: 1 }}
-                end={{ x: 1, y: 1 }}
-              />
-
-              {/* Content */}
-              <View
-                style={{
-                  flex: 1,
-                  height: IsMobileScreen ? "auto" : 543,
-                  width: IsMobileScreen ? Size.screen.width : 378,
-                  borderTopRightRadius: BorderRadius.large,
-                  borderTopLeftRadius: IsMobileScreen ? BorderRadius.large : 0,
-                  borderBottomRightRadius: IsMobileScreen
-                    ? 0
-                    : BorderRadius.large,
-                  backgroundColor: Color.background,
-                  justifyContent: IsMobileScreen ? "flex-start" : "center",
-                  paddingHorizontal: Distance.default,
-                  paddingVertical: Distance.default,
-                  alignItems: "center",
-                }}
-              >
-                <View
-                  style={{
-                    alignItems: "center",
-                    gap: 20,
-                  }}
-                >
-                  <TextBase variant={IsMobileScreen ? "header" : "title"}>
-                    Masuk
-                  </TextBase>
-                  <InputBase
-                    value={username}
-                    onChangeText={this.handleUsernameChange}
-                    placeholder="Masukan username anda"
-                  />
-                  <InputBase
-                    value={password}
-                    onChangeText={this.handlePasswordChange}
-                    placeholder="Masukan kata sandi anda"
-                    secureTextEntry
-                  />
-                  <ButtonBase
-                    onPress={this.handleLogin}
-                    title="Lanjut"
-                    isLoading={this.state.isLoading}
-                  />
-                </View>
+              <View>
+                <TextBase variant="title">Masuk</TextBase>
+                <TextBase variant="content">Selamat datang kembali!</TextBase>
               </View>
+              <InputBase
+                value={username}
+                onChangeText={this.handleUsernameChange}
+                placeholder="Masukan username anda"
+              />
+              <InputBase
+                value={password}
+                onChangeText={this.handlePasswordChange}
+                placeholder="Masukan kata sandi anda"
+                secureTextEntry
+              />
+              <ButtonBase
+                onPress={this.handleLogin}
+                title="Lanjut"
+                isLoading={this.state.isLoading}
+              />
             </View>
           </View>
-        </LinearGradient>
+        </View>
       </ScrollView>
     );
   }

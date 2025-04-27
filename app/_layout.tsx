@@ -28,11 +28,17 @@ export default function RootLayout() {
 
   return (
     <>
-      <Stack initialRouteName="index">
+      <Stack
+        initialRouteName="index"
+        screenOptions={{ headerShown: false, animation: "none" }}
+      >
         {/* <Stack initialRouteName="(tabs)"> */}
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(subtab)" options={{ headerShown: false }} />
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="(tabs)"
+          options={{ headerShown: false, animation: "none" }}
+        />
+        <Stack.Screen name="(subtab)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

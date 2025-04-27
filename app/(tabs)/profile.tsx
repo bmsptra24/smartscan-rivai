@@ -6,8 +6,12 @@ import { BorderRadius, Color, Size, TABBAR_HEIGHT } from "@/constants/Styles";
 import { View } from "react-native";
 import ButtonBase from "@/components/base/Button";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { router } from "expo-router";
 
 export default class profile extends Component {
+  handleLogout = () => {
+    router.replace("/");
+  };
   render() {
     return (
       <Container>
@@ -37,7 +41,7 @@ export default class profile extends Component {
             textStyle={{ color: Color.text }}
             icon={<MaterialIcons name="logout" size={24} color={Color.text} />}
             title="Logout"
-            onPress={() => {}}
+            onPress={this.handleLogout}
           />
         </View>
       </Container>

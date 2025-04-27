@@ -4,8 +4,14 @@ import { BorderRadius, Color } from "@/constants/Styles";
 import { Image } from "expo-image";
 import TextBase from "@/components/base/Text";
 import InputBase from "@/components/base/Input";
+import { userService } from "@/services";
+import { UserProfile } from "@/services/User";
 
 export class HomeHeader extends PureComponent {
+  state = {
+    userData: userService.getCurrentUser(),
+  };
+
   render() {
     return (
       <View
@@ -34,7 +40,9 @@ export class HomeHeader extends PureComponent {
           />
           <View>
             <TextBase variant="subcontent">Selamat datang,</TextBase>
-            <TextBase variant="header">Bima Saputra</TextBase>
+            <TextBase variant="header">
+              {this.state.userData?.displayName}
+            </TextBase>
           </View>
         </View>
 

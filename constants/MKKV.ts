@@ -1,7 +1,7 @@
 import { MMKV } from 'react-native-mmkv';
 import { Platform } from 'react-native';
 
-let storage;
+let storage: MMKV;
 
 if (Platform.OS === 'web') {
     // Initialize MMKV without encryptionKey for web

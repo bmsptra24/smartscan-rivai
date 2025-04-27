@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     opacity: 0.7, // Efek sentuh untuk iOS
   },
   text: {
-    color: Color.background,
+    color: Color.text,
     fontSize: 16,
     fontWeight: "bold",
   },

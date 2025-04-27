@@ -1,54 +1,57 @@
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { Component } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Color } from "@/constants/Styles";
-import { scannerService } from "@/services/Scanner";
+import { StoreProps, useStore } from "@/stores";
+import { documentService } from "@/services";
 
-export default function TabLayout() {
-  return (
-    <View style={{ flex: 1 }}>
-      <Tabs
-        screenOptions={{
-          headerShown: false,
-          tabBarStyle: { position: "relative" },
-          tabBarActiveTintColor: Color.black,
-          tabBarInactiveTintColor: Color.grey,
-          tabBarShowLabel: false,
-          tabBarLabelPosition: "beside-icon",
-        }}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: "Home",
-            tabBarIcon: ({ color, size }) => (
-              <Entypo size={size - 6} name="home" color={color} />
-            ),
+class TabLayout extends Component<StoreProps> {
+  render() {
+    return (
+      <View style={{ flex: 1 }}>
+        <Tabs
+          screenOptions={{
+            headerShown: false,
+            tabBarStyle: { position: "relative" },
+            tabBarActiveTintColor: Color.black,
+            tabBarInactiveTintColor: Color.grey,
+            tabBarShowLabel: false,
+            tabBarLabelPosition: "beside-icon",
           }}
-        />
-        <Tabs.Screen
-          name="profile"
-          options={{
-            title: "Profil",
-            tabBarIcon: ({ color, size }) => (
-              <AntDesign size={size - 6} name="user" color={color} />
-            ),
-          }}
-        />
-      </Tabs>
-      <View style={styles.cameraButtonContainer}>
-        <TouchableOpacity
-          style={styles.scanButton}
-          onPress={scannerService.scanDocument}
         >
-          <Ionicons name="scan" size={22} color={Color.black} />
-        </TouchableOpacity>
+          <Tabs.Screen
+            name="home"
+            options={{
+              title: "Home",
+              tabBarIcon: ({ color, size }) => (
+                <Entypo size={size - 6} name="home" color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="profile"
+            options={{
+              title: "Profil",
+              tabBarIcon: ({ color, size }) => (
+                <AntDesign size={size - 6} name="user" color={color} />
+              ),
+            }}
+          />
+        </Tabs>
+        <View style={styles.cameraButtonContainer}>
+          <TouchableOpacity
+            style={styles.scanButton}
+            onPress={documentService.handleScanDocument}
+          >
+            <Ionicons name="scan" size={22} color={Color.black} />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -73,3 +76,5 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
 });
+
+export default useStore(TabLayout);

@@ -1,16 +1,16 @@
 import React from "react";
-import { Pressable, TouchableOpacity, View } from "react-native";
+import { Pressable, View } from "react-native";
 import TextBase from "@/components/base/Text";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { AccentColors, BorderRadius } from "@/constants/Styles";
-import { router } from "expo-router";
 
 interface HistoryItemProps {
   id: string;
   fileCount: number;
   date: string;
   time: string;
-  index: number; // Tambahkan prop `index` untuk menentukan urutan item
+  index: number;
+  onPress: () => void;
 }
 
 const HistoryItem: React.FC<HistoryItemProps> = ({
@@ -19,6 +19,7 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
   date,
   time,
   index,
+  onPress,
 }) => {
   // Hitung warna berdasarkan indeks item
   const iconColor = AccentColors[index % AccentColors.length];
@@ -26,7 +27,7 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
   return (
     <Pressable
       android_ripple={{ color: "rgba(0, 0, 0, 0.1)" }}
-      onPress={() => router.push("/(subtab)/detail")}
+      onPress={onPress}
       style={{
         flexDirection: "row",
         gap: 10,

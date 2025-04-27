@@ -34,7 +34,7 @@ export default class InputBase extends Component<InputBaseProps> {
         {...restProps}
         style={[
           {
-            backgroundColor: Color.background,
+            backgroundColor: Color.greyLight,
             width: ResponsiveComponent.width,
             borderRadius: BorderRadius.full,
             fontFamily: "PlusJakartaSans",
