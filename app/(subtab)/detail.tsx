@@ -1,5 +1,5 @@
 import { View, FlatList, Image } from "react-native";
-import { Component, PureComponent } from "react";
+import { Component } from "react";
 import Container from "@/components/base/Container";
 import TextBase from "@/components/base/Text";
 import { Color, Size, Distance, BorderRadius } from "@/constants/Styles";
@@ -8,10 +8,8 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
 import IconButton from "@/components/base/IconButton";
 import Header from "@/components/base/Header";
-import { documentService } from "@/services";
-import { Document } from "@/services/Document";
-import useGroupStore from "@/stores/Group";
 import { StoreProps, useStore } from "@/stores";
+import { timeFormatter } from "@/utils/formatter";
 
 interface ScrollEvent {
   nativeEvent: {
@@ -21,27 +19,15 @@ interface ScrollEvent {
   };
 }
 
-interface Props {}
-
 export class Detail extends Component<StoreProps> {
   state = {
     currentIndex: 0,
-    documents: [] as Document[],
-    customerId: undefined as string | undefined,
-    updatedAt: undefined as Date | undefined,
   };
 
   async componentDidMount() {
-    const { selectedGroup } = this.props.group;
+    const { selectedGroup } = this.props.groupStore;
     if (!selectedGroup) return console.error("Group not found");
-
-    const documents = await documentService.getDocumentsByGroupId(
-      selectedGroup.id
-    );
-
-    console.log({ selectedGroup });
-
-    this.setState({ documents });
+    this.props.documentStore.syncDocumentsFromFirestore(selectedGroup.id);
   }
 
   handleScrollEnd = (e: ScrollEvent) => {
@@ -70,7 +56,7 @@ export class Detail extends Component<StoreProps> {
             <Header title="Detail" />
 
             {/* Preview Image Section */}
-            {this.state.documents.length > 0 ? (
+            {this.props.documentStore.documents.length > 0 ? (
               <View
                 style={{
                   width: screenWidth,
@@ -80,7 +66,7 @@ export class Detail extends Component<StoreProps> {
                 }}
               >
                 <FlatList
-                  data={this.state.documents}
+                  data={this.props.documentStore.documents}
                   horizontal
                   pagingEnabled
                   showsHorizontalScrollIndicator={false}
@@ -103,7 +89,7 @@ export class Detail extends Component<StoreProps> {
                         style={{
                           width: "100%",
                           height: "100%",
-                          resizeMode: "contain",
+                          resizeMode: "cover",
                         }}
                         onError={(error) =>
                           console.log("Error loading image:", error)
@@ -125,7 +111,7 @@ export class Detail extends Component<StoreProps> {
                     gap: 4,
                   }}
                 >
-                  {this.state.documents.map((_, index) => (
+                  {this.props.documentStore.documents.map((_, index) => (
                     <View
                       key={index}
                       style={{
@@ -150,27 +136,30 @@ export class Detail extends Component<StoreProps> {
               style={{
                 flex: 1,
                 gap: Distance.default,
-                marginTop: 20, // Add space for the page indicator
+                marginTop: 20,
               }}
             >
               <View>
                 <TextBase variant="header">ID Pelanggan</TextBase>
                 <TextBase variant="content">
-                  {this.props.group.selectedGroup.customerId}
+                  {this.props.groupStore.selectedGroup.customerId}
                 </TextBase>
               </View>
 
               <View>
                 <TextBase variant="header">Jumlah</TextBase>
                 <TextBase variant="content">
-                  {this.state.documents.length} Halaman
+                  {this.props.documentStore.documents.length} Halaman
                 </TextBase>
               </View>
 
               <View>
                 <TextBase variant="header">Tanggal update</TextBase>
                 <TextBase variant="content">
-                  {this.props.group.selectedGroup.updatedAt?.toLocaleString()}
+                  {this.props.groupStore.selectedGroup.updatedAt &&
+                    timeFormatter(
+                      this.props.groupStore.selectedGroup.updatedAt?.toDate()
+                    )}
                 </TextBase>
               </View>
             </View>

@@ -18,29 +18,55 @@ import PickerActionSheet from "@/components/base/PickerActionSheet";
 import { showToastable } from "react-native-toastable";
 import { StoreProps, useStore } from "@/stores";
 import { DOCUMENT_TYPE } from "@/constants/Config";
-import { documentService } from "@/services";
+import { documentService, groupService } from "@/services";
 
 export class Edit extends Component<StoreProps> {
-  // Handler untuk pilihan kategori
   handleOptionSelected = (docId: string) => (selectedIndex: number) => {
+    console.log({ docId, selectedIndex, tes: DOCUMENT_TYPE[selectedIndex] });
+
     if (selectedIndex >= 0 && selectedIndex < DOCUMENT_TYPE.length) {
-      this.props.document.updateDocumentCategory(
+      this.props.documentStore.updateDocumentCategory(
         docId,
         DOCUMENT_TYPE[selectedIndex]
       );
     }
   };
 
-  // Handler simpan perubahan
-  handleSave = () => {
+  handleSave = async () => {
+    console.log("saving doc...");
+
     showToastable({
       message: "Perubahan Berhasil Disimpan",
       status: "success",
     });
-    router.back();
+
+    try {
+      // Update group info
+      const groupResponse = await groupService.upsertGroup(
+        this.props.groupStore.selectedGroup.id,
+        this.props.groupStore.selectedGroup
+      );
+
+      if (!groupResponse) return console.error("Failed to update group");
+      this.props.groupStore.setSelectedGroup({
+        ...groupResponse,
+        documentCount: this.props.documentStore.documents.length,
+      });
+
+      // Update documents
+      this.props.documentStore.documents.forEach(async (doc) => {
+        await documentService.upsertDocument(doc.id as string, doc);
+      });
+    } catch (error) {
+      console.error("Failed to save changes", error);
+    } finally {
+      router.back();
+    }
   };
 
   render() {
+    console.log(this.props.documentStore.documents);
+
     return (
       <Container>
         <View
@@ -76,14 +102,19 @@ export class Edit extends Component<StoreProps> {
             >
               <TextInput
                 placeholder="ID Pelanggan"
-                value={this.props.document.title}
+                value={this.props.groupStore.selectedGroup.customerId}
                 style={{
                   fontFamily: "OpenSansBold",
                   fontSize: 16,
                   color: Color.text,
                   width: 120,
                 }}
-                onChangeText={(title) => this.props.document.setTitle(title)}
+                onChangeText={(customerId) =>
+                  this.props.groupStore.setSelectedGroup({
+                    ...this.props.groupStore.selectedGroup,
+                    customerId,
+                  })
+                }
               />
               <MaterialCommunityIcons name="pencil" size={16} color="black" />
             </View>
@@ -97,7 +128,7 @@ export class Edit extends Component<StoreProps> {
               justifyContent: "center",
             }}
           >
-            {this.props.document.documents.map((doc) => (
+            {this.props.documentStore.documents.map((doc) => (
               <View key={doc.id}>
                 <Image
                   source={{ uri: doc.image_url }}

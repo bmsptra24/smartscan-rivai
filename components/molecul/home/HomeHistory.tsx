@@ -100,20 +100,14 @@ export class HomeHistory extends Component {
               <HistoryItem
                 key={index.toString()}
                 id={item.customerId ?? ""}
-                fileCount={0}
+                fileCount={item.documentCount}
                 // fileCount={this.state.historyData.length}
                 date={dateFormatter.format(
                   item.createdAt instanceof Date
                     ? item.createdAt
                     : item.createdAt.toDate()
                 )}
-                time={timeFormatter(
-                  new Date(
-                    item.createdAt instanceof Date
-                      ? item.createdAt
-                      : item.createdAt.toDate()
-                  )
-                )}
+                time={timeFormatter(item.createdAt.toDate())}
                 index={index}
                 onPress={() => {
                   useGroupStore.getState().setSelectedGroup(item);

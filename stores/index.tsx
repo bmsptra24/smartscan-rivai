@@ -3,10 +3,10 @@ import hocMapper from "@/utils/hocMapper";
 import useGroupStore, { GroupStoreProps } from "./Group";
 
 export type StoreProps = {
-  document: DocumentStoreProps;
-  group: GroupStoreProps;
+  documentStore: DocumentStoreProps;
+  groupStore: GroupStoreProps;
 };
 export const useStore = hocMapper({
-  document: useDocumentStore,
-  group: useGroupStore,
+  documentStore: useDocumentStore,
+  groupStore: useGroupStore,
 });

@@ -17,7 +17,8 @@ import {
     SnapshotOptions,
     DocumentData,
     WithFieldValue,
-    DocumentReference
+    DocumentReference,
+    setDoc
 } from 'firebase/firestore';
 import { scannerService } from './Scanner';
 import useDocumentStore from '@/stores/Document';
@@ -119,6 +120,54 @@ class DocumentService {
             }
         } catch (error) {
             throw new Error(`Error fetching document: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
+    * Insert or update a document based on document ID existence
+    * @param documentId Document ID to check
+    * @param documentData Data for creating or updating the document
+    * @returns Promise with the created or updated document
+    */
+    public async upsertDocument(documentId: string, documentData: CreateDocumentData | UpdateDocumentData): Promise<Document> {
+        try {
+            const docRef = doc(this.db, this.collectionName, documentId).withConverter(documentConverter);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                // Document exists, update it
+                const updateData: Record<string, any> = {
+                    ...documentData,
+                    updatedAt: serverTimestamp()
+                };
+
+                // Convert Date objects to Firestore Timestamps
+                Object.entries(updateData).forEach(([key, value]) => {
+                    if (value instanceof Date) {
+                        updateData[key] = Timestamp.fromDate(value);
+                    }
+                });
+
+                await updateDoc(docRef, updateData);
+                return await this.getDocumentById(documentId);
+            } else {
+                // Document doesn't exist, create new one
+                const createData: CreateDocumentData = {
+                    groupId: (documentData as CreateDocumentData).groupId,
+                    image_url: (documentData as CreateDocumentData).image_url,
+                    type: (documentData as CreateDocumentData).type,
+                    createdAt: 'createdAt' in documentData && documentData.createdAt
+                        ? (documentData.createdAt instanceof Date
+                            ? Timestamp.fromDate(documentData.createdAt)
+                            : documentData.createdAt)
+                        : Timestamp.now()
+                };
+
+                await setDoc(docRef, createData);
+                return await this.getDocumentById(documentId);
+            }
+        } catch (error) {
+            throw new Error(`Error inserting or updating document: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 

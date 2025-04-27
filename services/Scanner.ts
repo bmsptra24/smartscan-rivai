@@ -2,6 +2,7 @@ import DocumentScanner from "react-native-document-scanner-plugin";
 import { documentService, groupService, userService } from ".";
 import { CreateDocumentData } from "./Document";
 import { CreateGroupData } from "./Group";
+import { Timestamp } from "firebase/firestore";
 
 class ScannerService {
     async scanDocument(callback: (scannedImages: string[]) => void): Promise<void> {
@@ -22,7 +23,8 @@ class ScannerService {
             const groupData: CreateGroupData = {
                 customerId: '',
                 userId: userDate.id,
-                createdAt: new Date(),
+                createdAt: Timestamp.now(),
+                documentCount: 0,
             };
             const groupResponse = await groupService.createGroup(groupData);
             if (!groupResponse) {
@@ -31,15 +33,16 @@ class ScannerService {
             }
 
             // Analyze the document type
-            scannedImages.map((image) => {
+            scannedImages.map(async (image) => {
                 const documentType = "-";
                 const data: CreateDocumentData = {
                     type: documentType,
                     image_url: image,
-                    customerId: groupResponse.id,
+                    groupId: groupResponse.id,
                     createdAt: new Date(),
                 };
-                documentService.addDocument(data);
+                const newDocument = await documentService.addDocument(data);
+                if (!newDocument) return console.error("Error adding document")
             });
 
             if (scannedImages && scannedImages.length > 0) {

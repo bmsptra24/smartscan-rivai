@@ -16,7 +16,8 @@ import {
     SnapshotOptions,
     DocumentData,
     WithFieldValue,
-    DocumentReference
+    DocumentReference,
+    setDoc
 } from 'firebase/firestore';
 import firebaseInstance from './Firebase';
 
@@ -25,8 +26,9 @@ export interface Group {
     id: string;
     customerId: string;
     userId: string;
-    createdAt: Date | Timestamp;
-    updatedAt?: Date | Timestamp;
+    documentCount: number;
+    createdAt: Timestamp;
+    updatedAt?: Timestamp;
 }
 
 // Type for creating a new group
@@ -41,6 +43,7 @@ const groupConverter: FirestoreDataConverter<Group> = {
         return {
             customerId: group.customerId,
             userId: group.userId,
+            documentCount: group.documentCount,
             createdAt: group.createdAt instanceof Date ? Timestamp.fromDate(group.createdAt) : group.createdAt,
             updatedAt: serverTimestamp(),
         };
@@ -54,6 +57,7 @@ const groupConverter: FirestoreDataConverter<Group> = {
             id: snapshot.id,
             customerId: data.customerId,
             userId: data.userId,
+            documentCount: data.documentCount,
             createdAt: data.createdAt,
             updatedAt: data.updatedAt,
         };
@@ -136,6 +140,55 @@ class GroupService {
             return groups;
         } catch (error) {
             throw new Error(`Error fetching groups: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
+    * Insert or update a group based on group ID existence
+    * @param groupId Group ID to check
+    * @param groupData Data for creating or updating the group
+    * @returns Promise with the created or updated group
+    */
+    public async upsertGroup(groupId: string, groupData: CreateGroupData | UpdateGroupData): Promise<Group> {
+        try {
+            const docRef = doc(this.db, this.collectionName, groupId).withConverter(groupConverter);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                // Group exists, update it
+                const updateData: Record<string, any> = {
+                    ...groupData,
+                    updatedAt: serverTimestamp()
+                };
+
+                // Convert Date objects to Firestore Timestamps
+                Object.entries(updateData).forEach(([key, value]) => {
+                    if (value instanceof Date) {
+                        updateData[key] = Timestamp.fromDate(value);
+                    }
+                });
+
+                await updateDoc(docRef, updateData);
+                return await this.getGroupById(groupId);
+            } else {
+                // Group doesn't exist, create new one
+                const createData: CreateGroupData = {
+                    customerId: (groupData as CreateGroupData).customerId,
+                    userId: (groupData as CreateGroupData).userId,
+                    documentCount: (groupData as CreateGroupData).documentCount,
+                    createdAt: 'createdAt' in groupData && groupData.createdAt
+                        ? (groupData.createdAt instanceof Date
+                            ? Timestamp.fromDate(groupData.createdAt)
+                            : groupData.createdAt)
+                        : Timestamp.now()
+                };
+
+                // Use setDoc instead of updateDoc for creating new document with specific ID
+                await setDoc(docRef, createData);
+                return await this.getGroupById(groupId);
+            }
+        } catch (error) {
+            throw new Error(`Error inserting or updating group: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
