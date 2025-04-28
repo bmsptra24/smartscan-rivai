@@ -18,11 +18,10 @@ import { showToastable } from "react-native-toastable";
 import { StoreProps, useStore } from "@/stores";
 import { DOCUMENT_TYPE } from "@/constants/Config";
 import { documentService, groupService } from "@/services";
+import { Group } from "@/services/Group";
 
 export class Edit extends Component<StoreProps> {
   handleOptionSelected = (docId: string) => (selectedIndex: number) => {
-    console.log({ docId, selectedIndex, tes: DOCUMENT_TYPE[selectedIndex] });
-
     if (selectedIndex >= 0 && selectedIndex < DOCUMENT_TYPE.length) {
       this.props.documentStore.updateDocumentCategory(
         docId,
@@ -32,14 +31,14 @@ export class Edit extends Component<StoreProps> {
   };
 
   handleSave = async () => {
-    console.log("saving doc...");
-
     showToastable({
       message: "Perubahan Berhasil Disimpan",
       status: "success",
     });
 
     try {
+      console.log("Saving changes...", this.props.groupStore.selectedGroup);
+
       // Update group info
       const updatedData = {
         ...this.props.groupStore.selectedGroup,
@@ -47,7 +46,7 @@ export class Edit extends Component<StoreProps> {
       };
 
       const groupResponse = await groupService.upsertGroup(
-        this.props.groupStore.selectedGroup.id,
+        this.props.groupStore.selectedGroup?.id,
         updatedData
       );
 
@@ -69,8 +68,6 @@ export class Edit extends Component<StoreProps> {
   };
 
   render() {
-    console.log(this.props.documentStore.documents);
-
     return (
       <Container>
         <View
@@ -106,19 +103,22 @@ export class Edit extends Component<StoreProps> {
             >
               <TextInput
                 placeholder="ID Pelanggan"
-                value={this.props.groupStore.selectedGroup.customerId}
+                value={this.props.groupStore.selectedGroup?.customerId}
                 style={{
                   fontFamily: "OpenSansBold",
                   fontSize: 16,
                   color: Color.text,
                   width: 120,
                 }}
-                onChangeText={(customerId) =>
+                onChangeText={(customerId) => {
+                  if (!this.props.groupStore.selectedGroup)
+                    return console.error("Selected group is undefined");
+
                   this.props.groupStore.setSelectedGroup({
                     ...this.props.groupStore.selectedGroup,
                     customerId,
-                  })
-                }
+                  });
+                }}
               />
               <MaterialCommunityIcons name="pencil" size={16} color="black" />
             </View>

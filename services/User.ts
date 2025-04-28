@@ -89,7 +89,6 @@ class UserService {
     public getCurrentUser(): UserProfile | null {
         const userDataString = storage.getString('userData');
         const userData: UserProfile | null = userDataString ? JSON.parse(userDataString) : null;
-        console.warn('User data:', userData);
 
         return userData;
     }

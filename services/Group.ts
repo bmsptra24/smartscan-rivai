@@ -169,14 +169,21 @@ class GroupService {
     }
 
     /**
-    * Insert or update a group based on group ID existence
-    * @param groupId Group ID to check
-    * @param groupData Data for creating or updating the group
-    * @returns Promise with the created or updated group
-    */
-    public async upsertGroup(groupId: string, groupData: CreateGroupData | UpdateGroupData): Promise<Group> {
+  * Insert or update a group based on group ID existence
+  * @param groupId Group ID to check (optional, auto-generated if not provided)
+  * @param groupData Data for creating or updating the group
+  * @returns Promise with the created or updated group
+  */
+    public async upsertGroup(groupId: string | undefined, groupData: CreateGroupData | UpdateGroupData): Promise<Group> {
         try {
-            const docRef = doc(this.db, this.collectionName, groupId).withConverter(groupConverter);
+            // Menentukan referensi dokumen
+            const docRef = groupId
+                ? doc(this.db, this.collectionName, groupId).withConverter(groupConverter)
+                : doc(collection(this.db, this.collectionName)).withConverter(groupConverter);
+
+            // Jika groupId tidak disediakan, gunakan ID dari docRef
+            const effectiveGroupId = groupId || docRef.id;
+
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {
@@ -194,7 +201,7 @@ class GroupService {
                 });
 
                 await updateDoc(docRef, updateData);
-                return await this.getGroupById(groupId);
+                return await this.getGroupById(effectiveGroupId);
             } else {
                 // Group doesn't exist, create new one
                 const createData: CreateGroupData = {
@@ -208,9 +215,8 @@ class GroupService {
                         : Timestamp.now()
                 };
 
-                // Use setDoc instead of updateDoc for creating new document with specific ID
                 await setDoc(docRef, createData);
-                return await this.getGroupById(groupId);
+                return await this.getGroupById(effectiveGroupId);
             }
         } catch (error) {
             throw new Error(`Error inserting or updating group: ${error instanceof Error ? error.message : String(error)}`);
@@ -309,8 +315,6 @@ class GroupService {
      */
     public async getGroupsByCreator(userId: string): Promise<Group[]> {
         try {
-            console.log({ userId });
-
             const q = query(
                 collection(this.db, this.collectionName).withConverter(groupConverter),
                 where('userId', '==', userId),
@@ -324,8 +328,6 @@ class GroupService {
             querySnapshot.forEach((doc) => {
                 groups.push(doc.data());
             });
-
-            console.log({ groups });
 
             return groups;
         } catch (error) {

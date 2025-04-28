@@ -4,14 +4,10 @@ import { BorderRadius, Color } from "@/constants/Styles";
 import { Image } from "expo-image";
 import TextBase from "@/components/base/Text";
 import InputBase from "@/components/base/Input";
-import { groupService, userService } from "@/services";
+import { groupService } from "@/services";
 import { StoreProps, useStore } from "@/stores";
 
 export class HomeHeader extends Component<StoreProps> {
-  state = {
-    userData: userService.getCurrentUser(),
-  };
-
   handleSearch = (() => {
     let debounceTimeout: NodeJS.Timeout;
 
@@ -21,7 +17,7 @@ export class HomeHeader extends Component<StoreProps> {
       debounceTimeout = setTimeout(async () => {
         // If the search text is empty, fetch all groups created by the user
         if (!text.trim()) {
-          const userId = this.state.userData?.id;
+          const userId = this.props.userStore.currentUser?.id;
 
           if (!userId) {
             console.error("User ID is undefined");
@@ -68,7 +64,7 @@ export class HomeHeader extends Component<StoreProps> {
           <View>
             <TextBase variant="subcontent">Selamat datang,</TextBase>
             <TextBase variant="header">
-              {this.state.userData?.displayName}
+              {this.props.userStore.currentUser?.displayName}
             </TextBase>
           </View>
         </View>

@@ -69,7 +69,7 @@ class LoginScreen extends Component {
       const { username, password } = this.state;
       await authService.login({ username, password });
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       this.setState({ isLoading: false });
     }

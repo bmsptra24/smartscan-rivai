@@ -6,9 +6,15 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Color } from "@/constants/Styles";
 import { StoreProps, useStore } from "@/stores";
-import { documentService } from "@/services";
+import { documentService, userService } from "@/services";
 
 class TabLayout extends Component<StoreProps> {
+  async componentDidMount() {
+    const user = await userService.getCurrentUser();
+    if (!user) return console.error("User not found");
+    this.props.userStore.setCurrentUser(user);
+  }
+
   render() {
     return (
       <View style={{ flex: 1 }}>
@@ -44,7 +50,11 @@ class TabLayout extends Component<StoreProps> {
         <View style={styles.cameraButtonContainer}>
           <TouchableOpacity
             style={styles.scanButton}
-            onPress={documentService.handleScanDocument}
+            onPress={() => {
+              this.props.groupStore.clearSelectedGroup();
+              this.props.documentStore.clearDocuments();
+              documentService.handleScanDocument();
+            }}
           >
             <Ionicons name="scan" size={22} color={Color.black} />
           </TouchableOpacity>

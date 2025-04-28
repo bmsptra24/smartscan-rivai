@@ -1,8 +1,8 @@
 import { Document } from "@/services/Document";
-import { generateUUID } from "./generator";
+import { generateID } from "./generator";
 
 export const imagesUriToDocumentMapper = (groupId: string, imageUri: string): Document => ({
-    id: generateUUID(),
+    id: generateID('documents'),
     image_url: imageUri,
     type: "-",
     createdAt: new Date(),

@@ -9,6 +9,7 @@ interface DocumentState {
 interface DocumentActions {
   updateDocumentCategory: (docId: string, category: string) => void;
   addDocuments: (newDocuments: Document[]) => void;
+  clearDocuments: () => void;
   syncDocumentsFromFirestore: (groupId: string) => void;
 }
 
@@ -21,6 +22,9 @@ const useDocumentStore = create<DocumentStore>((set) => ({
     set((state) => ({
       documents: [...state.documents, ...newDocuments],
     }));
+  },
+  clearDocuments: () => {
+    set({ documents: [] });
   },
   updateDocumentCategory: (docId, type) => {
     set((state) => ({

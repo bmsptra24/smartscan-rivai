@@ -33,8 +33,6 @@ class FirebaseConfig {
     }
 
     getFirestoreInstance(): Firestore {
-        console.warn(this.db);
-
         return this.db;
     }
 }

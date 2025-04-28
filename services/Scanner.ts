@@ -9,7 +9,7 @@ class ScannerService {
         try {
             const { scannedImages } = await DocumentScanner.scanDocument();
             if (!scannedImages) {
-                console.log("No images scanned.");
+                console.error("No images scanned.");
                 return;
             }
 

@@ -92,7 +92,7 @@ export class Detail extends Component<StoreProps> {
                           resizeMode: "cover",
                         }}
                         onError={(error) =>
-                          console.log("Error loading image:", error)
+                          console.error("Error loading image:", error)
                         }
                       />
                     </View>
@@ -142,7 +142,7 @@ export class Detail extends Component<StoreProps> {
               <View>
                 <TextBase variant="header">ID Pelanggan</TextBase>
                 <TextBase variant="content">
-                  {this.props.groupStore.selectedGroup.customerId}
+                  {this.props.groupStore.selectedGroup?.customerId}
                 </TextBase>
               </View>
 
@@ -156,7 +156,7 @@ export class Detail extends Component<StoreProps> {
               <View>
                 <TextBase variant="header">Tanggal update</TextBase>
                 <TextBase variant="content">
-                  {this.props.groupStore.selectedGroup.updatedAt &&
+                  {this.props.groupStore.selectedGroup?.updatedAt &&
                     timeFormatter(
                       this.props.groupStore.selectedGroup.updatedAt?.toDate()
                     )}

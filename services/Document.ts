@@ -26,6 +26,9 @@ import { imagesUriToDocumentMapper } from '@/utils/formatter';
 import { router } from 'expo-router';
 import firebaseInstance from './Firebase';
 import useGroupStore from '@/stores/Group';
+import { generateID } from '@/utils/generator';
+import { Group } from './Group';
+import { userService } from '.';
 
 // Define document types
 export interface Document {
@@ -328,12 +331,29 @@ class DocumentService {
     * @returns void
     */
     public handleScanDocument(): void {
-        scannerService.scanDocument((scannedImages) => {
-            // callback for save scanned images to state
-            console.log("Scanned images:", scannedImages)
+        // ! ERROR
+        // ! Saat scan biasa bukan edit, dia error: 
+        // ! (NOBRIDGE) ERROR  Failed to save changes [Error: Error inserting or updating group: Cannot read property 'indexOf' of undefined]
+        // ! Sepertinya karena documentStore.selectedDocument.id undefined
 
-            // maps the scanned images to the document type
-            const groupId = useGroupStore.getState().selectedGroup.id
+        scannerService.scanDocument((scannedImages) => {
+            let groupId = useGroupStore.getState().selectedGroup?.id
+
+            // if group does not selected, create new group with raw data, so in edit page they can use selected data to referece to the document taht we want to edit
+            if (!groupId) {
+                groupId = generateID('groups')
+                const userId = userService.getCurrentUser()?.id
+                if (!userId) return console.error("User not found");
+
+                const rawGroup: Group = {
+                    userId,
+                    id: groupId,
+                    customerId: "",
+                    createdAt: Timestamp.now(),
+                    documentCount: 0,
+                };
+                useGroupStore.getState().setSelectedGroup(rawGroup)
+            }
             const newDocuments = scannedImages.map((imageUri) => imagesUriToDocumentMapper(groupId, imageUri))
 
             // save to state

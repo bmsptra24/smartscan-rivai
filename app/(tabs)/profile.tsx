@@ -7,8 +7,9 @@ import { View } from "react-native";
 import ButtonBase from "@/components/base/Button";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
+import { StoreProps, useStore } from "@/stores";
 
-export default class profile extends Component {
+class Profile extends Component<StoreProps> {
   handleLogout = () => {
     router.replace("/");
   };
@@ -30,8 +31,12 @@ export default class profile extends Component {
             style={{ width: 223, height: 223, borderRadius: BorderRadius.full }}
           />
           <View>
-            <TextBase variant="header">14100.bima</TextBase>
-            <TextBase variant="content">Bima Saputra</TextBase>
+            <TextBase variant="header" style={{ textAlign: "center" }}>
+              {this.props.userStore.currentUser?.username}
+            </TextBase>
+            <TextBase variant="content" style={{ textAlign: "center" }}>
+              {this.props.userStore.currentUser?.displayName}
+            </TextBase>
           </View>
 
           <TextBase variant="header">Versi 1.1</TextBase>
@@ -48,3 +53,5 @@ export default class profile extends Component {
     );
   }
 }
+
+export default useStore(Profile);

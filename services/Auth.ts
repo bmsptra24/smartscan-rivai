@@ -15,14 +15,11 @@ class AuthService {
     logout(): void {
         // Hapus data credential dari MMKV
         storage.delete('userData');
-        console.log("Logged out successfully!");
-        // Redirect ke halaman login setelah logout
         router.push("/");
     }
 
     async login(requestBody: LoginRequest): Promise<void> {
         const { username, password } = requestBody;
-        console.warn({ password });
 
         try {
             // Query ke Firestore untuk mencari user dengan username yang sesuai
@@ -37,12 +34,9 @@ class AuthService {
             // Ambil data user dari Firestore
             const userDoc = querySnapshot.docs[0];
             const userData = userDoc.data();
-            console.warn({ TEST: userData });
 
             // Bandingkan password
             if (userData.password === password) {
-                console.log("Login successful!");
-
                 // Tambahkan ID dokumen ke data user
                 const userWithId = {
                     id: userDoc.id, // Ambil ID dokumen

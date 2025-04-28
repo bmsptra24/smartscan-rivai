@@ -3,7 +3,7 @@ import { create } from "zustand";
 
 interface GroupState {
   groups: Group[];
-  selectedGroup: Group;
+  selectedGroup: Group | undefined;
 }
 
 interface GroupActions {
@@ -21,7 +21,9 @@ const useGroupStore = create<GroupStore>((set) => ({
   setGroups: (groups: Group[]) => set({ groups }),
   updateGrup: (group: Group) =>
     set((state) => ({
-      groups: state.groups.map((g) => (g.id === group.id ? group : g)),
+      groups: state.groups.some((g) => g.id === group.id)
+        ? state.groups.map((g) => (g.id === group.id ? group : g))
+        : [group, ...state.groups],
     })),
   setSelectedGroup: (group: Group) => set({ selectedGroup: group }),
   clearSelectedGroup: () => set({ selectedGroup: {} as Group }),
