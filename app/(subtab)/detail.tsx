@@ -95,6 +95,23 @@ export class Detail extends Component<StoreProps> {
                           console.error("Error loading image:", error)
                         }
                       />
+                      <View
+                        style={{
+                          height: 40,
+                          // backgroundColor: Color.primary,
+                        }}
+                      >
+                        <TextBase
+                          variant="subcontent"
+                          style={
+                            {
+                              // color: Color.white,
+                            }
+                          }
+                        >
+                          {item.type}
+                        </TextBase>
+                      </View>
                     </View>
                   )}
                 />
