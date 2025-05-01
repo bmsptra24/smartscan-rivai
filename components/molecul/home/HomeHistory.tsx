@@ -3,70 +3,11 @@ import React, { Component } from "react";
 import TextBase from "@/components/base/Text";
 import HistoryItem from "@/components/list/HistoryItem";
 import { dateFormatter, timeFormatter } from "@/utils/formatter";
-import { documentService, groupService, userService } from "@/services";
-import { Group } from "@/services/Group";
+import { groupService, userService } from "@/services";
 import useGroupStore from "@/stores/Group";
 import { router } from "expo-router";
 import { StoreProps, useStore } from "@/stores";
-
-// const historyData = [
-//   {
-//     index: 0,
-//     id: "141002212997",
-//     fileCount: 5,
-//     date: "21 Okt 2024",
-//     time: "12.15",
-//   },
-//   {
-//     index: 1,
-//     id: "141002212998",
-//     fileCount: 3,
-//     date: "22 Okt 2024",
-//     time: "14.30",
-//   },
-//   {
-//     index: 2,
-//     id: "141002212997",
-//     fileCount: 5,
-//     date: "21 Okt 2024",
-//     time: "12.15",
-//   },
-//   {
-//     index: 3,
-//     id: "141002212998",
-//     fileCount: 3,
-//     date: "22 Okt 2024",
-//     time: "14.30",
-//   },
-//   {
-//     index: 4,
-//     id: "141002212997",
-//     fileCount: 5,
-//     date: "21 Okt 2024",
-//     time: "12.15",
-//   },
-//   {
-//     index: 5,
-//     id: "141002212998",
-//     fileCount: 3,
-//     date: "22 Okt 2024",
-//     time: "14.30",
-//   },
-//   {
-//     index: 6,
-//     id: "141002212997",
-//     fileCount: 5,
-//     date: "21 Okt 2024",
-//     time: "12.15",
-//   },
-//   {
-//     index: 7,
-//     id: "141002212998",
-//     fileCount: 3,
-//     date: "22 Okt 2024",
-//     time: "14.30",
-//   },
-// ];
+import NotFound from "@/components/base/NotFound";
 
 export class HomeHistory extends Component<StoreProps> {
   async componentDidMount() {
@@ -88,6 +29,8 @@ export class HomeHistory extends Component<StoreProps> {
         >
           Riwayat
         </TextBase>
+
+        {this.props.groupStore.groups.length === 0 && <NotFound />}
 
         <View style={{}}>
           {this.props.groupStore.groups &&

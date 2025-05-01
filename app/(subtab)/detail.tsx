@@ -10,6 +10,7 @@ import IconButton from "@/components/base/IconButton";
 import Header from "@/components/base/Header";
 import { StoreProps, useStore } from "@/stores";
 import { timeFormatter } from "@/utils/formatter";
+import NotFound from "@/components/base/NotFound";
 
 interface ScrollEvent {
   nativeEvent: {
@@ -145,7 +146,7 @@ export class Detail extends Component<StoreProps> {
                 </View>
               </View>
             ) : (
-              <TextBase variant="header">Tidak ada dokumen.</TextBase>
+              <NotFound title="Tidak ada dokumen." />
             )}
 
             {/* Detail Informasi */}

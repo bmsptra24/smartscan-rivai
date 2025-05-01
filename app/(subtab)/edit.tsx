@@ -21,6 +21,10 @@ import { documentService, groupService } from "@/services";
 import { Group } from "@/services/Group";
 
 export class Edit extends Component<StoreProps> {
+  state = {
+    isSaving: false,
+  };
+
   handleOptionSelected = (docId: string) => (selectedIndex: number) => {
     if (selectedIndex >= 0 && selectedIndex < DOCUMENT_TYPE.length) {
       this.props.documentStore.updateDocumentCategory(
@@ -31,12 +35,8 @@ export class Edit extends Component<StoreProps> {
   };
 
   handleSave = async () => {
-    showToastable({
-      message: "Perubahan Berhasil Disimpan",
-      status: "success",
-    });
-
     try {
+      this.setState({ isSaving: true });
       console.log("Saving changes...", this.props.groupStore.selectedGroup);
 
       // Update group info
@@ -60,9 +60,15 @@ export class Edit extends Component<StoreProps> {
 
       // Update list groups in home page
       this.props.groupStore.updateGrup(groupResponse);
+
+      showToastable({
+        message: "Perubahan Berhasil Disimpan",
+        status: "success",
+      });
     } catch (error) {
       console.error("Failed to save changes", error);
     } finally {
+      this.setState({ isSaving: false });
       router.back();
     }
   };
@@ -124,6 +130,7 @@ export class Edit extends Component<StoreProps> {
             </View>
           </View>
 
+          {/* Gambar Document */}
           <ScrollView
             contentContainerStyle={{
               flexDirection: "row",
@@ -178,6 +185,7 @@ export class Edit extends Component<StoreProps> {
 
           {/* Tombol Aksi */}
           <ButtonBase
+            isLoading={this.state.isSaving}
             style={{ width: "100%" }}
             textStyle={{ color: Color.text }}
             title="Save"
