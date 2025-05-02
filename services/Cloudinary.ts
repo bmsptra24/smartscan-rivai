@@ -145,8 +145,8 @@ class CloudinaryService {
         formData.append('public_id', public_id);
         formData.append('overwrite', 'true');
         formData.append('api_key', this.api_key);
-        // formData.append('timestamp', timestamp);
-        // formData.append('signature', signature);
+        formData.append('timestamp', timestamp);
+        formData.append('signature', signature);
         formData.append('quality', 'auto:low');
 
         const response = await this.postToCloudinary('image/upload', formData);
