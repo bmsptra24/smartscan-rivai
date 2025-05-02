@@ -28,6 +28,7 @@ import useGroupStore from '@/stores/Group';
 import { generateID } from '@/utils/generator';
 import { Group } from './Group';
 import { userService } from '.';
+import { detectDocumentType } from '@/utils/detectDocumentType';
 
 // Define document types
 export interface Document {
@@ -340,6 +341,7 @@ class DocumentService {
         // ! Sepertinya karena documentStore.selectedDocument.id undefined
 
         scannerService.scanDocument((scannedImages) => {
+            const documentStore = useDocumentStore.getState()
             let groupId = useGroupStore.getState().selectedGroup?.id
 
             // if group does not selected, create new group with raw data, so in edit page they can use selected data to referece to the document taht we want to edit
@@ -359,8 +361,25 @@ class DocumentService {
             }
             const newDocuments = scannedImages.map((imageUri) => imagesUriToDocumentMapper(groupId, imageUri))
 
+            // Analize the document type
+            newDocuments.forEach(async (doc) => {
+                // OCR the image
+                let type
+                const ocrResult = await scannerService.extractTextFromImage(doc.image_url)
+
+                // Analize the text
+                if (!ocrResult) type = "Lainnya"
+                if (ocrResult) type = detectDocumentType(ocrResult)
+
+                // buat seolah olah await selama 1 detik dengan timeout
+                // await new Promise(resolve => setTimeout(resolve, 1000))
+
+                // Set the document type
+                if (!doc.id || !type) return
+                documentStore.updateDocumentCategory(doc.id, type)
+            });
+
             // save to state
-            const documentStore = useDocumentStore.getState()
             documentStore.addDocuments(newDocuments)
 
             // navigate to edit screen

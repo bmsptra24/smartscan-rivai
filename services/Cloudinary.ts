@@ -103,8 +103,8 @@ class CloudinaryService {
             } as any);
             formData.append('api_key', this.api_key);
             formData.append('upload_preset', this.upload_preset);
-            formData.append('timestamp', timestamp);
-            formData.append('signature', signature);
+            // formData.append('timestamp', timestamp);
+            // formData.append('signature', signature);
             formData.append('quality', 'auto:low');
 
             const response = await this.postToCloudinary('image/upload', formData);
@@ -124,8 +124,8 @@ class CloudinaryService {
         formData.append('public_id', id);
         formData.append('api_key', this.api_key);
         formData.append('upload_preset', this.upload_preset);
-        formData.append('timestamp', timestamp);
-        formData.append('signature', signature);
+        // formData.append('timestamp', timestamp);
+        // formData.append('signature', signature);
         formData.append('quality', 'auto:low');
 
         await this.postToCloudinary('image/destroy', formData);
@@ -145,8 +145,8 @@ class CloudinaryService {
         formData.append('public_id', public_id);
         formData.append('overwrite', 'true');
         formData.append('api_key', this.api_key);
-        formData.append('timestamp', timestamp);
-        formData.append('signature', signature);
+        // formData.append('timestamp', timestamp);
+        // formData.append('signature', signature);
         formData.append('quality', 'auto:low');
 
         const response = await this.postToCloudinary('image/upload', formData);

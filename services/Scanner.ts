@@ -1,8 +1,6 @@
 import DocumentScanner from "react-native-document-scanner-plugin";
-import { documentService, groupService, userService } from ".";
-import { CreateDocumentData } from "./Document";
-import { CreateGroupData } from "./Group";
-import { Timestamp } from "firebase/firestore";
+import { userService } from ".";
+import MlkitOcr, { MlkitOcrResult } from 'react-native-mlkit-ocr';
 
 class ScannerService {
     async scanDocument(callback: (scannedImages: string[]) => void): Promise<void> {
@@ -24,6 +22,16 @@ class ScannerService {
             }
         } catch (error) {
             console.error("Error scanning document:", error);
+        }
+    }
+
+    async extractTextFromImage(uri: string) {
+        try {
+            const result: MlkitOcrResult = await MlkitOcr.detectFromUri(uri);
+            const text = result.map(block => block.text).join('\n');
+            return text;
+        } catch (error) {
+            console.error('Error during OCR:', error);
         }
     }
 }

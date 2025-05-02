@@ -6,7 +6,7 @@ export const imagesUriToDocumentMapper = (groupId: string, imageUri: string): Do
     id: generateID('documents'),
     image_public_id: undefined,
     image_url: imageUri,
-    type: "-",
+    type: "Analizing...",
     createdAt: new Date(),
     groupId
 });
