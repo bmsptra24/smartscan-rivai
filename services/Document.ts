@@ -9,7 +9,6 @@ import {
     query,
     where,
     orderBy,
-    limit,
     serverTimestamp,
     Timestamp,
     FirestoreDataConverter,
@@ -34,6 +33,7 @@ import { userService } from '.';
 export interface Document {
     id?: string;
     groupId: string;
+    image_public_id?: string;
     image_url: string;
     type: string;
     createdAt: Date | Timestamp;
@@ -51,6 +51,7 @@ const documentConverter: FirestoreDataConverter<Document> = {
     toFirestore(document: WithFieldValue<Document>): DocumentData {
         return {
             groupId: document.groupId,
+            image_public_id: document.image_public_id,
             image_url: document.image_url,
             type: document.type,
             createdAt: document.createdAt instanceof Date ? Timestamp.fromDate(document.createdAt) : document.createdAt,
@@ -65,6 +66,7 @@ const documentConverter: FirestoreDataConverter<Document> = {
         return {
             id: snapshot.id,
             groupId: data.groupId,
+            image_public_id: data.image_public_id,
             image_url: data.image_url,
             type: data.type,
             createdAt: data.createdAt,
@@ -157,6 +159,7 @@ class DocumentService {
                 // Document doesn't exist, create new one
                 const createData: CreateDocumentData = {
                     groupId: (documentData as CreateDocumentData).groupId,
+                    image_public_id: (documentData as CreateDocumentData).image_public_id,
                     image_url: (documentData as CreateDocumentData).image_url,
                     type: (documentData as CreateDocumentData).type,
                     createdAt: 'createdAt' in documentData && documentData.createdAt

@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import TextBase from "@/components/base/Text";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { AccentColors, BorderRadius } from "@/constants/Styles";
+import { AccentColors, BorderRadius, IsMobileScreen } from "@/constants/Styles";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 interface HistoryItemProps {
@@ -33,23 +33,27 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
 
   return (
     <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-      }}
+      style={[
+        {
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+        },
+        IsMobileScreen ? {} : { paddingVertical: 10, paddingHorizontal: 20 },
+      ]}
     >
       <Pressable
         android_ripple={{ color: "rgba(0, 0, 0, 0.1)" }}
         onPress={onPress}
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 10,
-        }}
+        style={[
+          {
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+          },
+          !IsMobileScreen ? {} : { paddingVertical: 10, paddingHorizontal: 20 },
+        ]}
       >
         <Ionicons
           style={{
@@ -81,9 +85,15 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
           </View>
         </View>
       </Pressable>
-      <TouchableOpacity>
-        <MaterialCommunityIcons name="delete-outline" size={24} color="black" />
-      </TouchableOpacity>
+      {!IsMobileScreen && (
+        <TouchableOpacity>
+          <MaterialCommunityIcons
+            name="delete-outline"
+            size={24}
+            color="black"
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

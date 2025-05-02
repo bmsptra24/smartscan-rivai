@@ -19,6 +19,8 @@ import { StoreProps, useStore } from "@/stores";
 import { DOCUMENT_TYPE } from "@/constants/Config";
 import { documentService, groupService } from "@/services";
 import { Group } from "@/services/Group";
+import { cloudinaryService } from "@/services/Cloudinary";
+import { uriToBase64 } from "@/utils/formatter";
 
 export class Edit extends Component<StoreProps> {
   state = {
@@ -54,9 +56,28 @@ export class Edit extends Component<StoreProps> {
       this.props.groupStore.setSelectedGroup(groupResponse);
 
       // Update documents
-      this.props.documentStore.documents.forEach(async (doc) => {
-        await documentService.upsertDocument(doc.id as string, doc);
-      });
+      await Promise.all(
+        this.props.documentStore.documents.map(async (doc) => {
+          // If image_public_id is empty, it means the document is new
+          // and needs to be uploaded to Cloudinary
+          let response;
+          if (!doc.image_public_id) {
+            response = await cloudinaryService.addFile(doc.image_url);
+          } else {
+            response = await cloudinaryService.upsertFile(
+              doc.image_public_id,
+              doc.image_url
+            );
+          }
+
+          const updatedData = {
+            ...doc,
+            image_public_id: response?.public_id,
+            image_url: response?.secure_url,
+          };
+          return documentService.upsertDocument(doc.id as string, updatedData);
+        })
+      );
 
       // Update list groups in home page
       this.props.groupStore.updateGrup(groupResponse);
