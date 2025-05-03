@@ -4,6 +4,7 @@ import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import Toastable from "react-native-toastable";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Color } from "@/constants/Styles";
+import { AlertProvider } from "@/utils/alert";
 
 const ProviderWrapper: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -22,7 +23,9 @@ const ProviderWrapper: React.FC<{ children: React.ReactNode }> = ({
         duration={3000}
         offset={top}
       />
-      <ActionSheetProvider>{children}</ActionSheetProvider>
+      <AlertProvider>
+        <ActionSheetProvider>{children}</ActionSheetProvider>
+      </AlertProvider>
     </>
   );
 };

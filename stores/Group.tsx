@@ -11,6 +11,7 @@ interface GroupActions {
   clearSelectedGroup: () => void;
   setGroups: (groups: Group[]) => void;
   updateGrup: (group: Group) => void;
+  removeGroup: (groupId: string) => void; // Tambahkan fungsi removeGroup
 }
 
 type GroupStore = GroupState & GroupActions;
@@ -27,6 +28,10 @@ const useGroupStore = create<GroupStore>((set) => ({
     })),
   setSelectedGroup: (group: Group) => set({ selectedGroup: group }),
   clearSelectedGroup: () => set({ selectedGroup: {} as Group }),
+  removeGroup: (groupId: string) =>
+    set((state) => ({
+      groups: state.groups.filter((g) => g.id !== groupId),
+    })), // Implementasi fungsi removeGroup
 }));
 
 // 3. Export type untuk memudahkan penggunaan di komponen

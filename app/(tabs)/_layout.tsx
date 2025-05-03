@@ -15,6 +15,7 @@ import { StoreProps, useStore } from "@/stores";
 import { documentService, userService } from "@/services";
 import { Image } from "expo-image";
 import { Images } from "@/constants/Images";
+import ProviderWrapper from "@/contexts/ProviderWrapper";
 
 class TabLayout extends Component<StoreProps> {
   async componentDidMount() {
@@ -27,100 +28,106 @@ class TabLayout extends Component<StoreProps> {
     const isMobile = IsMobileScreen;
 
     return (
-      <View style={{ flex: 1, flexDirection: isMobile ? "column" : "row" }}>
-        {/* Tab bar kustom untuk web (sisi kiri) */}
-        {!isMobile && (
-          <View style={styles.webTabBar}>
-            <TouchableOpacity
-              style={[
-                styles.webTabItem,
-                { justifyContent: "flex-start", gap: 15 },
-              ]}
-            >
-              <Image
-                source={Images.logo.src}
-                style={{ width: 40, height: 40, borderRadius: 5 }}
-              />
-              <Text
-                style={{ fontSize: 16, fontWeight: "bold", color: Color.black }}
+      <ProviderWrapper>
+        <View style={{ flex: 1, flexDirection: isMobile ? "column" : "row" }}>
+          {/* Tab bar kustom untuk web (sisi kiri) */}
+          {!isMobile && (
+            <View style={styles.webTabBar}>
+              <TouchableOpacity
+                style={[
+                  styles.webTabItem,
+                  { justifyContent: "flex-start", gap: 15 },
+                ]}
               >
-                SmartScan Rivai
-              </Text>
-            </TouchableOpacity>
-            <Pressable
-              style={({ hovered }) => [
-                styles.webTabItem,
-                hovered && { backgroundColor: Color.greyLight },
-              ]}
-              onPress={() => router.push("/home")}
-            >
-              <Entypo size={24} name="home" color={Color.black} />
-              <Text>Home</Text>
-            </Pressable>
-            <Pressable
-              style={({ hovered }) => [
-                styles.webTabItem,
-                hovered && { backgroundColor: Color.greyLight },
-              ]}
-              onPress={() => router.push("/profile")}
-            >
-              <AntDesign size={24} name="user" color={Color.black} />
-              <Text>Profil</Text>
-            </Pressable>
-          </View>
-        )}
+                <Image
+                  source={Images.logo.src}
+                  style={{ width: 40, height: 40, borderRadius: 5 }}
+                />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    color: Color.black,
+                  }}
+                >
+                  SmartScan Rivai
+                </Text>
+              </TouchableOpacity>
+              <Pressable
+                style={({ hovered }) => [
+                  styles.webTabItem,
+                  hovered && { backgroundColor: Color.greyLight },
+                ]}
+                onPress={() => router.push("/home")}
+              >
+                <Entypo size={24} name="home" color={Color.black} />
+                <Text>Home</Text>
+              </Pressable>
+              <Pressable
+                style={({ hovered }) => [
+                  styles.webTabItem,
+                  hovered && { backgroundColor: Color.greyLight },
+                ]}
+                onPress={() => router.push("/profile")}
+              >
+                <AntDesign size={24} name="user" color={Color.black} />
+                <Text>Profil</Text>
+              </Pressable>
+            </View>
+          )}
 
-        {/* Konten utama */}
-        <View style={{ flex: 1 }}>
-          <Tabs
-            screenOptions={{
-              headerShown: false,
-              tabBarStyle: isMobile
-                ? { position: "relative" }
-                : { display: "none" },
-              tabBarActiveTintColor: Color.black,
-              tabBarInactiveTintColor: Color.grey,
-              tabBarShowLabel: isMobile,
-              tabBarLabelPosition: "beside-icon",
-            }}
-          >
-            <Tabs.Screen
-              name="home"
-              options={{
-                title: "Home",
-                tabBarIcon: ({ color, size }) => (
-                  <Entypo size={size - 6} name="home" color={color} />
-                ),
+          {/* Konten utama */}
+          <View style={{ flex: 1 }}>
+            <Tabs
+              screenOptions={{
+                headerShown: false,
+                tabBarStyle: isMobile
+                  ? { position: "relative" }
+                  : { display: "none" },
+                tabBarActiveTintColor: Color.black,
+                tabBarInactiveTintColor: Color.grey,
+                tabBarShowLabel: isMobile,
+                tabBarLabelPosition: "beside-icon",
               }}
-            />
-            <Tabs.Screen
-              name="profile"
-              options={{
-                title: "Profil",
-                tabBarIcon: ({ color, size }) => (
-                  <AntDesign size={size - 6} name="user" color={color} />
-                ),
-              }}
-            />
-          </Tabs>
+            >
+              <Tabs.Screen
+                name="home"
+                options={{
+                  title: "Home",
+                  tabBarIcon: ({ color, size }) => (
+                    <Entypo size={size - 6} name="home" color={color} />
+                  ),
+                }}
+              />
+              <Tabs.Screen
+                name="profile"
+                options={{
+                  title: "Profil",
+                  tabBarIcon: ({ color, size }) => (
+                    <AntDesign size={size - 6} name="user" color={color} />
+                  ),
+                }}
+              />
+            </Tabs>
+          </View>
+
+          {/* Tombol scan */}
+          {isMobile && (
+            <View style={styles.cameraButtonContainer}>
+              <TouchableOpacity
+                style={styles.scanButton}
+                onPress={() => {
+                  this.props.groupStore.clearSelectedGroup();
+                  this.props.documentStore.clearDocuments();
+                  documentService.handleScanDocument();
+                }}
+              >
+                <Ionicons name="scan" size={22} color={Color.black} />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-
-        {/* Tombol scan */}
-        {isMobile && (
-          <View style={styles.cameraButtonContainer}>
-            <TouchableOpacity
-              style={styles.scanButton}
-              onPress={() => {
-                this.props.groupStore.clearSelectedGroup();
-                this.props.documentStore.clearDocuments();
-                documentService.handleScanDocument();
-              }}
-            >
-              <Ionicons name="scan" size={22} color={Color.black} />
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
+      </ProviderWrapper>
     );
   }
 }

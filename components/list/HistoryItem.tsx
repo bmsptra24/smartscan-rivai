@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Pressable,
-  TouchableHighlight,
-  TouchableNativeFeedback,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Pressable, TouchableOpacity, View } from "react-native";
 import TextBase from "@/components/base/Text";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { AccentColors, BorderRadius, IsMobileScreen } from "@/constants/Styles";
@@ -13,20 +7,24 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 interface HistoryItemProps {
   id: string;
+  costumerId: string;
   fileCount: number;
   date: string;
   time: string;
   index: number;
   onPress: () => void;
+  onDelete: (grupId: string) => void;
 }
 
 const HistoryItem: React.FC<HistoryItemProps> = ({
   id,
+  costumerId,
   fileCount,
   date,
   time,
   index,
   onPress,
+  onDelete,
 }) => {
   // Hitung warna berdasarkan indeks item
   const iconColor = AccentColors[index % AccentColors.length];
@@ -75,7 +73,7 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
           }}
         >
           <View>
-            <TextBase>{id}</TextBase>
+            <TextBase>{costumerId}</TextBase>
             <TextBase variant="subcontent">{fileCount} File</TextBase>
           </View>
 
@@ -86,7 +84,7 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
         </View>
       </Pressable>
       {!IsMobileScreen && (
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => onDelete(id)}>
           <MaterialCommunityIcons
             name="delete-outline"
             size={24}
