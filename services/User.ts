@@ -14,10 +14,12 @@ import {
     query,
     where,
     getDocs,
-    DocumentReference
+    DocumentReference,
+    deleteDoc
 } from 'firebase/firestore';
 import { storage } from '@/constants/MKKV';
 import firebaseInstance from './Firebase';
+import { groupService } from '.';
 
 // Define user profile types
 export interface UserProfile {
@@ -94,14 +96,30 @@ class UserService {
     }
 
     /**
+     * Get all user profiles
+     * @returns Promise with an array of user profiles
+     */
+    public async getAllUsers(): Promise<UserProfile[]> {
+        try {
+            const usersCollection = collection(this.db, this.collectionName).withConverter(userProfileConverter);
+            const querySnapshot = await getDocs(usersCollection);
+
+            return querySnapshot.docs.map(doc => doc.data());
+        } catch (error) {
+            throw new Error(`Error getting all users: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
      * Create or update user profile
-     * @param userId User ID
+     * @param userId Optional User ID. If not provided, a new ID will be generated.
      * @param userData User profile data
      * @returns Promise with the user profile
      */
-    public async setUserProfile(userId: string, userData: CreateUserProfileData): Promise<UserProfile> {
+    public async upsertUserProfile(userId: string | undefined, userData: CreateUserProfileData): Promise<UserProfile> {
         try {
-            const userRef = doc(this.db, this.collectionName, userId).withConverter(userProfileConverter);
+            const id = userId || doc(collection(this.db, this.collectionName)).id; // Generate a new ID if not provided
+            const userRef = doc(this.db, this.collectionName, id).withConverter(userProfileConverter);
             const userSnap = await getDoc(userRef);
 
             if (userSnap.exists()) {
@@ -123,7 +141,7 @@ class UserService {
                 // Create new user
                 const newUserData: UserProfile = {
                     ...userData,
-                    id: userId,
+                    id: id,
                     createdAt: userData.createdAt || serverTimestamp() as Timestamp,
                     updatedAt: serverTimestamp() as Timestamp
                 };
@@ -132,9 +150,9 @@ class UserService {
             }
 
             // Fetch and return the updated user profile
-            const userProfile = await this.getUserProfile(userId);
+            const userProfile = await this.getUserProfile(id);
             if (!userProfile) {
-                throw new Error(`User profile with ID ${userId} not found`);
+                throw new Error(`User profile with ID ${id} not found`);
             }
             return userProfile;
         } catch (error) {
@@ -258,6 +276,26 @@ class UserService {
         return doc(this.db, this.collectionName, userId).withConverter(userProfileConverter);
     }
 
+
+    /**
+     * Delete user profile
+     * @param userId User ID to delete
+     * @returns Promise<void>
+     */
+    public async deleteUser(userId: string): Promise<boolean> {
+        try {
+            // If user has data, cancel the process
+            const groupData = await groupService.getGroupsByCreator(userId);
+            if (groupData.length > 0) throw new Error("User has some data in this app, can't delete it.");
+
+            const userRef = doc(this.db, this.collectionName, userId).withConverter(userProfileConverter);
+            await deleteDoc(userRef);
+            return true;
+        } catch (error) {
+            console.error(`Error deleting user profile: ${error instanceof Error ? error.message : String(error)}`);
+            return false;
+        }
+    }
 }
 
 export default UserService;

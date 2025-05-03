@@ -53,6 +53,7 @@ class TabLayout extends Component<StoreProps> {
                   SmartScan Rivai
                 </Text>
               </TouchableOpacity>
+
               <Pressable
                 style={({ hovered }) => [
                   styles.webTabItem,
@@ -61,8 +62,20 @@ class TabLayout extends Component<StoreProps> {
                 onPress={() => router.push("/home")}
               >
                 <Entypo size={24} name="home" color={Color.black} />
-                <Text>Home</Text>
+                <Text>Beranda</Text>
               </Pressable>
+
+              <Pressable
+                style={({ hovered }) => [
+                  styles.webTabItem,
+                  hovered && { backgroundColor: Color.greyLight },
+                ]}
+                onPress={() => router.push("/users")}
+              >
+                <AntDesign size={24} name="user" color={Color.black} />
+                <Text>Pengguna</Text>
+              </Pressable>
+
               <Pressable
                 style={({ hovered }) => [
                   styles.webTabItem,

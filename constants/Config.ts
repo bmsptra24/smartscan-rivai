@@ -59,3 +59,5 @@ export const DOC_TYPE_WITH_KEYWORDS: DocumentTypeKeywords = {
 };
 
 export const DOCUMENT_TYPE = Object.keys(DOC_TYPE_WITH_KEYWORDS)
+
+export const ROLE = ['admin', 'user', 'superadmin']

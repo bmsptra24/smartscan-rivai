@@ -6,6 +6,7 @@ import TextBase from "@/components/base/Text";
 import InputBase from "@/components/base/Input";
 import { groupService } from "@/services";
 import { StoreProps, useStore } from "@/stores";
+import ProfileCard from "@/components/base/ProfileCard";
 
 export class HomeHeader extends Component<StoreProps> {
   handleSearch = (() => {
@@ -57,25 +58,7 @@ export class HomeHeader extends Component<StoreProps> {
             alignItems: IsMobileScreen ? "flex-start" : "center",
           }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 10,
-            }}
-          >
-            <Image
-              source={{
-                uri: "https://api.dicebear.com/9.x/initials/svg?seed=Bima Saputra",
-              }}
-              style={{ width: 40, height: 40, borderRadius: BorderRadius.full }}
-            />
-            <View>
-              <TextBase variant="subcontent">Selamat datang,</TextBase>
-              <TextBase variant="header">
-                {this.props.userStore.currentUser?.displayName}
-              </TextBase>
-            </View>
-          </View>
+          <ProfileCard />
 
           {/* Cari File Description */}
           <View>

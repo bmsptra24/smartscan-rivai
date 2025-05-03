@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { UserProfile } from "./User";
 import { userService } from ".";
+import { createHashSHA1 } from "@/utils/generator";
 
 interface LoginRequest {
     username: string;
@@ -36,7 +37,7 @@ class AuthService {
             const userData = userDoc.data();
 
             // Bandingkan password
-            if (userData.password === password) {
+            if (userData.password === createHashSHA1(password)) {
                 // Tambahkan ID dokumen ke data user
                 const userWithId = {
                     id: userDoc.id, // Ambil ID dokumen

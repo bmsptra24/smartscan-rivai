@@ -37,7 +37,6 @@ export default class InputBase extends Component<InputBaseProps> {
             backgroundColor: Color.greyLight,
             width: ResponsiveComponent.width,
             borderRadius: BorderRadius.full,
-            fontFamily: "PlusJakartaSans",
             color: Color.placeholder,
           },
           paddingStyles[size], // Gunakan padding sesuai ukuran
