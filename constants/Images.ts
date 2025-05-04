@@ -8,7 +8,7 @@ export const Images = {
         placeholder: 'LG1O2wp_k=aKqFp_k=aKp_pwkqaK'
     },
     logo: {
-        src: 'https://bloggytalky.com/wp-content/uploads/2017/07/create-a-free-logo-design-logo-designs-design-a-free-logo-design-a-free-logo-alltech-just-free-logo-design-1024x934.png',
+        src: 'https://res.cloudinary.com/duyzfabe3/image/upload/v1746334057/smartscan-rivai/assets/nqvtqljvmztiduy6twmo.png',
         placeholder: 'Logo'
     },
 } 

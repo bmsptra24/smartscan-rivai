@@ -16,7 +16,10 @@ export class HomeHistory extends Component<StoreProps> {
     if (!userData || !userData.id)
       return console.error("User data is missing or incomplete.");
 
-    const groups = await groupService.getGroupsByCreator(userData.id);
+    let groups;
+    if (userData.role === "user")
+      groups = await groupService.getGroupsByCreator(userData.id);
+    if (userData.role !== "user") groups = await groupService.getAllGroups();
     if (!groups) return console.error("No groups found.");
     this.props.groupStore.setGroups(groups);
   }

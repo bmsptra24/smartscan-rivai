@@ -18,14 +18,37 @@ import { showToastable } from "react-native-toastable";
 import { StoreProps, useStore } from "@/stores";
 import { DOCUMENT_TYPE } from "@/constants/Config";
 import { documentService, groupService } from "@/services";
-import { Group } from "@/services/Group";
 import { cloudinaryService } from "@/services/Cloudinary";
 import { uriToBase64 } from "@/utils/formatter";
+import { showAlert } from "@/utils/alert";
 
 export class Edit extends Component<StoreProps> {
   state = {
     isSaving: false,
   };
+
+  validateData() {
+    const { selectedGroup } = this.props.groupStore;
+    const { documents } = this.props.documentStore;
+
+    if (!selectedGroup?.customerId?.trim()) {
+      return { isValid: false, message: "ID Pelanggan harus diisi." };
+    }
+
+    for (const doc of documents) {
+      if (!doc.type || !DOCUMENT_TYPE.includes(doc.type)) {
+        return {
+          isValid: false,
+          message: "Semua dokumen harus memiliki tipe yang valid",
+        };
+      }
+      if (!doc.image_url) {
+        return { isValid: false, message: "All documents must have an image" };
+      }
+    }
+
+    return { isValid: true };
+  }
 
   handleOptionSelected = (docId: string) => (selectedIndex: number) => {
     if (selectedIndex >= 0 && selectedIndex < DOCUMENT_TYPE.length) {
@@ -37,11 +60,16 @@ export class Edit extends Component<StoreProps> {
   };
 
   handleSave = async () => {
+    const validation = this.validateData();
+    if (!validation.isValid) {
+      showAlert("Input tidak valid", validation.message);
+      return;
+    }
+
     try {
       this.setState({ isSaving: true });
       console.log("Saving changes...", this.props.groupStore.selectedGroup);
 
-      // Update group info
       const updatedData = {
         ...this.props.groupStore.selectedGroup,
         documentCount: this.props.documentStore.documents.length,
@@ -52,14 +80,13 @@ export class Edit extends Component<StoreProps> {
         updatedData
       );
 
-      if (!groupResponse) return console.error("Failed to update group");
+      if (!groupResponse) {
+        throw new Error("Failed to update group");
+      }
       this.props.groupStore.setSelectedGroup(groupResponse);
 
-      // Update documents
       await Promise.all(
         this.props.documentStore.documents.map(async (doc) => {
-          // If image_public_id is empty, it means the document is new
-          // and needs to be uploaded to Cloudinary
           let response;
           if (!doc.image_public_id) {
             response = await cloudinaryService.addFile(doc.image_url);
@@ -79,18 +106,21 @@ export class Edit extends Component<StoreProps> {
         })
       );
 
-      // Update list groups in home page
       this.props.groupStore.updateGrup(groupResponse);
 
       showToastable({
         message: "Perubahan Berhasil Disimpan",
         status: "success",
       });
+      router.back();
     } catch (error) {
       console.error("Failed to save changes", error);
+      showToastable({
+        message: "Failed to save changes",
+        status: "danger",
+      });
     } finally {
       this.setState({ isSaving: false });
-      router.back();
     }
   };
 

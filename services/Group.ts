@@ -98,6 +98,26 @@ class GroupService {
     }
 
     /**
+     * Get all groups
+     * @returns Promise with array of all groups
+     */
+    public async getAllGroups(): Promise<Group[]> {
+        try {
+            const collectionRef = collection(this.db, this.collectionName).withConverter(groupConverter);
+            const querySnapshot = await getDocs(collectionRef);
+            const groups: Group[] = [];
+
+            querySnapshot.forEach((doc) => {
+                groups.push(doc.data());
+            });
+
+            return groups;
+        } catch (error) {
+            throw new Error(`Error fetching all groups: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
      * Get group by ID
      * @param groupId Group ID to retrieve
      * @returns Promise with the group
