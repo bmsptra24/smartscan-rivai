@@ -1,3 +1,4 @@
+import ProviderWrapper from "@/contexts/ProviderWrapper";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -27,21 +28,23 @@ export default function RootLayout() {
   }
 
   return (
-    <>
-      <Stack
-        initialRouteName="index"
-        screenOptions={{ headerShown: false, animation: "none" }}
-      >
-        {/* <Stack initialRouteName="(tabs)"> */}
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="(tabs)"
-          options={{ headerShown: false, animation: "none" }}
-        />
-        <Stack.Screen name="(subtab)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </>
+    <ProviderWrapper>
+      <>
+        <Stack
+          initialRouteName="index"
+          screenOptions={{ headerShown: false, animation: "none" }}
+        >
+          {/* <Stack initialRouteName="(tabs)"> */}
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(tabs)"
+            options={{ headerShown: false, animation: "none" }}
+          />
+          <Stack.Screen name="(subtab)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </>
+    </ProviderWrapper>
   );
 }

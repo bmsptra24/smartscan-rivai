@@ -50,20 +50,6 @@ class LoginScreen extends Component {
 
   handleLogin = async () => {
     try {
-      // buat data dummy pengguna
-      // userService.setUserProfile("1dsadasda", {
-      //   id: "1dsadasda",
-      //   displayName: "Bima Putra",
-      //   username: "bima",
-      //   password: "123",
-      //   photoURL: "https://example.com/photo.jpg",
-      //   phoneNumber: "+628123456789",
-      //   createdAt: new Date(),
-      //   role: "superadmin",
-      //   isActive: true,
-      //   lastLogin: new Date(),
-      //   metadata: { additionalInfo: "Dummy user for testing" },
-      // });
       this.setState({ isLoading: true });
 
       const { username, password } = this.state;

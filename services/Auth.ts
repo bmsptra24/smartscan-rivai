@@ -5,6 +5,8 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { UserProfile } from "./User";
 import { userService } from ".";
 import { createHashSHA1 } from "@/utils/generator";
+import { Platform } from "react-native";
+import { showAlert } from "@/utils/alert";
 
 interface LoginRequest {
     username: string;
@@ -34,19 +36,20 @@ class AuthService {
 
             // Ambil data user dari Firestore
             const userDoc = querySnapshot.docs[0];
-            const userData = userDoc.data();
+            const userData = userDoc.data() as Omit<UserProfile, 'id'>;
 
             // Bandingkan password
             if (userData.password === createHashSHA1(password)) {
                 // Tambahkan ID dokumen ke data user
                 const userWithId = {
-                    id: userDoc.id, // Ambil ID dokumen
-                    ...userData     // Gabungkan dengan data user lainnya
+                    id: userDoc.id,
+                    ...userData
                 };
 
                 // Simpan data credential (termasuk ID) ke MMKV
                 storage.set('userData', JSON.stringify(userWithId));
 
+                if (Platform.OS === 'web' && userData.role === 'user') return showAlert('Gagal Login', 'Hanya admin yang bisa mengakses website.')
                 // Redirect ke halaman utama setelah login berhasil
                 router.push("/(tabs)/home");
             } else {
