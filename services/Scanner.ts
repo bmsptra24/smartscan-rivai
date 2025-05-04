@@ -71,8 +71,6 @@ class ScannerService {
                 return text;
             } else {
                 const { data: { text } } = await Tesseract.recognize(uri, 'ind');
-                console.log(text);
-
                 return text;
             }
         } catch (error) {

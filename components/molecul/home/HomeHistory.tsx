@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { Dimensions, View, TouchableOpacity } from "react-native";
 import React, { Component } from "react";
 import TextBase from "@/components/base/Text";
 import HistoryItem from "@/components/list/HistoryItem";
@@ -9,8 +9,13 @@ import { router } from "expo-router";
 import { StoreProps, useStore } from "@/stores";
 import NotFound from "@/components/base/NotFound";
 import { showConfirm } from "@/utils/alert";
+import { BorderRadius, Color } from "@/constants/Styles";
 
 export class HomeHistory extends Component<StoreProps> {
+  state = {
+    currentPage: 1,
+  };
+
   async componentDidMount() {
     const userData = userService.getCurrentUser();
     if (!userData || !userData.id)
@@ -31,15 +36,60 @@ export class HomeHistory extends Component<StoreProps> {
     );
     if (!confirmed) return;
 
-    const userData = userService.getCurrentUser();
-    if (!userData || !userData.id)
-      return console.error("User data is missing or incomplete.");
-
     await groupService.deleteGroup(id);
     this.props.groupStore.removeGroup(id);
+
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(
+      this.props.groupStore.groups.length / itemsPerPage
+    );
+    if (this.state.currentPage > totalPages) {
+      this.setState({ currentPage: totalPages });
+    }
   };
 
   render() {
+    const { currentPage } = this.state;
+    const itemsPerPage = 9;
+    const totalPages = Math.ceil(
+      this.props.groupStore.groups.length / itemsPerPage
+    );
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const displayedGroups = this.props.groupStore.groups.slice(start, end);
+
+    const getPageNumbers = () => {
+      const pages = [];
+      const maxPagesToShow = 4;
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, currentPage + 2);
+
+      if (endPage - startPage < maxPagesToShow - 1) {
+        if (startPage === 1) {
+          endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+        } else {
+          startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      if (startPage > 1) {
+        pages.unshift("...");
+        pages.unshift(1);
+      }
+      if (endPage < totalPages) {
+        pages.push("...");
+        pages.push(totalPages);
+      }
+
+      return pages;
+    };
+
+    const pageNumbers = getPageNumbers();
+
     return (
       <View>
         <TextBase
@@ -49,32 +99,93 @@ export class HomeHistory extends Component<StoreProps> {
           Riwayat
         </TextBase>
 
-        {this.props.groupStore.groups.length === 0 && <NotFound />}
+        {this.props.groupStore.groups.length === 0 ? (
+          <NotFound />
+        ) : (
+          <>
+            <View>
+              {displayedGroups.map((item, index) => (
+                <HistoryItem
+                  key={item.id}
+                  id={item.id ?? ""}
+                  costumerId={item.customerId ?? ""}
+                  fileCount={item.documentCount}
+                  date={dateFormatter.format(
+                    item.createdAt instanceof Date
+                      ? item.createdAt
+                      : item.createdAt.toDate()
+                  )}
+                  time={timeFormatter(item.createdAt.toDate())}
+                  index={index}
+                  onPress={() => {
+                    useGroupStore.getState().setSelectedGroup(item);
+                    router.push("/(subtab)/detail");
+                  }}
+                  onDelete={this.handleDelete}
+                />
+              ))}
+            </View>
 
-        <View style={{}}>
-          {this.props.groupStore.groups &&
-            this.props.groupStore.groups?.map((item, index) => (
-              <HistoryItem
-                key={index.toString()}
-                id={item.id ?? ""}
-                costumerId={item.customerId ?? ""}
-                fileCount={item.documentCount}
-                // fileCount={this.props.groupStore.groups.length}
-                date={dateFormatter.format(
-                  item.createdAt instanceof Date
-                    ? item.createdAt
-                    : item.createdAt.toDate()
-                )}
-                time={timeFormatter(item.createdAt.toDate())}
-                index={index}
-                onPress={() => {
-                  useGroupStore.getState().setSelectedGroup(item);
-                  router.push("/(subtab)/detail");
+            {/* Pagination */}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 10,
+                marginBottom: 50,
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => this.setState({ currentPage: currentPage - 1 })}
+                disabled={currentPage === 1}
+                style={{
+                  borderTopLeftRadius: BorderRadius.default,
+                  borderBottomLeftRadius: BorderRadius.default,
+                  padding: 10,
+                  backgroundColor:
+                    currentPage === 1 ? Color.greyLight : Color.primary,
                 }}
-                onDelete={this.handleDelete}
-              />
-            ))}
-        </View>
+              >
+                <TextBase style={{ color: Color.text }}>Previous</TextBase>
+              </TouchableOpacity>
+
+              {pageNumbers.map((page, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() =>
+                    typeof page === "number" &&
+                    this.setState({ currentPage: page })
+                  }
+                  style={{
+                    padding: 10,
+                    backgroundColor:
+                      page === currentPage ? Color.primary : Color.greyLight,
+                  }}
+                  disabled={typeof page !== "number"}
+                >
+                  <TextBase style={{ color: Color.text }}>{page}</TextBase>
+                </TouchableOpacity>
+              ))}
+
+              <TouchableOpacity
+                onPress={() => this.setState({ currentPage: currentPage + 1 })}
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: 10,
+                  borderTopRightRadius: BorderRadius.default,
+                  borderBottomRightRadius: BorderRadius.default,
+                  backgroundColor:
+                    currentPage === totalPages
+                      ? Color.greyLight
+                      : Color.primary,
+                }}
+              >
+                <TextBase style={{ color: Color.text }}>Next</TextBase>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
       </View>
     );
   }

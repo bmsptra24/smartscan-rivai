@@ -18,6 +18,9 @@ import Header from "@/components/base/Header";
 import { StoreProps, useStore } from "@/stores";
 import { timeFormatter } from "@/utils/formatter";
 import NotFound from "@/components/base/NotFound";
+import { generateAndSharePdf } from "@/utils/PDF";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { SpinnerIcon } from "@/components/animation/SpinnerIcon";
 
 interface ScrollEvent {
   nativeEvent: {
@@ -30,6 +33,7 @@ interface ScrollEvent {
 export class Detail extends Component<StoreProps> {
   state = {
     currentIndex: 0,
+    isLoading: false,
   };
 
   async componentDidMount() {
@@ -42,6 +46,13 @@ export class Detail extends Component<StoreProps> {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
     const currentIndex = Math.round(contentOffsetX / Size.screen.width);
     this.setState({ currentIndex });
+  };
+
+  handleShare = async () => {
+    if (this.state.isLoading) return;
+    this.setState({ isLoading: true });
+    await generateAndSharePdf(this.props.documentStore.documents);
+    this.setState({ isLoading: false });
   };
 
   render() {
@@ -256,15 +267,22 @@ export class Detail extends Component<StoreProps> {
             onPress={() => router.push("/(subtab)/edit")}
           />
           <IconButton
-            style={{ backgroundColor: Color.secondary }}
+            style={{
+              backgroundColor: Color.secondary,
+              opacity: this.state.isLoading ? 0.5 : 1,
+            }}
             icon={
-              <MaterialCommunityIcons
-                name="share"
-                size={24}
-                color={Color.text}
-              />
+              !this.state.isLoading ? (
+                <MaterialCommunityIcons
+                  name="share"
+                  size={24}
+                  color={Color.text}
+                />
+              ) : (
+                <SpinnerIcon size={24} color={Color.text} />
+              )
             }
-            onPress={() => {}}
+            onPress={this.handleShare}
           />
         </View>
       </>
