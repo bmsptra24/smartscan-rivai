@@ -1,21 +1,14 @@
-import { router, Tabs } from "expo-router";
+import { Tabs } from "expo-router";
 import React, { Component } from "react";
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Text,
-  Pressable,
-} from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Color, IsMobileScreen } from "@/constants/Styles";
 import { StoreProps, useStore } from "@/stores";
 import { documentService, userService } from "@/services";
-import { Image } from "expo-image";
-import { Images } from "@/constants/Images";
 import ProviderWrapper from "@/contexts/ProviderWrapper";
+import Sidebar from "@/components/base/Sidebar";
 
 class TabLayout extends Component<StoreProps> {
   async componentDidMount() {
@@ -31,63 +24,7 @@ class TabLayout extends Component<StoreProps> {
       <ProviderWrapper>
         <View style={{ flex: 1, flexDirection: isMobile ? "column" : "row" }}>
           {/* Tab bar kustom untuk web (sisi kiri) */}
-          {!isMobile && (
-            <View style={styles.webTabBar}>
-              <TouchableOpacity
-                style={[
-                  styles.webTabItem,
-                  { justifyContent: "flex-start", gap: 15 },
-                ]}
-              >
-                <Image
-                  source={Images.logo.src}
-                  style={{ width: 40, height: 40, borderRadius: 5 }}
-                />
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "bold",
-                    color: Color.black,
-                  }}
-                >
-                  SmartScan Rivai
-                </Text>
-              </TouchableOpacity>
-
-              <Pressable
-                style={({ hovered }) => [
-                  styles.webTabItem,
-                  hovered && { backgroundColor: Color.greyLight },
-                ]}
-                onPress={() => router.push("/home")}
-              >
-                <Entypo size={24} name="home" color={Color.black} />
-                <Text>Beranda</Text>
-              </Pressable>
-
-              <Pressable
-                style={({ hovered }) => [
-                  styles.webTabItem,
-                  hovered && { backgroundColor: Color.greyLight },
-                ]}
-                onPress={() => router.push("/users")}
-              >
-                <AntDesign size={24} name="user" color={Color.black} />
-                <Text>Pengguna</Text>
-              </Pressable>
-
-              <Pressable
-                style={({ hovered }) => [
-                  styles.webTabItem,
-                  hovered && { backgroundColor: Color.greyLight },
-                ]}
-                onPress={() => router.push("/profile")}
-              >
-                <AntDesign size={24} name="user" color={Color.black} />
-                <Text>Profil</Text>
-              </Pressable>
-            </View>
-          )}
+          {!isMobile && <Sidebar />}
 
           {/* Konten utama */}
           <View style={{ flex: 1 }}>

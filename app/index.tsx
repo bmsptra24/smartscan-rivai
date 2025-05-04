@@ -1,22 +1,13 @@
 import React, { Component } from "react";
-import { ScrollView, Text, View } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import {
-  BorderRadius,
-  Color,
-  Distance,
-  IsMobileScreen,
-  Size,
-} from "@/constants/Styles";
+import { ScrollView, View } from "react-native";
+import { Color, Distance, IsMobileScreen, Size } from "@/constants/Styles";
 import TextBase from "@/components/base/Text";
 import InputBase from "@/components/base/Input";
-import { Image } from "expo-image";
-import { Images } from "@/constants/Images";
 import ButtonBase from "@/components/base/Button";
-import { router } from "expo-router";
 import LottieView from "lottie-react-native";
 import { BlurView } from "expo-blur";
 import { authService, userService } from "@/services";
+import { router } from "expo-router";
 
 class LoginScreen extends Component {
   animation = React.createRef<LottieView>();
@@ -25,18 +16,14 @@ class LoginScreen extends Component {
     username: "bima",
     password: "123",
     isLoading: false,
-    isLoggedIn: false,
   };
 
   componentDidMount(): void {
-    if (true) {
-      this.setState({ isLoggedIn: true });
-    }
-  }
-
-  componentDidUpdate(prevProps: any, prevState: any) {
-    if (this.state.isLoggedIn && !prevState.isLoggedIn) {
-      // router.replace("/(tabs)");
+    const user = userService.getCurrentUser();
+    if (user) {
+      setTimeout(() => {
+        router.push("/(tabs)/home");
+      }, 0);
     }
   }
 
@@ -52,7 +39,9 @@ class LoginScreen extends Component {
     try {
       this.setState({ isLoading: true });
 
-      const { username, password } = this.state;
+      const username = this.state.username;
+      const password = this.state.password;
+
       await authService.login({ username, password });
     } catch (error) {
       console.error(error);

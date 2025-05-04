@@ -3,6 +3,7 @@ import IconButton from "@/components/base/IconButton";
 import Navbar from "@/components/base/Navbar";
 import Table from "@/components/base/Table";
 import TextBase from "@/components/base/Text";
+import { Color } from "@/constants/Styles";
 import { userService } from "@/services";
 import { UserProfile } from "@/services/User";
 import { StoreProps, useStore } from "@/stores";
@@ -42,22 +43,22 @@ export class UsersPage extends Component<StoreProps> {
 
     const handleEdit = () => {
       this.props.userStore.setSelectedUser(user);
-      router.push(`/(tabs)/edit-users`);
+      router.push(`/(subtab)/edit-users`);
     };
 
     return (
       <View style={{ flexDirection: "row", gap: 10 }}>
         <IconButton
-          onPress={handleDelete}
-          icon={<Ionicons name="trash" size={24} color="black" />}
-          size="small"
-        />
-
-        <IconButton
           onPress={handleEdit}
           icon={
             <MaterialCommunityIcons name="pencil" size={24} color="black" />
           }
+          size="small"
+        />
+        <IconButton
+          style={{ backgroundColor: Color.danger }}
+          onPress={handleDelete}
+          icon={<Ionicons name="trash" size={24} color={Color.white} />}
           size="small"
         />
       </View>
@@ -88,7 +89,7 @@ export class UsersPage extends Component<StoreProps> {
             <IconButton
               onPress={() => {
                 this.props.userStore.clearSelectedUserState();
-                router.push("/(tabs)/edit-users");
+                router.push("/(subtab)/edit-users");
               }}
               icon={<FontAwesome6 name="add" size={24} color="black" />}
               size="small"

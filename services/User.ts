@@ -96,6 +96,13 @@ class UserService {
     }
 
     /**
+     * Clear current user data from local storage
+     */
+    public clearCurrentUser(): void {
+        storage.delete('userData');
+    }
+
+    /**
      * Get all user profiles
      * @returns Promise with an array of user profiles
      */

@@ -8,9 +8,11 @@ import ButtonBase from "@/components/base/Button";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import { StoreProps, useStore } from "@/stores";
+import { userService } from "@/services";
 
 class Profile extends Component<StoreProps> {
   handleLogout = () => {
+    userService.clearCurrentUser();
     router.replace("/");
   };
   render() {
