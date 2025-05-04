@@ -19,7 +19,6 @@ import { StoreProps, useStore } from "@/stores";
 import { timeFormatter } from "@/utils/formatter";
 import NotFound from "@/components/base/NotFound";
 import { generateAndSharePdf } from "@/utils/PDF";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { SpinnerIcon } from "@/components/animation/SpinnerIcon";
 
 interface ScrollEvent {

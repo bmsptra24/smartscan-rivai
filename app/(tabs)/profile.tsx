@@ -28,7 +28,9 @@ class Profile extends Component<StoreProps> {
           <TextBase variant="titlepage">Profile</TextBase>
           <Image
             source={{
-              uri: "https://api.dicebear.com/9.x/initials/svg?seed=Bima Saputra",
+              uri:
+                "https://api.dicebear.com/9.x/initials/svg?seed=" +
+                this.props.userStore.currentUser?.displayName,
             }}
             style={{ width: 223, height: 223, borderRadius: BorderRadius.full }}
           />
@@ -44,7 +46,7 @@ class Profile extends Component<StoreProps> {
           <TextBase variant="header">Versi 1.1</TextBase>
 
           <ButtonBase
-            style={{ backgroundColor: Color.secondary }}
+            style={{ backgroundColor: Color.greyLight }}
             textStyle={{ color: Color.text }}
             icon={<MaterialIcons name="logout" size={24} color={Color.text} />}
             title="Logout"

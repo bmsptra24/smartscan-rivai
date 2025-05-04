@@ -1,7 +1,6 @@
 import { View } from "react-native";
 import React, { Component } from "react";
-import { BorderRadius, Color, IsMobileScreen } from "@/constants/Styles";
-import { Image } from "expo-image";
+import { Color, IsMobileScreen } from "@/constants/Styles";
 import TextBase from "@/components/base/Text";
 import InputBase from "@/components/base/Input";
 import { groupService } from "@/services";
@@ -72,7 +71,7 @@ export class HomeHeader extends Component<StoreProps> {
         {/* Cari File Input */}
         <InputBase
           placeholder="Cari file..."
-          style={{ width: "100%", marginTop: 10 }}
+          style={{ width: "100%", marginTop: 10, backgroundColor: Color.white }}
           onChangeText={this.handleSearch}
         />
       </View>

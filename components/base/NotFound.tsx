@@ -1,4 +1,3 @@
-import { IsMobileScreen, Size } from "@/constants/Styles";
 import LottieView from "lottie-react-native";
 import React, { Component } from "react";
 import TextBase from "./Text";

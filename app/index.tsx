@@ -21,9 +21,9 @@ class LoginScreen extends Component {
   componentDidMount(): void {
     const user = userService.getCurrentUser();
     if (user) {
-      // setTimeout(() => {
-      //   router.push("/(tabs)/home");
-      // }, 0);
+      setTimeout(() => {
+        router.push("/(tabs)/home");
+      }, 0);
     }
   }
 

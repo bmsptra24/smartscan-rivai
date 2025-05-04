@@ -12,7 +12,7 @@ import Sidebar from "@/components/base/Sidebar";
 
 class TabLayout extends Component<StoreProps> {
   async componentDidMount() {
-    const user = await userService.getCurrentUser();
+    const user = userService.getCurrentUser();
     if (!user) return console.error("User not found");
     this.props.userStore.setCurrentUser(user);
   }
@@ -49,6 +49,21 @@ class TabLayout extends Component<StoreProps> {
                   ),
                 }}
               />
+              {/* {this.props.userStore.currentUser.role !== "user" && (
+                <Tabs.Screen
+                  name="users"
+                  options={{
+                    title: "Pengguna",
+                    tabBarIcon: ({ color, size }) => (
+                      <FontAwesome5
+                        size={size - 6}
+                        name="users-cog"
+                        color={color}
+                      />
+                    ),
+                  }}
+                />
+              )} */}
               <Tabs.Screen
                 name="profile"
                 options={{
@@ -97,9 +112,11 @@ const styles = StyleSheet.create({
   },
   cameraButtonContainer: {
     position: "absolute",
-    bottom: 20,
+    bottom: 20, //! center
     left: "50%",
     marginLeft: -30,
+    // bottom: 80, //! left
+    // right: "10%",
     zIndex: 1,
   },
   scanButton: {

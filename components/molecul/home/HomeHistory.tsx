@@ -1,4 +1,4 @@
-import { Dimensions, View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import React, { Component } from "react";
 import TextBase from "@/components/base/Text";
 import HistoryItem from "@/components/list/HistoryItem";
@@ -9,7 +9,7 @@ import { router } from "expo-router";
 import { StoreProps, useStore } from "@/stores";
 import NotFound from "@/components/base/NotFound";
 import { showConfirm } from "@/utils/alert";
-import { BorderRadius, Color } from "@/constants/Styles";
+import { BorderRadius, Color, IsMobileScreen } from "@/constants/Styles";
 
 export class HomeHistory extends Component<StoreProps> {
   state = {
@@ -133,7 +133,7 @@ export class HomeHistory extends Component<StoreProps> {
                 justifyContent: "center",
                 alignItems: "center",
                 marginTop: 10,
-                marginBottom: 50,
+                marginBottom: IsMobileScreen ? 100 : 50,
               }}
             >
               <TouchableOpacity

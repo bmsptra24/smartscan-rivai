@@ -12,6 +12,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { Color } from "@/constants/Styles";
 import { Image } from "expo-image";
 import { Images } from "@/constants/Images";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 export class Sidebar extends Component {
   render() {
@@ -54,7 +55,7 @@ export class Sidebar extends Component {
           ]}
           onPress={() => router.push("/users")}
         >
-          <AntDesign size={24} name="user" color={Color.black} />
+          <FontAwesome5 size={20} name="users-cog" color={Color.black} />
           <Text>Pengguna</Text>
         </Pressable>
 

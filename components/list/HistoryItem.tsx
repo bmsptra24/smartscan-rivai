@@ -2,7 +2,12 @@ import React from "react";
 import { Pressable, TouchableOpacity, View } from "react-native";
 import TextBase from "@/components/base/Text";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { AccentColors, BorderRadius, IsMobileScreen } from "@/constants/Styles";
+import {
+  AccentColors,
+  BorderRadius,
+  Color,
+  IsMobileScreen,
+} from "@/constants/Styles";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 interface HistoryItemProps {
@@ -55,13 +60,14 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
       >
         <Ionicons
           style={{
-            backgroundColor: iconColor,
+            // backgroundColor: iconColor,
+            backgroundColor: Color.greyLight,
             padding: 10,
             borderRadius: BorderRadius.full,
           }}
           name="document-outline"
           size={24}
-          color="black"
+          color={Color.text}
         />
 
         <View
@@ -88,7 +94,7 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
           <MaterialCommunityIcons
             name="delete-outline"
             size={24}
-            color="black"
+            color={Color.text}
           />
         </TouchableOpacity>
       )}

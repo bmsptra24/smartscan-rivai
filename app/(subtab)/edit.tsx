@@ -19,7 +19,6 @@ import { StoreProps, useStore } from "@/stores";
 import { DOCUMENT_TYPE } from "@/constants/Config";
 import { documentService, groupService } from "@/services";
 import { cloudinaryService } from "@/services/Cloudinary";
-import { uriToBase64 } from "@/utils/formatter";
 import { showAlert } from "@/utils/alert";
 
 export class Edit extends Component<StoreProps> {
