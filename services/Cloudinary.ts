@@ -1,3 +1,4 @@
+import { compressImage } from "@/utils/compresor";
 import { createHashSHA1 } from "@/utils/generator";
 import { Cloudinary } from "@cloudinary/url-gen";
 
@@ -114,29 +115,39 @@ class CloudinaryService {
 
         let fileType: string;
         let fileData: any;
+        let uriToUse = url;
 
-        if (url.startsWith('file://')) {
-            fileType = url.split('.').pop()?.toLowerCase() ?? '';
+        // Jika URL adalah file lokal atau blob, kompresi gambar terlebih dahulu
+        if (url.startsWith('file://') || url.startsWith('blob:')) {
+            const compressedUri = await compressImage(url);
+            if (!compressedUri) {
+                throw new Error('Gagal mengompresi gambar');
+            }
+            uriToUse = compressedUri; // Gunakan URI yang sudah dikompresi
+        }
+
+        if (uriToUse.startsWith('file://')) {
+            fileType = uriToUse.split('.').pop()?.toLowerCase() ?? '';
             if (!CloudinaryService.SUPPORTED_TYPES.includes(fileType)) {
-                throw new Error(`Unsupported file type: ${fileType}. Supported types: ${CloudinaryService.SUPPORTED_TYPES.join(', ')}`);
+                throw new Error(`Tipe file tidak didukung: ${fileType}. Tipe yang didukung: ${CloudinaryService.SUPPORTED_TYPES.join(', ')}`);
             }
 
             fileData = {
-                uri: url,
+                uri: uriToUse,
                 name: `image.${fileType}`,
                 type: CloudinaryService.MIME_TYPE_MAP[fileType],
             };
-        } else if (url.startsWith('blob:')) {
-            const response = await fetch(url);
+        } else if (uriToUse.startsWith('blob:')) {
+            const response = await fetch(uriToUse);
             const blob = await response.blob();
             fileType = blob.type.split('/')[1]?.toLowerCase() ?? 'jpg';
             if (!CloudinaryService.SUPPORTED_TYPES.includes(fileType)) {
-                throw new Error(`Unsupported file type: ${fileType}. Supported types: ${CloudinaryService.SUPPORTED_TYPES.join(', ')}`);
+                throw new Error(`Tipe file tidak didukung: ${fileType}. Tipe yang didukung: ${CloudinaryService.SUPPORTED_TYPES.join(', ')}`);
             }
 
             fileData = new File([blob], `image.${fileType}`, { type: CloudinaryService.MIME_TYPE_MAP[fileType] });
         } else {
-            throw new Error('Unsupported URL format. Use file:// or blob:');
+            throw new Error('Format URL tidak didukung. Gunakan file:// atau blob:');
         }
 
         return { fileData, fileType };
