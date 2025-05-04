@@ -112,7 +112,7 @@ export class Edit extends Component<StoreProps> {
         message: "Perubahan Berhasil Disimpan",
         status: "success",
       });
-      router.back();
+      router.replace("/(tabs)/home");
     } catch (error) {
       console.error("Failed to save changes", error);
       showToastable({

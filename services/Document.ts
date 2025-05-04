@@ -335,12 +335,9 @@ class DocumentService {
     * @returns void
     */
     public handleScanDocument(): void {
-        // ! ERROR
-        // ! Saat scan biasa bukan edit, dia error: 
-        // ! (NOBRIDGE) ERROR  Failed to save changes [Error: Error inserting or updating group: Cannot read property 'indexOf' of undefined]
-        // ! Sepertinya karena documentStore.selectedDocument.id undefined
-
         scannerService.scanDocument((scannedImages) => {
+            console.log({ scannedImages });
+
             const documentStore = useDocumentStore.getState()
             let groupId = useGroupStore.getState().selectedGroup?.id
 

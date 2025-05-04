@@ -25,10 +25,19 @@ export type CloudinaryAsset = {
 };
 
 class CloudinaryService {
-    private cloudinary: Cloudinary;
-    private api_key: string;
-    private api_secret: string;
-    private upload_preset: string;
+    private readonly cloudinary: Cloudinary;
+    private readonly api_key: string;
+    private readonly api_secret: string;
+    private readonly upload_preset: string;
+
+    private static readonly SUPPORTED_TYPES = ['jpg', 'jpeg', 'png', 'gif'];
+    private static readonly MIME_TYPE_MAP: Record<string, string> = {
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        png: 'image/png',
+        gif: 'image/gif',
+    };
+    private static readonly CLOUDINARY_URL_PREFIX = 'https://res.cloudinary.com/';
 
     constructor() {
         const cloud_name = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME || '';
@@ -37,24 +46,26 @@ class CloudinaryService {
         this.upload_preset = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '';
 
         if (!cloud_name || !this.api_key || !this.api_secret || !this.upload_preset) {
-            throw new Error('Konfigurasi Cloudinary tidak lengkap');
+            throw new Error('Incomplete Cloudinary configuration');
         }
 
         this.cloudinary = new Cloudinary({
-            cloud: {
-                cloudName: cloud_name
-            }
+            cloud: { cloudName: cloud_name },
         });
     }
 
     private async postToCloudinary(path: string, formData: FormData): Promise<any> {
         const config = this.cloudinary.getConfig();
-        if (!config.cloud) throw new Error('Cloudinary config not found');
-        const url = `https://api.cloudinary.com/v1_1/${config.cloud.cloudName || ''}/${path}`;
+        if (!config.cloud) {
+            throw new Error('Cloudinary configuration not found');
+        }
+
+        const url = `https://api.cloudinary.com/v1_1/${config.cloud.cloudName}/${path}`;
         const response = await fetch(url, {
             method: 'POST',
             body: formData,
         });
+
         const data = await response.json();
         if (data.error) {
             throw new Error(data.error.message);
@@ -64,17 +75,21 @@ class CloudinaryService {
 
     private async adminPostToCloudinary(path: string, body: object): Promise<any> {
         const config = this.cloudinary.getConfig();
-        if (!config.cloud) throw new Error('Cloudinary config not found');
+        if (!config.cloud) {
+            throw new Error('Cloudinary configuration not found');
+        }
+
         const url = `https://api.cloudinary.com/v1_1/${config.cloud.cloudName}${path}`;
         const auth = btoa(`${this.api_key}:${this.api_secret}`);
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Authorization': `Basic ${auth}`,
+                Authorization: `Basic ${auth}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(body),
         });
+
         const data = await response.json();
         if (data.error) {
             throw new Error(data.error.message);
@@ -82,75 +97,140 @@ class CloudinaryService {
         return data;
     }
 
-    private generateSignature(params: { [key: string]: string }): string {
+    private generateSignature(params: Record<string, string>): string {
         const sortedKeys = Object.keys(params).sort();
         const stringToSign = sortedKeys.map(key => `${key}=${params[key]}`).join('&') + this.api_secret;
-        const hash = createHashSHA1(stringToSign);
-        return hash;
+        return createHashSHA1(stringToSign);
+    }
+
+    private async prepareFileData(url: string): Promise<{ fileData: any; fileType: string } | null> {
+        if (!url) {
+            throw new Error('URL is empty');
+        }
+
+        if (url.startsWith(CloudinaryService.CLOUDINARY_URL_PREFIX)) {
+            return null; // Skip jika sudah URL Cloudinary
+        }
+
+        let fileType: string;
+        let fileData: any;
+
+        if (url.startsWith('file://')) {
+            fileType = url.split('.').pop()?.toLowerCase() ?? '';
+            if (!CloudinaryService.SUPPORTED_TYPES.includes(fileType)) {
+                throw new Error(`Unsupported file type: ${fileType}. Supported types: ${CloudinaryService.SUPPORTED_TYPES.join(', ')}`);
+            }
+
+            fileData = {
+                uri: url,
+                name: `image.${fileType}`,
+                type: CloudinaryService.MIME_TYPE_MAP[fileType],
+            };
+        } else if (url.startsWith('blob:')) {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            fileType = blob.type.split('/')[1]?.toLowerCase() ?? 'jpg';
+            if (!CloudinaryService.SUPPORTED_TYPES.includes(fileType)) {
+                throw new Error(`Unsupported file type: ${fileType}. Supported types: ${CloudinaryService.SUPPORTED_TYPES.join(', ')}`);
+            }
+
+            fileData = new File([blob], `image.${fileType}`, { type: CloudinaryService.MIME_TYPE_MAP[fileType] });
+        } else {
+            throw new Error('Unsupported URL format. Use file:// or blob:');
+        }
+
+        return { fileData, fileType };
     }
 
     public async addFile(url: string): Promise<CloudinaryAsset | undefined> {
         try {
-            const timestamp = Math.floor(Date.now() / 1000).toString();
-            const params = { public_id: timestamp };
-            const signature = this.generateSignature(params);
+            const fileDataResult = await this.prepareFileData(url);
+            if (!fileDataResult) {
+                console.warn('Skipping upload: URL is already a Cloudinary resource');
+                return undefined;
+            }
+
+            const { fileData } = fileDataResult;
             const formData = new FormData();
-            const fileType = url.split('.').pop();
-            formData.append('file', {
-                uri: url,
-                name: `image.${fileType}`,
-                type: `image/${fileType}`,
-            } as any);
+            formData.append('file', fileData);
             formData.append('api_key', this.api_key);
             formData.append('upload_preset', this.upload_preset);
-            // formData.append('timestamp', timestamp);
-            // formData.append('signature', signature);
             formData.append('quality', 'auto:low');
 
-            const response = await this.postToCloudinary('image/upload', formData);
-
-            return response;
+            return await this.postToCloudinary('image/upload', formData);
         } catch (error) {
-            console.error("Error uploading file to Cloudinary:", error);
+            console.error('Error uploading file to Cloudinary:', error);
             return undefined;
         }
     }
 
-    public async deleteFile(id: string): Promise<void> {
+    public async deleteFile(public_id: string): Promise<void> {
         const timestamp = Math.floor(Date.now() / 1000).toString();
-        const params = { public_id: id, timestamp };
+        const params = { public_id, timestamp };
         const signature = this.generateSignature(params);
+
         const formData = new FormData();
-        formData.append('public_id', id);
+        formData.append('public_id', public_id);
         formData.append('api_key', this.api_key);
-        formData.append('upload_preset', this.upload_preset);
-        // formData.append('timestamp', timestamp);
-        // formData.append('signature', signature);
-        formData.append('quality', 'auto:low');
+        formData.append('timestamp', timestamp);
+        formData.append('signature', signature);
 
         await this.postToCloudinary('image/destroy', formData);
     }
 
-    public async editFile(id: string, tags: string[]): Promise<void> {
-        const body = { public_ids: [id], tags: tags.join(',') };
-        await this.adminPostToCloudinary('/resources/image/upload', body);
+    public async editFile(public_id: string, tags: string[]): Promise<void> {
+        const body = { public_ids: [public_id], tags: tags.join(',') };
+        await this.adminPostToCloudinary('/resources/image/tags', body);
     }
 
     public async upsertFile(public_id: string, url: string): Promise<CloudinaryAsset> {
-        const timestamp = Math.floor(Date.now() / 1000).toString();
-        const params = { public_id: public_id, overwrite: 'true', timestamp };
-        const signature = this.generateSignature(params);
-        const formData = new FormData();
-        formData.append('file', url);
-        formData.append('public_id', public_id);
-        formData.append('overwrite', 'true');
-        formData.append('api_key', this.api_key);
-        formData.append('timestamp', timestamp);
-        formData.append('signature', signature);
-        formData.append('quality', 'auto:low');
+        try {
+            const fileDataResult = await this.prepareFileData(url);
+            if (!fileDataResult) {
+                console.warn('Skipping upload: URL is already a Cloudinary resource');
+                return {
+                    access_mode: 'public',
+                    asset_id: '',
+                    bytes: 0,
+                    created_at: new Date().toISOString(),
+                    etag: '',
+                    folder: '',
+                    format: url.split('.').pop()?.toLowerCase() || 'jpg',
+                    height: 0,
+                    original_filename: '',
+                    placeholder: false,
+                    public_id,
+                    resource_type: 'image',
+                    secure_url: url,
+                    signature: '',
+                    tags: [],
+                    type: 'upload',
+                    url,
+                    version: 0,
+                    version_id: '',
+                    width: 0,
+                };
+            }
 
-        const response = await this.postToCloudinary('image/upload', formData);
-        return response;
+            const { fileData } = fileDataResult;
+            const timestamp = Math.floor(Date.now() / 1000).toString();
+            const params = { public_id, overwrite: 'true', timestamp };
+            const signature = this.generateSignature(params);
+
+            const formData = new FormData();
+            formData.append('file', fileData);
+            formData.append('public_id', public_id);
+            formData.append('overwrite', 'true');
+            formData.append('api_key', this.api_key);
+            formData.append('timestamp', timestamp);
+            formData.append('signature', signature);
+            formData.append('quality', 'auto:low');
+
+            return await this.postToCloudinary('image/upload', formData);
+        } catch (error) {
+            console.error('Error upserting file to Cloudinary:', error);
+            throw error;
+        }
     }
 }
 
