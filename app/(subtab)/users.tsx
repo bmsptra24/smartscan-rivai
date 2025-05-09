@@ -1,10 +1,11 @@
 import Container from "@/components/base/Container";
 import IconButton from "@/components/base/IconButton";
+import InputBase from "@/components/base/Input";
 import Navbar from "@/components/base/Navbar";
 import Table from "@/components/base/Table";
 import TextBase from "@/components/base/Text";
 import { Color } from "@/constants/Styles";
-import { userService } from "@/services";
+import { systemService, userService } from "@/services";
 import { UserProfile } from "@/services/User";
 import { StoreProps, useStore } from "@/stores";
 import { showAlert, showConfirm } from "@/utils/alert";
@@ -12,11 +13,26 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
+
+// Extend the Window interface to include electronAPI
+interface ElectronAPI {
+  selectFolder: () => Promise<string | null>;
+  saveFile: (fileName: string, content: string) => Promise<boolean>;
+  openFileExplorer: () => Promise<boolean>;
+}
+
+declare global {
+  interface Window {
+    electronAPI: ElectronAPI;
+  }
+}
+
 import React, { Component } from "react";
 import { View, Dimensions } from "react-native";
 
 interface UsersPageState {
   screenWidth: number;
+  path: string | undefined;
 }
 
 export class UsersPage extends Component<StoreProps, UsersPageState> {
@@ -27,6 +43,7 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
     super(props);
     this.state = {
       screenWidth: Dimensions.get("window").width,
+      path: systemService.getPath(),
     };
 
     this.dimensionsHandler = null; // Initialize in constructor
@@ -42,6 +59,7 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
       "change",
       this.updateScreenWidth
     );
+    this.setState({ path: systemService.getPath() });
   }
 
   componentWillUnmount() {
@@ -74,6 +92,32 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
       return [300, 320, 300, 500];
     }
   }
+
+  handleOpenFileExplorer = async () => {
+    try {
+      if (!window.electronAPI) return console.error("Electron API is null.");
+      const success = await window.electronAPI.openFileExplorer();
+      if (!success)
+        return showAlert(
+          "Gagal membuka file explorer",
+          "Path folder tidak ditemukan"
+        );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  handleChooseStorageLocation = async () => {
+    try {
+      if (!window.electronAPI) return console.error("Electron API is null.");
+      const path = await window.electronAPI.selectFolder();
+      if (!path) return;
+      systemService.setPath(path);
+      this.setState({ path });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   generateButtonAction = (user: UserProfile) => {
     const handleDelete = async () => {
@@ -140,55 +184,101 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
 
     return (
       <Container>
-        <View style={{ gap: isMobile ? 10 : 20 }}>
-          <Navbar title="Pengguna" />
+        <View style={{ gap: isMobile ? 20 : 40 }}>
+          <Navbar title="Setting" />
           <View
             style={{
+              gap: isMobile ? 10 : 20,
               paddingHorizontal: isMobile ? 15 : 25,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
             }}
           >
-            <TextBase variant="title">Akun Pengguna</TextBase>
-            <IconButton
-              onPress={() => {
-                this.props.userStore.clearSelectedUserState();
-                router.push("/(subtab)/edit-users");
+            <TextBase variant="title">Lokasi Penyimpanan</TextBase>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                gap: 10,
               }}
-              icon={
-                <FontAwesome6
-                  name="add"
-                  size={isMobile ? 18 : 24}
-                  color="black"
-                />
-              }
-              size="small"
-            />
+            >
+              <InputBase
+                style={{ width: "100%" }}
+                value={systemService.getPath()}
+                placeholder="Pilih lokasi..."
+              />
+              <IconButton
+                onPress={this.handleChooseStorageLocation}
+                icon={
+                  <MaterialCommunityIcons
+                    name="pencil"
+                    size={isMobile ? 18 : 24}
+                    color="black"
+                  />
+                }
+              />
+              <IconButton
+                onPress={this.handleOpenFileExplorer}
+                icon={
+                  <Ionicons
+                    name="open-outline"
+                    size={isMobile ? 18 : 24}
+                    color="black"
+                  />
+                }
+              />
+            </View>
           </View>
+
           <View
             style={{
-              paddingHorizontal: isMobile ? 10 : 25,
-              flex: 1,
+              gap: isMobile ? 10 : 20,
+              paddingHorizontal: isMobile ? 15 : 25,
             }}
           >
-            <Table
-              tableHead={this.tableHead}
-              tableData={tableData}
-              widthArr={isMobile ? this.getWidthArr() : undefined}
-              containerStyle={{
-                padding: isMobile ? 5 : 15,
-                flex: isMobile ? 0 : 1,
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
-              headerCellStyle={{
-                padding: 10,
-                width: isMobile ? 100 : "25%",
+            >
+              <TextBase variant="title">Akun Pengguna</TextBase>
+              <IconButton
+                onPress={() => {
+                  this.props.userStore.clearSelectedUserState();
+                  router.push("/(subtab)/edit-users");
+                }}
+                icon={
+                  <FontAwesome6
+                    name="add"
+                    size={isMobile ? 18 : 24}
+                    color="black"
+                  />
+                }
+              />
+            </View>
+            <View
+              style={{
+                flex: 1,
               }}
-              bodyCellStyle={{
-                padding: isMobile ? 5 : 10,
-                width: isMobile ? 100 : "25%",
-              }}
-            />
+            >
+              <Table
+                tableHead={this.tableHead}
+                tableData={tableData}
+                widthArr={isMobile ? this.getWidthArr() : undefined}
+                containerStyle={{
+                  padding: isMobile ? 5 : 15,
+                  flex: isMobile ? 0 : 1,
+                }}
+                headerCellStyle={{
+                  padding: 10,
+                  width: isMobile ? 100 : "25%",
+                }}
+                bodyCellStyle={{
+                  padding: isMobile ? 5 : 10,
+                  width: isMobile ? 100 : "25%",
+                }}
+              />
+            </View>
           </View>
         </View>
       </Container>

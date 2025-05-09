@@ -55,7 +55,7 @@ export class Sidebar extends Component {
           ]}
           onPress={() => router.push("/users")}
         >
-          <FontAwesome5 size={20} name="users-cog" color={Color.black} />
+          <AntDesign size={24} name="setting" color={Color.black} />
           <Text>Pengguna</Text>
         </Pressable>
 

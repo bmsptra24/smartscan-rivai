@@ -10,6 +10,9 @@ import { StoreProps, useStore } from "@/stores";
 import NotFound from "@/components/base/NotFound";
 import { showConfirm } from "@/utils/alert";
 import { BorderRadius, Color, IsMobileScreen } from "@/constants/Styles";
+import ButtonBase from "@/components/base/Button";
+import IconButton from "@/components/base/IconButton";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export class HomeHistory extends Component<StoreProps> {
   state = {
@@ -92,6 +95,10 @@ export class HomeHistory extends Component<StoreProps> {
 
     return (
       <View>
+        <IconButton
+          size="small"
+          icon={<Ionicons name="sync" size={24} color="black" />}
+        />
         <TextBase
           style={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10 }}
           variant="header"

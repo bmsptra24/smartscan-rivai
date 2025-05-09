@@ -128,7 +128,7 @@ class UsersPage extends Component<StoreProps, UsersPageState> {
               onChangeText={(text: string) =>
                 this.handleInputChange("password", text)
               }
-              value={this.props.userStore.selectedUser?.password}
+              // value={this.props.userStore.selectedUser?.password}
               secureTextEntry
             />
             <InputBase

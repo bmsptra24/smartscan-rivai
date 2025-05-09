@@ -5,6 +5,11 @@
   "scripts": {
     "dev": "npx expo start",
     "build-dev-client": "sudo mount -o remount,size=10G /tmp && eas build --platform android --profile development --local",
+    "prod-android": "sudo mount -o remount,size=10G /tmp && eas build --platform android --profile production --local",
+    "prod-web": "npx expo export --platform web",
+    "prod:linux": "./scripts/build-linux.sh",
+    "start:linux": "./scripts/build-linux.sh && ./dist/SmartScan\\ Rivai-1.0.0.AppImage --no-sandbox",
+    "prod:win": "./scripts/build-win.sh",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
@@ -66,7 +71,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
+    "@babel/core": "^7.27.1",
     "@config-plugins/react-native-blob-util": "^9.0.0",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.3.12",

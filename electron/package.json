@@ -1,0 +1,41 @@
+{
+  "name": "smartscan-rivai",
+  "version": "1.0.0",
+  "main": "main.js",
+  "description": "Aplikasi SmartScan untuk kebutuhan scanning",
+  "author": "bmsptra24",
+  "scripts": {
+    "start": "electron . --no-sandbox",
+    "build:win": "npx electron-builder --win",
+    "build:linux": "npx electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^latest",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.smartscan-rivai.myapp",
+    "productName": "SmartScan Rivai",
+    "icon": "assets/icon.png",
+    "files": [
+      "web-build/**/*",
+      "services/**",
+      "assets/**",
+      "preload.js",
+      "main.js"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "express": "^5.1.0"
+  }
+}
