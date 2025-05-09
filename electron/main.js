@@ -6,6 +6,7 @@ const {
   selectFolderAndSaveToLocal,
   saveFileWithPathFromLocal,
   openFileExplorer,
+  getFolders,
 } = require('./services/file')
 
 let mainWindow
@@ -58,10 +59,14 @@ ipcMain.handle('select-folder', async () => {
   return await selectFolderAndSaveToLocal()
 })
 
-ipcMain.handle('save-file', async (event, fileName, content) => {
-  return await saveFileWithPathFromLocal(fileName, content)
+ipcMain.handle('save-file', async (event, folderName, fileName, content) => {
+  return await saveFileWithPathFromLocal(folderName, fileName, content)
 })
 
 ipcMain.handle('open-file-explorer', async () => {
   return await openFileExplorer()
+})
+
+ipcMain.handle('get-folders', async () => {
+  return await getFolders()
 })

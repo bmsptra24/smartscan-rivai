@@ -4,17 +4,7 @@
     "strict": true,
     "paths": {
       "@/*": ["./*"]
-    },
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types" // Tambahkan folder types untuk deklarasi tipe kustom
-    ]
+    }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "types/**/*.d.ts" // Sertakan file deklarasi di folder types
-  ]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
 }

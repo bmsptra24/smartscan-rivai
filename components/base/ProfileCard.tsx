@@ -16,7 +16,9 @@ export class ProfileCard extends Component<StoreProps> {
       >
         <Image
           source={{
-            uri: "https://api.dicebear.com/9.x/initials/svg?seed=Bima Saputra",
+            uri:
+              "https://api.dicebear.com/9.x/initials/svg?seed=" +
+              this.props.userStore.currentUser?.displayName,
           }}
           style={{ width: 40, height: 40, borderRadius: BorderRadius.full }}
         />

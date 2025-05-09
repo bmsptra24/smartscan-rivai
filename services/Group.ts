@@ -20,6 +20,8 @@ import {
     setDoc
 } from 'firebase/firestore';
 import firebaseInstance from './Firebase';
+import DocumentService, { Document } from './Document';
+import { documentService } from '.';
 
 // Define group types
 export interface Group {
@@ -29,6 +31,10 @@ export interface Group {
     documentCount: number;
     createdAt: Timestamp;
     updatedAt?: Timestamp;
+}
+
+interface GroupWithDocuments extends Group {
+    documents: Document[];
 }
 
 // Type for creating a new group
@@ -114,6 +120,43 @@ class GroupService {
             return groups;
         } catch (error) {
             throw new Error(`Error fetching all groups: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
+     * Get all groups excluding specified customer IDs, including their documents
+     * @param excludedCustomerIds Array of customer IDs to exclude
+     * @param documentService Instance of DocumentService to fetch documents
+     * @returns Promise with array of groups, each including their documents
+     */
+    public async getGroupsExcludingCustomerIdsWithDocuments(
+        excludedCustomerIds: string[]
+    ): Promise<GroupWithDocuments[]> {
+        try {
+            let q;
+            if (excludedCustomerIds.length === 0) {
+                q = collection(this.db, this.collectionName).withConverter(groupConverter);
+            } else {
+                q = query(
+                    collection(this.db, this.collectionName).withConverter(groupConverter),
+                    where('customerId', 'not-in', excludedCustomerIds)
+                );
+            }
+
+            const querySnapshot = await getDocs(q);
+            const groups: Group[] = querySnapshot.docs.map(doc => doc.data());
+
+            const documentsPromises = groups.map(group => documentService.getDocumentsByGroupId(group.id));
+            const documentsArrays = await Promise.all(documentsPromises);
+
+            const groupsWithDocuments: GroupWithDocuments[] = groups.map((group, index) => ({
+                ...group,
+                documents: documentsArrays[index]
+            }));
+
+            return groupsWithDocuments;
+        } catch (error) {
+            throw new Error(`Error fetching groups with documents: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 

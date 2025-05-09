@@ -14,19 +14,6 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
 
-// Extend the Window interface to include electronAPI
-interface ElectronAPI {
-  selectFolder: () => Promise<string | null>;
-  saveFile: (fileName: string, content: string) => Promise<boolean>;
-  openFileExplorer: () => Promise<boolean>;
-}
-
-declare global {
-  interface Window {
-    electronAPI: ElectronAPI;
-  }
-}
-
 import React, { Component } from "react";
 import { View, Dimensions } from "react-native";
 

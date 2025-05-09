@@ -10,6 +10,24 @@ import "react-native-reanimated";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+// Extend the Window interface to include electronAPI
+interface ElectronAPI {
+  selectFolder: () => Promise<string | null>;
+  saveFile: (
+    folder: string,
+    fileName: string,
+    content: ArrayBuffer
+  ) => Promise<boolean>;
+  openFileExplorer: () => Promise<boolean>;
+  getFolders: () => Promise<string[]>;
+}
+
+declare global {
+  interface Window {
+    electronAPI: ElectronAPI;
+  }
+}
+
 export default function RootLayout() {
   const [loaded] = useFonts({
     OpenSansMedium: require("../assets/fonts/OpenSans-Medium.ttf"),
