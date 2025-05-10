@@ -124,32 +124,33 @@ class GroupService {
     }
 
     /**
-     * Get all groups excluding specified customer IDs, including their documents
-     * @param excludedCustomerIds Array of customer IDs to exclude
-     * @param documentService Instance of DocumentService to fetch documents
-     * @returns Promise with array of groups, each including their documents
-     */
+  * Get all groups excluding specified customer IDs, including their documents
+  * @param excludedCustomerIds Array of customer IDs to exclude
+  * @param documentService Instance of DocumentService to fetch documents
+  * @returns Promise with array of groups, each including their documents
+  */
     public async getGroupsExcludingCustomerIdsWithDocuments(
         excludedCustomerIds: string[]
     ): Promise<GroupWithDocuments[]> {
         try {
-            let q;
-            if (excludedCustomerIds.length === 0) {
-                q = collection(this.db, this.collectionName).withConverter(groupConverter);
-            } else {
-                q = query(
-                    collection(this.db, this.collectionName).withConverter(groupConverter),
-                    where('customerId', 'not-in', excludedCustomerIds)
-                );
-            }
-
+            // 1. Ambil semua grup dari Firestore tanpa filter not-in
+            const q = collection(this.db, this.collectionName).withConverter(groupConverter);
             const querySnapshot = await getDocs(q);
-            const groups: Group[] = querySnapshot.docs.map(doc => doc.data());
+            const allGroups: Group[] = querySnapshot.docs.map(doc => doc.data());
 
-            const documentsPromises = groups.map(group => documentService.getDocumentsByGroupId(group.id));
+            // 2. Filter grup yang customerId-nya tidak ada dalam excludedCustomerIds
+            const filteredGroups = allGroups.filter(
+                group => !excludedCustomerIds.includes(group.customerId)
+            );
+
+            // 3. Ambil dokumen untuk setiap grup yang difilter
+            const documentsPromises = filteredGroups.map(group =>
+                documentService.getDocumentsByGroupId(group.id)
+            );
             const documentsArrays = await Promise.all(documentsPromises);
 
-            const groupsWithDocuments: GroupWithDocuments[] = groups.map((group, index) => ({
+            // 4. Gabungkan grup dengan dokumennya
+            const groupsWithDocuments: GroupWithDocuments[] = filteredGroups.map((group, index) => ({
                 ...group,
                 documents: documentsArrays[index]
             }));

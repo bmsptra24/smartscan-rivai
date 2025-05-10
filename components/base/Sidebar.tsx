@@ -56,7 +56,7 @@ export class Sidebar extends Component {
           onPress={() => router.push("/users")}
         >
           <AntDesign size={24} name="setting" color={Color.black} />
-          <Text>Pengguna</Text>
+          <Text>Pengaturan</Text>
         </Pressable>
 
         <Pressable

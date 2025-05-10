@@ -5,16 +5,16 @@ import { View } from "react-native";
 import IconButton from "@/components/base/IconButton";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ProgressBar from "@/components/base/ProgressBar";
-import { groupService, documentService } from "@/services";
+import { groupService } from "@/services";
 import { useState } from "react";
 import { jsPDF } from "jspdf";
 import { Document } from "@/services/Document";
+import { showAlert } from "@/utils/alert";
 
 export default function HomeScreen() {
   const [progress, setProgress] = useState(0);
 
   const handleSyncDocument = async () => {
-    // Pastikan Electron API tersedia
     if (!window.electronAPI) {
       console.error("Electron API is null.");
       return;
@@ -33,38 +33,49 @@ export default function HomeScreen() {
         await groupService.getGroupsExcludingCustomerIdsWithDocuments(
           excludedCustomerIds
         );
+      console.log({ groupsWithDocuments, excludedCustomerIds });
 
       // 3. Hitung total grup untuk progress bar
       const totalGroups = groupsWithDocuments.length;
       if (totalGroups === 0) {
-        console.log("Tidak ada grup untuk diproses.");
+        showAlert("Selesai", "Tidak ada grup untuk diproses.");
         setProgress(100);
         return;
       }
 
       let processedGroups = 0;
 
-      // 4. Proses setiap grup: buat PDF dan simpan ke file system
+      // 4. Proses setiap grup
       for (const group of groupsWithDocuments) {
         try {
-          // Buat PDF dari dokumen grup
-          const pdfBlob = await createPdfFromDocuments(group.documents);
+          // Kelompokkan dokumen berdasarkan type
+          const documentsByType = group.documents.reduce((acc, doc) => {
+            if (!acc[doc.type]) {
+              acc[doc.type] = [];
+            }
+            acc[doc.type].push(doc);
+            return acc;
+          }, {} as Record<string, Document[]>);
 
-          // Konversi Blob ke ArrayBuffer
-          const pdfBuffer = await pdfBlob.arrayBuffer();
+          // Buat dan simpan PDF untuk setiap type
+          for (const [type, docs] of Object.entries(documentsByType)) {
+            const pdfBlob = await createPdfFromDocuments(docs);
+            const pdfBuffer = await pdfBlob.arrayBuffer();
+            const fileName = `${type}.pdf`; // Nama file berdasarkan type
 
-          // Simpan PDF ke desktop melalui Electron API
-          const success = await window.electronAPI.saveFile(
-            group.customerId,
-            processedGroups.toString(),
-            pdfBuffer
-          );
-          if (!success) {
-            console.error(`Gagal menyimpan PDF untuk grup ${group.id}`);
-            continue;
+            // Simpan PDF dengan folderName = customerId, fileName = type.pdf
+            const success = await window.electronAPI.saveFile(
+              group.customerId,
+              fileName,
+              pdfBuffer
+            );
+            if (!success) {
+              console.error(
+                `Gagal menyimpan PDF untuk grup ${group.id} dan type ${type}`
+              );
+            }
           }
 
-          // 5. Update progress berdasarkan jumlah grup yang diproses
           processedGroups++;
           setProgress((processedGroups / totalGroups) * 100);
         } catch (error) {
@@ -96,36 +107,29 @@ export default function HomeScreen() {
     for (let i = 0; i < documents.length; i++) {
       const document = documents[i];
       try {
-        // Ambil gambar dari image_url
         const response = await fetch(document.image_url);
         if (!response.ok)
           throw new Error(`Gagal mengambil gambar dari ${document.image_url}`);
         const blob = await response.blob();
         const imgData = await blobToBase64(blob);
 
-        // Tambahkan gambar ke PDF
         const imgProps = await getImageProperties(imgData);
-        const imgWidth = imgProps.width;
-        const imgHeight = imgProps.height;
-        let scaledWidth = imgWidth;
-        let scaledHeight = imgHeight;
+        let scaledWidth = imgProps.width;
+        let scaledHeight = imgProps.height;
 
-        // Skala gambar agar muat di halaman
-        if (imgWidth > maxImgWidth || imgHeight > maxImgHeight) {
-          const widthRatio = maxImgWidth / imgWidth;
-          const heightRatio = maxImgHeight / imgHeight;
+        if (imgProps.width > maxImgWidth || imgProps.height > maxImgHeight) {
+          const widthRatio = maxImgWidth / imgProps.width;
+          const heightRatio = maxImgHeight / imgProps.height;
           const scaleRatio = Math.min(widthRatio, heightRatio);
-          scaledWidth = imgWidth * scaleRatio;
-          scaledHeight = imgHeight * scaleRatio;
+          scaledWidth = imgProps.width * scaleRatio;
+          scaledHeight = imgProps.height * scaleRatio;
         }
 
-        // Pusatkan gambar
         const x = (pageWidth - scaledWidth) / 2;
         const y = (pageHeight - scaledHeight) / 2;
 
         doc.addImage(imgData, "JPEG", x, y, scaledWidth, scaledHeight);
 
-        // Tambahkan halaman baru untuk dokumen berikutnya (kecuali dokumen terakhir)
         if (i < documents.length - 1) {
           doc.addPage();
         }

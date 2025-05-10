@@ -146,7 +146,8 @@ async function getFolders() {
       throw new Error('Path folder tidak ditemukan')
     }
 
-    const dirPath = path.resolve(folderPath)
+    // Gabungkan path folder dengan subdirektori Documents
+    const dirPath = path.join(folderPath, 'Documents')
     const items = await fs.readdir(dirPath, { withFileTypes: true })
 
     // Filter hanya folder dan ambil namanya
