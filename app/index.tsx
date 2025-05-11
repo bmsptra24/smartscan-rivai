@@ -52,6 +52,7 @@ class LoginScreen extends Component {
 
   render() {
     const { username, password } = this.state;
+    console.log({ IsMobileScreen });
 
     return (
       <ScrollView style={{ backgroundColor: Color.background }}>
