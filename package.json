@@ -22,8 +22,6 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@cloudinary/react": "^1.14.1",
-    "@cloudinary/url-gen": "^1.21.0",
     "@config-plugins/react-native-pdf": "^9.0.0",
     "@expo/react-native-action-sheet": "^4.1.1",
     "@expo/vector-icons": "^14.0.2",
