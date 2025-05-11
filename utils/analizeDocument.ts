@@ -1,8 +1,5 @@
 import { DOC_TYPE_WITH_KEYWORDS, DocumentTypeKeywords } from "@/constants/Config";
 
-
-
-
 // Fungsi untuk mempersiapkan teks OCR
 function prepareText(text: string): string {
     return text.toLowerCase();
@@ -44,4 +41,19 @@ function determineDocumentType(ocrText: string, DOC_TYPE_WITH_KEYWORDS: Document
 // Fungsi utama untuk mendeteksi jenis dokumen
 export function detectDocumentType(ocrText: string): string {
     return determineDocumentType(ocrText, DOC_TYPE_WITH_KEYWORDS);
+}
+
+export function detectCustomerId(ocrText: string): string | null {
+    const regex = /14100\d+/g;
+    const matches = ocrText.match(regex);
+
+    if (matches) {
+        for (const match of matches) {
+            if (match.length === 12) {
+                return match;
+            }
+        }
+    }
+
+    return null;
 }

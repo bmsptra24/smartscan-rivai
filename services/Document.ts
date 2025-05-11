@@ -28,7 +28,7 @@ import useGroupStore from '@/stores/Group';
 import { generateID } from '@/utils/generator';
 import { Group } from './Group';
 import { userService } from '.';
-import { detectDocumentType } from '@/utils/detectDocumentType';
+import { detectCustomerId, detectDocumentType } from '@/utils/analizeDocument';
 
 // Define document types
 export interface Document {
@@ -384,20 +384,24 @@ class DocumentService {
             // Analize the document type
             newDocuments.forEach(async (doc) => {
                 // OCR the image
-                let type
+                let type, idpel
                 const ocrResult = await scannerService.extractTextFromImage(doc.image_url)
 
                 // Analize the text
                 if (!ocrResult) type = "Lainnya"
                 if (ocrResult) type = detectDocumentType(ocrResult)
+                if (ocrResult) idpel = detectCustomerId(ocrResult);
 
                 // buat seolah olah await selama 1 detik dengan timeout
                 // await new Promise(resolve => setTimeout(resolve, 1000))
 
                 // Set the document type
-                if (!doc.id || !type) return
+                if (!doc.id || !type || !idpel) return
                 documentStore.updateDocumentCategory(doc.id, type)
+                documentStore.updateCustomerId(doc.id, idpel)
             });
+
+            // documentStore.updateCustomerId(doc.id, idPelanggan)
 
             // save to state
             documentStore.addDocuments(newDocuments)
