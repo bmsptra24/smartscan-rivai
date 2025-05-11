@@ -115,6 +115,11 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
 
   handleResetSystem = async () => {
     try {
+      const confirmation = await showConfirm(
+        "Peringatan!",
+        "Yakin ingin mereset? Data akan hilang permanen."
+      );
+      if (!confirmation) return;
       await documentService.deleteAllDocuments();
       await groupService.deleteAllGroups();
       await cloudinaryService.deleteAllFiles();
@@ -301,6 +306,7 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
               }}
             >
               <ButtonBase
+                onPress={this.handleResetSystem}
                 textStyle={{ color: Color.white }}
                 style={{ backgroundColor: Color.danger }}
                 title="Kosongkan Penyimpanan"
