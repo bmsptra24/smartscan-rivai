@@ -1,3 +1,4 @@
+import ButtonBase from "@/components/base/Button";
 import Container from "@/components/base/Container";
 import IconButton from "@/components/base/IconButton";
 import InputBase from "@/components/base/Input";
@@ -5,7 +6,13 @@ import Navbar from "@/components/base/Navbar";
 import Table from "@/components/base/Table";
 import TextBase from "@/components/base/Text";
 import { Color } from "@/constants/Styles";
-import { systemService, userService } from "@/services";
+import {
+  documentService,
+  groupService,
+  systemService,
+  userService,
+} from "@/services";
+import { cloudinaryService } from "@/services/Cloudinary";
 import { UserProfile } from "@/services/User";
 import { StoreProps, useStore } from "@/stores";
 import { showAlert, showConfirm } from "@/utils/alert";
@@ -103,6 +110,17 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
       this.setState({ path });
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  handleResetSystem = async () => {
+    try {
+      await documentService.deleteAllDocuments();
+      await groupService.deleteAllGroups();
+      await cloudinaryService.deleteAllFiles();
+      showAlert("Berhasil", `Penyimpanan berhasil dikosongkan.`);
+    } catch (error) {
+      showAlert("Gagal mengosongkan penyimpanan.", `${error}`);
     }
   };
 
@@ -264,6 +282,28 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
                   padding: isMobile ? 5 : 10,
                   width: isMobile ? 100 : "25%",
                 }}
+              />
+            </View>
+          </View>
+
+          <View
+            style={{
+              gap: isMobile ? 10 : 20,
+              paddingHorizontal: isMobile ? 15 : 25,
+            }}
+          >
+            <TextBase variant="title">Reset</TextBase>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                gap: 10,
+              }}
+            >
+              <ButtonBase
+                textStyle={{ color: Color.white }}
+                style={{ backgroundColor: Color.danger }}
+                title="Kosongkan Penyimpanan"
               />
             </View>
           </View>

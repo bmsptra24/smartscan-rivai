@@ -189,6 +189,21 @@ class CloudinaryService {
         await this.postToCloudinary('image/destroy', formData);
     }
 
+    public async deleteAllFiles(): Promise<void> {
+        const timestamp = Math.floor(Date.now() / 1000).toString();
+        const params = { timestamp };
+        const signature = this.generateSignature(params);
+
+        const body = {
+            all: true,
+            api_key: this.api_key,
+            timestamp,
+            signature,
+        };
+
+        await this.adminPostToCloudinary('/resources/image/delete_by_prefix', body);
+    }
+
     public async editFile(public_id: string, tags: string[]): Promise<void> {
         const body = { public_ids: [public_id], tags: tags.join(',') };
         await this.adminPostToCloudinary('/resources/image/tags', body);

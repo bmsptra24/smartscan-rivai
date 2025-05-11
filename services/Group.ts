@@ -335,6 +335,24 @@ class GroupService {
     }
 
     /**
+     * Delete all groups
+     * @returns Promise with boolean indicating success
+     */
+    public async deleteAllGroups(): Promise<boolean> {
+        try {
+            const collectionRef = collection(this.db, this.collectionName).withConverter(groupConverter);
+            const querySnapshot = await getDocs(collectionRef);
+
+            const deletePromises = querySnapshot.docs.map((doc) => deleteDoc(doc.ref));
+            await Promise.all(deletePromises);
+
+            return true;
+        } catch (error) {
+            throw new Error(`Error deleting all groups: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
      * Get groups by type
      * @param type Group type to filter by
      * @param customerId Optional customer ID to filter by
