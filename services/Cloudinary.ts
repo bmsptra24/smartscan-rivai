@@ -52,7 +52,7 @@ class CloudinaryService {
         }
 
         this.cloudinary = new Cloudinary({
-            cloud: { cloudName: cloud_name },
+            cloud: { cloudName: cloud_name, apiKey: this.api_key, apiSecret: this.api_secret },
         });
     }
 
