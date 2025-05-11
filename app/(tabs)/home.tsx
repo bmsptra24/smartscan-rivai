@@ -10,6 +10,7 @@ import { useState } from "react";
 import { jsPDF } from "jspdf";
 import { Document } from "@/services/Document";
 import { showAlert } from "@/utils/alert";
+import { IsMobileScreen } from "@/constants/Styles";
 
 export default function HomeScreen() {
   const [progress, setProgress] = useState(0);
@@ -170,21 +171,23 @@ export default function HomeScreen() {
   return (
     <Container>
       <HomeHeader />
-      <View
-        style={{
-          paddingHorizontal: 20,
-          paddingTop: 20,
-          flexDirection: "row",
-          gap: 10,
-        }}
-      >
-        <ProgressBar progress={progress} />
-        <IconButton
-          size="small"
-          icon={<Ionicons name="sync" size={24} color="black" />}
-          onPress={handleSyncDocument}
-        />
-      </View>
+      {!IsMobileScreen && (
+        <View
+          style={{
+            paddingHorizontal: 20,
+            paddingTop: 20,
+            flexDirection: "row",
+            gap: 10,
+          }}
+        >
+          <ProgressBar progress={progress} />
+          <IconButton
+            size="small"
+            icon={<Ionicons name="sync" size={24} color="black" />}
+            onPress={handleSyncDocument}
+          />
+        </View>
+      )}
       <HomeHistory />
     </Container>
   );

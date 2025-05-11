@@ -112,17 +112,19 @@ export class HomeHistory extends Component<StoreProps> {
         >
           <TextBase variant="header">Riwayat</TextBase>
 
-          <IconButton
-            onPress={this.handleAddNew}
-            icon={
-              <Feather
-                name="plus"
-                size={IsMobileScreen ? 18 : 20}
-                color={Color.text}
-              />
-            }
-            size="small"
-          />
+          {!IsMobileScreen && (
+            <IconButton
+              onPress={this.handleAddNew}
+              icon={
+                <Feather
+                  name="plus"
+                  size={IsMobileScreen ? 18 : 20}
+                  color={Color.text}
+                />
+              }
+              size="small"
+            />
+          )}
         </View>
 
         {this.props.groupStore.groups.length === 0 ? (
