@@ -20,6 +20,8 @@ import { DOCUMENT_TYPE } from "@/constants/Config";
 import { documentService, groupService } from "@/services";
 import { cloudinaryService } from "@/services/Cloudinary";
 import { showAlert } from "@/utils/alert";
+import IconButton from "@/components/base/IconButton";
+import { Group } from "@/services/Group";
 
 export class Edit extends Component<StoreProps> {
   state = {
@@ -58,6 +60,11 @@ export class Edit extends Component<StoreProps> {
     }
   };
 
+  handleDelete = async (id: string | undefined) => {
+    if (!id || !this.props.groupStore.selectedGroup) return;
+    this.props.documentStore.deleteDocument(id);
+  };
+
   handleSave = async () => {
     const validation = this.validateData();
     if (!validation.isValid) {
@@ -67,8 +74,8 @@ export class Edit extends Component<StoreProps> {
 
     try {
       this.setState({ isSaving: true });
-      console.log("Saving changes...", this.props.groupStore.selectedGroup);
 
+      // Update the group and doc
       const updatedData = {
         ...this.props.groupStore.selectedGroup,
         documentCount: this.props.documentStore.documents.length,
@@ -106,6 +113,26 @@ export class Edit extends Component<StoreProps> {
       );
 
       this.props.groupStore.updateGrup(groupResponse);
+
+      // Delete doc in firestore that deleted in state
+      const docsInFirestore = await documentService.getDocumentsByGroupId(
+        groupResponse.id
+      );
+      // 1. Check documents that are in Firestore but not in the state
+      const stateDocumentIds = this.props.documentStore.documents.map(
+        (doc) => doc.id
+      );
+      const documentsToDelete = docsInFirestore.filter(
+        (firestoreDoc) => !stateDocumentIds.includes(firestoreDoc.id)
+      );
+      // 2. Delete the documents
+      await Promise.all(
+        documentsToDelete.map(async (doc) => {
+          if (!doc.id || !doc.image_public_id) return;
+          await cloudinaryService.deleteFile(doc.image_public_id);
+          await documentService.deleteDocument(doc.id);
+        })
+      );
 
       showToastable({
         message: "Perubahan Berhasil Disimpan",
@@ -190,7 +217,21 @@ export class Edit extends Component<StoreProps> {
             }}
           >
             {this.props.documentStore.documents.map((doc) => (
-              <View key={doc.id}>
+              <View key={doc.id} style={{ position: "relative" }}>
+                <IconButton
+                  onPress={() => this.handleDelete(doc.id)}
+                  icon={<Ionicons name="close" size={18} color="black" />}
+                  size="small"
+                  style={{
+                    backgroundColor: Color.white,
+                    width: 26,
+                    height: 26,
+                    position: "absolute",
+                    top: 6,
+                    left: 6,
+                    zIndex: 2,
+                  }}
+                />
                 <Image
                   source={{ uri: doc.image_url }}
                   style={{

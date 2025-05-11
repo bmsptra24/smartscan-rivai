@@ -125,7 +125,7 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
 
     const handleEdit = () => {
       this.props.userStore.setSelectedUser(user);
-      router.push(`/(subtab)/edit-users`);
+      router.push(`/(subtab)/edit-setting`);
     };
 
     const isMobile = this.state.screenWidth < 768;
@@ -232,7 +232,7 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
               <IconButton
                 onPress={() => {
                   this.props.userStore.clearSelectedUserState();
-                  router.push("/(subtab)/edit-users");
+                  router.push("/(subtab)/edit-setting");
                 }}
                 icon={
                   <FontAwesome6

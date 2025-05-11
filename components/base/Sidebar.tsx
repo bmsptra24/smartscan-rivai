@@ -53,7 +53,7 @@ export class Sidebar extends Component {
             styles.webTabItem,
             hovered && { backgroundColor: Color.greyLight },
           ]}
-          onPress={() => router.push("/users")}
+          onPress={() => router.push("/setting")}
         >
           <AntDesign size={24} name="setting" color={Color.black} />
           <Text>Pengaturan</Text>

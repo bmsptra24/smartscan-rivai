@@ -85,7 +85,7 @@ class UsersPage extends Component<StoreProps, UsersPageState> {
     });
     this.props.userStore.clearSelectedUserState();
 
-    router.replace("/users");
+    router.replace("/setting");
   };
 
   render() {

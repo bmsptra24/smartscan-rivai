@@ -10,6 +10,7 @@ interface DocumentActions {
   updateDocumentCategory: (docId: string, category: string) => void;
   addDocuments: (newDocuments: Document[]) => void;
   clearDocuments: () => void;
+  deleteDocument: (docId: string) => void;  
   syncDocumentsFromFirestore: (groupId: string) => void;
 }
 
@@ -33,12 +34,16 @@ const useDocumentStore = create<DocumentStore>((set) => ({
       ),
     }));
   },
+  deleteDocument: (docId) => {
+    set((state) => ({
+      documents: state.documents.filter((doc) => doc.id !== docId),
+    }));
+  },
   syncDocumentsFromFirestore: async (groupId) => {
     const documents = await documentService.getDocumentsByGroupId(groupId);
     set({ documents });
   },
 }));
 
-// 3. Export type untuk memudahkan penggunaan di komponen
 export type DocumentStoreProps = DocumentStore;
 export default useDocumentStore;
