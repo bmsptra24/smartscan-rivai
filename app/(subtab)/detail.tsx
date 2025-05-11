@@ -167,7 +167,7 @@ export class Detail extends Component<StoreProps> {
                 <NotFound title="Tidak ada dokumen." />
               ))}
 
-            <View style={{ flexDirection: "row", gap: 25 }}>
+            <View style={{ flexDirection: "row", gap: 25, flexWrap: "wrap" }}>
               {!IsMobileScreen &&
                 this.props.documentStore.documents.length > 0 &&
                 this.props.documentStore.documents.map((item) => (

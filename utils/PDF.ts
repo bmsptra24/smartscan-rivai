@@ -3,6 +3,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
 import { Document } from '../services/Document';
+import { PDFDocument, PageSizes } from 'pdf-lib';
 
 export const generateAndSharePdf = async (documents: Document[]) => {
   try {
@@ -82,3 +83,79 @@ export const generateAndSharePdf = async (documents: Document[]) => {
     Alert.alert('Error', 'Gagal membuat PDF. Silakan coba lagi.');
   }
 };
+
+export async function createPdfFromDocumentsInWeb(documents: Document[]): Promise<Blob> {
+  // Membuat dokumen PDF baru
+  const pdfDoc = await PDFDocument.create();
+
+  for (const document of documents) {
+    try {
+      // Mengambil gambar sebagai Uint8Array dan mendapatkan tipe kontennya
+      const { bytes, contentType } = await fetchImageAsUint8Array(document.image_url);
+
+      // Mengembed gambar berdasarkan tipe konten
+      let image;
+      if (contentType === 'image/jpeg') {
+        image = await pdfDoc.embedJpg(bytes);
+      } else if (contentType === 'image/png') {
+        image = await pdfDoc.embedPng(bytes);
+      } else {
+        throw new Error(`Format gambar tidak didukung: ${contentType}`);
+      }
+
+      // Menambahkan halaman baru dengan ukuran A4
+      const page = pdfDoc.addPage(PageSizes.A4);
+      const { width: pageWidth, height: pageHeight } = page.getSize();
+
+      // Mengonversi margin dari mm ke points (1 mm = 72 / 25.4 points)
+      const mmToPoints = 72 / 25.4;
+      const margin = 10; // Margin dalam mm
+      const marginPoints = margin * mmToPoints;
+
+      // Menghitung dimensi maksimum gambar
+      const maxImgWidth = pageWidth - 2 * marginPoints;
+      const maxImgHeight = pageHeight - 2 * marginPoints;
+
+      // Mendapatkan dimensi asli gambar dan menghitung skala
+      let scaledWidth = image.width;
+      let scaledHeight = image.height;
+
+      if (image.width > maxImgWidth || image.height > maxImgHeight) {
+        const widthRatio = maxImgWidth / image.width;
+        const heightRatio = maxImgHeight / image.height;
+        const scaleRatio = Math.min(widthRatio, heightRatio);
+        scaledWidth = image.width * scaleRatio;
+        scaledHeight = image.height * scaleRatio;
+      }
+
+      // Menghitung posisi gambar agar berada di tengah
+      const x = (pageWidth - scaledWidth) / 2;
+      const y = (pageHeight - scaledHeight) / 2;
+
+      // Menambahkan gambar ke halaman
+      page.drawImage(image, {
+        x,
+        y,
+        width: scaledWidth,
+        height: scaledHeight,
+      });
+    } catch (error) {
+      console.error(`Gagal menambahkan gambar untuk dokumen ${document.id}:`, error);
+    }
+  }
+
+  // Menyimpan PDF sebagai Uint8Array dan mengonversinya ke Blob
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  return blob;
+}
+
+// Fungsi untuk mengambil gambar dari URL sebagai Uint8Array
+async function fetchImageAsUint8Array(url: string): Promise<{ bytes: Uint8Array; contentType: string }> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Gagal mengambil gambar dari ${url}`);
+  const arrayBuffer = await response.arrayBuffer();
+  const contentType = response.headers.get('Content-Type') || 'image/jpeg';
+  return { bytes: new Uint8Array(arrayBuffer), contentType };
+}
+

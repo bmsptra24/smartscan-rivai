@@ -110,6 +110,26 @@ class DocumentService {
     }
 
     /**
+     * Get all documents
+     * @returns Promise with array of all documents
+     */
+    public async getAllDocuments(): Promise<Document[]> {
+        try {
+            const collectionRef = collection(this.db, this.collectionName).withConverter(documentConverter);
+            const querySnapshot = await getDocs(collectionRef);
+            const documents: Document[] = [];
+
+            querySnapshot.forEach((doc) => {
+                documents.push(doc.data());
+            });
+
+            return documents;
+        } catch (error) {
+            throw new Error(`Error fetching all documents: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
      * Get document by ID
      * @param documentId Document ID to retrieve
      * @returns Promise with the document
@@ -391,9 +411,6 @@ class DocumentService {
                 if (!ocrResult) type = "Lainnya"
                 if (ocrResult) type = detectDocumentType(ocrResult)
                 if (ocrResult) idpel = detectCustomerId(ocrResult);
-
-                // buat seolah olah await selama 1 detik dengan timeout
-                // await new Promise(resolve => setTimeout(resolve, 1000))
 
                 // Set the document type
                 if (!doc.id || !type || !idpel) return

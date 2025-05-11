@@ -120,9 +120,36 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
         "Yakin ingin mereset? Data akan hilang permanen."
       );
       if (!confirmation) return;
+
+      // delete all images
+      const docs = await documentService.getAllDocuments();
+      await Promise.all(
+        docs.map((doc) => {
+          if (doc.image_public_id) {
+            // delete using server
+            fetch(
+              `/cloudinary?public_id=${encodeURIComponent(
+                doc.image_public_id
+              )}`,
+              {
+                method: "DELETE",
+              }
+            );
+            return;
+          }
+          return Promise.resolve();
+        })
+      );
+
+      // delete all docs
       await documentService.deleteAllDocuments();
+      this.props.documentStore.clearDocuments();
+
+      // delete all groups
       await groupService.deleteAllGroups();
-      await cloudinaryService.deleteAllFiles();
+      this.props.groupStore.setGroups([]);
+      this.props.groupStore.clearSelectedGroup();
+
       showAlert("Berhasil", `Penyimpanan berhasil dikosongkan.`);
     } catch (error) {
       showAlert("Gagal mengosongkan penyimpanan.", `${error}`);

@@ -10,9 +10,7 @@ import { StoreProps, useStore } from "@/stores";
 import NotFound from "@/components/base/NotFound";
 import { showConfirm } from "@/utils/alert";
 import { BorderRadius, Color, IsMobileScreen } from "@/constants/Styles";
-import ButtonBase from "@/components/base/Button";
 import IconButton from "@/components/base/IconButton";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import Feather from "@expo/vector-icons/Feather";
 
 export class HomeHistory extends Component<StoreProps> {
@@ -40,6 +38,29 @@ export class HomeHistory extends Component<StoreProps> {
     );
     if (!confirmed) return;
 
+    // Fetch all documents for the group and delete them in parallel
+    const docs = await documentService.getDocumentsByGroupId(id);
+
+    // delete the image in cloudinary
+    await Promise.all(
+      docs.map((doc) => {
+        if (doc.image_public_id) {
+          // delete using server
+          fetch(
+            `/cloudinary?public_id=${encodeURIComponent(doc.image_public_id)}`,
+            {
+              method: "DELETE",
+            }
+          );
+          return;
+        }
+        return Promise.resolve();
+      })
+    );
+
+    // delete the doc
+    await documentService.deleteDocumentsByGroupId(id);
+
     await groupService.deleteGroup(id);
     this.props.groupStore.removeGroup(id);
 
@@ -53,6 +74,8 @@ export class HomeHistory extends Component<StoreProps> {
   };
 
   handleAddNew = () => {
+    this.props.documentStore.clearDocuments();
+    this.props.groupStore.clearSelectedGroup();
     documentService.handleScanDocument();
   };
 

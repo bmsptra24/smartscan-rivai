@@ -1,3 +1,4 @@
+import { showAlert } from "@/utils/alert";
 import { compressImage } from "@/utils/compresor";
 import { createHashSHA1 } from "@/utils/generator";
 import { Cloudinary } from "@cloudinary/url-gen";
@@ -98,6 +99,32 @@ class CloudinaryService {
         return data;
     }
 
+    private async adminGetFromCloudinary(path: string, params: Record<string, string> = {}): Promise<any> {
+        const config = this.cloudinary.getConfig();
+        if (!config.cloud) {
+            throw new Error('Cloudinary configuration not found');
+        }
+
+        const queryString = Object.keys(params).length
+            ? `?${Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')}`
+            : '';
+        const url = `https://api.cloudinary.com/v1_1/${config.cloud.cloudName}${path}${queryString}`;
+        const auth = btoa(`${this.api_key}:${this.api_secret}`);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                Authorization: `Basic ${auth}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json();
+        if (data.error) {
+            throw new Error(data.error.message);
+        }
+        return data;
+    }
+
     private generateSignature(params: Record<string, string>): string {
         const sortedKeys = Object.keys(params).sort();
         const stringToSign = sortedKeys.map(key => `${key}=${params[key]}`).join('&') + this.api_secret;
@@ -117,13 +144,12 @@ class CloudinaryService {
         let fileData: any;
         let uriToUse = url;
 
-        // Jika URL adalah file lokal atau blob, kompresi gambar terlebih dahulu
         if (url.startsWith('file://') || url.startsWith('blob:')) {
             const compressedUri = await compressImage(url);
             if (!compressedUri) {
                 throw new Error('Gagal mengompresi gambar');
             }
-            uriToUse = compressedUri; // Gunakan URI yang sudah dikompresi
+            uriToUse = compressedUri;
         }
 
         if (uriToUse.startsWith('file://')) {
@@ -187,21 +213,6 @@ class CloudinaryService {
         formData.append('signature', signature);
 
         await this.postToCloudinary('image/destroy', formData);
-    }
-
-    public async deleteAllFiles(): Promise<void> {
-        const timestamp = Math.floor(Date.now() / 1000).toString();
-        const params = { timestamp };
-        const signature = this.generateSignature(params);
-
-        const body = {
-            all: true,
-            api_key: this.api_key,
-            timestamp,
-            signature,
-        };
-
-        await this.adminPostToCloudinary('/resources/image/delete_by_prefix', body);
     }
 
     public async editFile(public_id: string, tags: string[]): Promise<void> {

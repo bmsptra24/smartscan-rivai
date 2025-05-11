@@ -21,7 +21,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "single",
+      "output": "server",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -33,7 +33,12 @@
       ],
       "@config-plugins/react-native-blob-util",
       "@config-plugins/react-native-pdf",
-      "expo-router",
+      [
+        "expo-router",
+        {
+          "origin": "http://localhost:8081/"
+        }
+      ],
       [
         "expo-splash-screen",
         {

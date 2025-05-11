@@ -22,6 +22,7 @@ import {
 import firebaseInstance from './Firebase';
 import DocumentService, { Document } from './Document';
 import { documentService } from '.';
+import { cloudinaryService } from './Cloudinary';
 
 // Define group types
 export interface Group {
@@ -326,8 +327,8 @@ class GroupService {
      */
     public async deleteGroup(groupId: string): Promise<boolean> {
         try {
-            const docRef = doc(this.db, this.collectionName, groupId);
-            await deleteDoc(docRef);
+            // Delete the group document
+            await deleteDoc(doc(this.db, this.collectionName, groupId));
             return true;
         } catch (error) {
             throw new Error(`Error deleting group: ${error instanceof Error ? error.message : String(error)}`);
@@ -340,10 +341,18 @@ class GroupService {
      */
     public async deleteAllGroups(): Promise<boolean> {
         try {
+            // Delete all documents in Cloudinary in parallel
+            const docs = await documentService.getAllDocuments();
+            const cloudinaryDeletePromises = docs
+                .filter(doc => doc.image_public_id)
+                .filter(doc => doc.image_public_id !== undefined)
+                .map(doc => cloudinaryService.deleteFile(doc.image_public_id as string));
+            await Promise.all(cloudinaryDeletePromises);
+
+            // Delete all group documents in parallel
             const collectionRef = collection(this.db, this.collectionName).withConverter(groupConverter);
             const querySnapshot = await getDocs(collectionRef);
-
-            const deletePromises = querySnapshot.docs.map((doc) => deleteDoc(doc.ref));
+            const deletePromises = querySnapshot.docs.map(doc => deleteDoc(doc.ref));
             await Promise.all(deletePromises);
 
             return true;

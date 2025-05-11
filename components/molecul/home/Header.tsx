@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import React, { Component } from "react";
-import { Color, IsMobileScreen } from "@/constants/Styles";
+import { Color, IsMobileScreen, ResponsiveComponent } from "@/constants/Styles";
 import TextBase from "@/components/base/Text";
 import InputBase from "@/components/base/Input";
 import { groupService } from "@/services";
@@ -60,7 +60,7 @@ export class HomeHeader extends Component<StoreProps> {
       <View
         style={{
           flex: 1,
-          height: 230,
+          // height: 230,
           backgroundColor: Color.primary,
           borderBottomRightRadius: IsMobileScreen ? 49 : 0,
           borderBottomLeftRadius: IsMobileScreen ? 49 : 0,
@@ -96,6 +96,7 @@ export class HomeHeader extends Component<StoreProps> {
             gap: 15,
             alignItems: "center",
             justifyContent: "space-between",
+            flexWrap: "wrap",
           }}
         >
           <DateRangePicker onDateRangeSelected={this.handleFilterDate} />
@@ -103,6 +104,7 @@ export class HomeHeader extends Component<StoreProps> {
             placeholder="Cari file..."
             style={{
               // width: "100%",
+              minWidth: ResponsiveComponent.width - 100,
               flex: 1,
               backgroundColor: Color.white,
             }}

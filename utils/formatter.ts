@@ -42,3 +42,13 @@ export const uriToBase64 = async (uri: string): Promise<string> => {
         throw error;
     }
 };
+
+// Fungsi untuk mengonversi blob ke base64 (untuk gambar di PDF)
+export async function blobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
