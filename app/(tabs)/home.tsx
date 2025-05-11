@@ -33,7 +33,6 @@ export default function HomeScreen() {
         await groupService.getGroupsExcludingCustomerIdsWithDocuments(
           excludedCustomerIds
         );
-      console.log({ groupsWithDocuments, excludedCustomerIds });
 
       // 3. Hitung total grup untuk progress bar
       const totalGroups = groupsWithDocuments.length;
@@ -84,8 +83,10 @@ export default function HomeScreen() {
       }
 
       console.log("Sinkronisasi dokumen selesai.");
+      showAlert("Selesai", "Semua grup selesai diproses.");
     } catch (error) {
       console.error("Error selama sinkronisasi:", error);
+      showAlert("Error selama sinkronisasi:", `${error}`);
       setProgress(0);
     }
   };

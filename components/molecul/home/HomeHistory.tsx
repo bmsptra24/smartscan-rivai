@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import TextBase from "@/components/base/Text";
 import HistoryItem from "@/components/list/HistoryItem";
 import { dateFormatter, timeFormatter } from "@/utils/formatter";
-import { groupService, userService } from "@/services";
+import { documentService, groupService, userService } from "@/services";
 import useGroupStore from "@/stores/Group";
 import { router } from "expo-router";
 import { StoreProps, useStore } from "@/stores";
@@ -13,6 +13,7 @@ import { BorderRadius, Color, IsMobileScreen } from "@/constants/Styles";
 import ButtonBase from "@/components/base/Button";
 import IconButton from "@/components/base/IconButton";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Feather from "@expo/vector-icons/Feather";
 
 export class HomeHistory extends Component<StoreProps> {
   state = {
@@ -49,6 +50,10 @@ export class HomeHistory extends Component<StoreProps> {
     if (this.state.currentPage > totalPages) {
       this.setState({ currentPage: totalPages });
     }
+  };
+
+  handleAddNew = () => {
+    documentService.handleScanDocument();
   };
 
   render() {
@@ -95,12 +100,30 @@ export class HomeHistory extends Component<StoreProps> {
 
     return (
       <View>
-        <TextBase
-          style={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10 }}
-          variant="header"
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingHorizontal: 20,
+            paddingTop: 20,
+            paddingBottom: 10,
+            alignItems: "center",
+          }}
         >
-          Riwayat
-        </TextBase>
+          <TextBase variant="header">Riwayat</TextBase>
+
+          <IconButton
+            onPress={this.handleAddNew}
+            icon={
+              <Feather
+                name="plus"
+                size={IsMobileScreen ? 18 : 20}
+                color={Color.text}
+              />
+            }
+            size="small"
+          />
+        </View>
 
         {this.props.groupStore.groups.length === 0 ? (
           <NotFound />
