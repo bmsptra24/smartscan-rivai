@@ -1,10 +1,12 @@
-import { TCollections, db } from "@/constants/Firebase";
+import { TCollections } from "@/constants/Firebase";
+import firebaseInstance from "@/services/Firebase";
 import { collection, doc } from "firebase/firestore";
 
 /**
  * @returns {string} AN ID FIRESTORE string
  */
 export function generateID(collectionName: TCollections): string {
+  const db = firebaseInstance.getFirestoreInstance();
   const newDocRef = doc(collection(db, collectionName));
 
   // ID unik yang dihasilkan oleh Firestore

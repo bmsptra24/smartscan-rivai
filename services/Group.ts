@@ -20,7 +20,7 @@ import {
     setDoc
 } from 'firebase/firestore';
 import firebaseInstance from './Firebase';
-import DocumentService, { Document } from './Document';
+import { Document } from './Document';
 import { documentService } from '.';
 import { cloudinaryService } from './Cloudinary';
 

@@ -1,4 +1,4 @@
-import { db } from "@/constants/Firebase";
+
 import { storage } from "@/constants/MKKV";
 import { router } from "expo-router";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -7,6 +7,7 @@ import { userService } from ".";
 import { createHashSHA1 } from "@/utils/generator";
 import { Platform } from "react-native";
 import { showAlert } from "@/utils/alert";
+import firebaseInstance from "./Firebase";
 
 interface LoginRequest {
     username: string;
@@ -14,6 +15,12 @@ interface LoginRequest {
 }
 
 class AuthService {
+    private db: ReturnType<typeof firebaseInstance.getFirestoreInstance>;
+
+    constructor() {
+        this.db = firebaseInstance.getFirestoreInstance();
+    }
+
     // Method untuk logout
     logout(): void {
         // Hapus data credential dari MMKV
@@ -26,7 +33,7 @@ class AuthService {
 
         try {
             // Query ke Firestore untuk mencari user dengan username yang sesuai
-            const usersRef = collection(db, "users");
+            const usersRef = collection(this.db, "users");
             const q = query(usersRef, where("username", "==", username));
             const querySnapshot = await getDocs(q);
 
