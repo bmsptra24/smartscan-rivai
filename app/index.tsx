@@ -1,3 +1,5 @@
+// fix: ui login #28
+
 import React, { Component } from "react";
 import { ScrollView, View } from "react-native";
 import { Color, Distance, IsMobileScreen, Size } from "@/constants/Styles";
@@ -71,13 +73,13 @@ class LoginScreen extends Component {
           autoPlay
           ref={this.animation}
           style={{
-            width: Size.screen.width,
+            // width: Size.screen.width,
             height: IsMobileScreen ? 395 : Size.screen.height * 2,
           }}
           source={{
             uri: IsMobileScreen
               ? "https://lottie.host/85cf047f-e2c1-43ae-b7ef-b546903ce7df/yvShlRd481.lottie"
-              : "https://lottie.host/316df1b7-790a-40a7-9d94-a53ae05412f7/cTlRiCy5Ub.lottie",
+              : "https://lottie.host/0c707f6f-ef76-4524-ab6c-e2d03c501ca7/MWmdlV7ori.lottie",
           }}
           loop={true}
         />
