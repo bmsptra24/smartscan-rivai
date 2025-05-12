@@ -7,7 +7,8 @@
   "scripts": {
     "start": "electron . --no-sandbox",
     "build:win": "npx electron-builder --win",
-    "build:linux": "npx electron-builder --linux"
+    "build:linux": "npx electron-builder --linux",
+    "build": "npx electron-builder --win --linux"
   },
   "devDependencies": {
     "electron": "^latest",
@@ -35,7 +36,6 @@
     }
   },
   "dependencies": {
-    "axios": "^1.9.0",
     "express": "^5.1.0"
   }
 }

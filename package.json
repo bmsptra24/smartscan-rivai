@@ -46,6 +46,7 @@
     "expo-symbols": "~0.2.2",
     "expo-system-ui": "~4.0.9",
     "expo-web-browser": "~14.0.2",
+    "express": "^5.1.0",
     "firebase": "^11.4.0",
     "lottie-ios": "^4.5.1",
     "lottie-react-native": "7.1.0",
@@ -72,6 +73,7 @@
   "devDependencies": {
     "@babel/core": "^7.27.1",
     "@config-plugins/react-native-blob-util": "^9.0.0",
+    "@types/express": "^5.0.1",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.3.12",
     "@types/react-test-renderer": "^18.3.0",

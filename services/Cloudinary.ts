@@ -1,4 +1,3 @@
-import { showAlert } from "@/utils/alert";
 import { compressImage } from "@/utils/compresor";
 import { createHashSHA1 } from "@/utils/generator";
 import { Platform } from 'react-native';

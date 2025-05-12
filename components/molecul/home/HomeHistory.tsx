@@ -47,7 +47,9 @@ export class HomeHistory extends Component<StoreProps> {
         if (doc.image_public_id) {
           // delete using server
           fetch(
-            `/cloudinary?public_id=${encodeURIComponent(doc.image_public_id)}`,
+            `${
+              process.env.EXPO_PUBLIC_API_ENDPOINT
+            }/cloudinary?public_id=${encodeURIComponent(doc.image_public_id)}`,
             {
               method: "DELETE",
             }
