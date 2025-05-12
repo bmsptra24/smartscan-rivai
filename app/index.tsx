@@ -1,5 +1,3 @@
-// fix: ui login #28
-
 import React, { Component } from "react";
 import { ScrollView, View } from "react-native";
 import { Color, Distance, IsMobileScreen, Size } from "@/constants/Styles";

@@ -1,10 +1,12 @@
 import ButtonBase from "@/components/base/Button";
 import InputBase from "@/components/base/Input";
+import TextBase from "@/components/base/Text";
 import { Images } from "@/constants/Images";
-import { Color } from "@/constants/Styles";
+import { Color, IsMobileScreen, Size } from "@/constants/Styles";
 import { authService, userService } from "@/services";
-import { ImageBackground } from "expo-image";
+import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
+import LottieView from "lottie-react-native";
 import React, { Component } from "react";
 import {
   View,
@@ -24,6 +26,7 @@ class LoginScreen extends Component {
     password: "123",
     isLoading: false,
   };
+  animation = React.createRef<LottieView>();
 
   componentDidMount(): void {
     const user = userService.getCurrentUser();
@@ -70,13 +73,11 @@ class LoginScreen extends Component {
                 source={Images.logo.src}
                 style={{ width: 50, height: 50, borderRadius: 5 }}
               />
-              <Text style={styles.logoText}>SmartScan Rivai</Text>
+              <TextBase style={styles.logoText}>SmartScan Rivai</TextBase>
             </View>
-            <Text style={styles.loginHeader}>Masuk ke akun mu</Text>
+            {/* <Text style={styles.loginHeader}>Masuk ke akun mu</Text> */}
             <View style={styles.signUpContainer}>
-              <Text style={styles.noAccountText}>
-                Hanya admin yang dapat masuk.
-              </Text>
+              <TextBase style={styles.noAccountText}>Masuk ke akun mu</TextBase>
             </View>
             <InputBase
               style={styles.input}
@@ -96,7 +97,7 @@ class LoginScreen extends Component {
               title="Lanjutkan"
               onPress={this.handleLogin}
               style={{
-                width: 200,
+                // width: 200,
                 backgroundColor: "#F2F2F2",
                 borderWidth: 1,
                 borderColor: "#DDD",
@@ -106,13 +107,28 @@ class LoginScreen extends Component {
             />
           </View>
           <View style={styles.promoSection}>
+            <View
+              style={{
+                position: "absolute",
+                inset: 0,
+              }}
+            >
+              <Image
+                source={require("@/assets/images/grainy-1.jpeg")}
+                style={{ width: "auto", height: Size.screen.height, inset: 0 }}
+              />
+            </View>
             <View style={styles.promoContent}>
-              <Text style={styles.promoHeader}>SmartScan Rivai</Text>
-              <Text style={styles.promoText}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. <br />
-                Expedita facilis odit voluptas ut tempora
-                <br />a dicta doloribus quos?
-              </Text>
+              <TextBase style={styles.promoHeader}>SmartScan Rivai</TextBase>
+              <TextBase style={styles.promoText}>
+                Aplikasi ini memungkinkan pemindaian,
+                <br />
+                pengenalan teks otomatis, dan
+                <br />
+                pengelolaan dokumen secara
+                <br />
+                efisien melalui lintas-platform.
+              </TextBase>
             </View>
             <View style={styles.illustrationsContainer}></View>
           </View>
@@ -126,15 +142,17 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContainer: { flexDirection: "row", minHeight: height },
   loginSection: {
-    width: "40%",
+    width: Size.screen.width < 1550 ? (IsMobileScreen ? "100%" : "50%") : "25%",
     padding: "3%",
     backgroundColor: "white",
     justifyContent: "center",
   },
   promoSection: {
-    width: "60%",
+    display: IsMobileScreen ? "none" : "flex",
+    position: "relative",
+    width: Size.screen.width < 1550 ? "50%" : "75%",
     backgroundColor: Color.primary,
-    padding: "3%",
+    // padding: "3%",
     justifyContent: "space-between",
   },
   logoContainer: {
@@ -145,7 +163,6 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontSize: Math.max(16, width * 0.015),
-    fontWeight: "bold",
     color: Color.text,
   },
   loginHeader: {
@@ -162,7 +179,7 @@ const styles = StyleSheet.create({
     marginBottom: "4%",
     fontSize: Math.max(14, width * 0.01),
   },
-  promoContent: { flex: 0.4 },
+  promoContent: { flex: 0.4, padding: 80 },
   promoHeader: {
     fontSize: Math.max(24, width * 0.025),
     fontWeight: "bold",
