@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "npx expo start",
     "build-dev-client": "sudo mount -o remount,size=10G /tmp && eas build --platform android --profile development --local",
-    "prod-android": "sudo mount -o remount,size=10G /tmp && eas build --platform android --profile production --local",
-    "prod-web": "npx expo export --platform web",
+    "prod:android": "sudo mount -o remount,size=10G /tmp && eas build --platform android --profile production --local",
+    "prod:web": "npx expo export --platform web",
     "prod:linux": "./scripts/build-linux.sh",
     "start:linux": "./scripts/build-linux.sh && ./dist/SmartScan\\ Rivai-1.0.0.AppImage --no-sandbox",
     "prod:win": "./scripts/build-win.sh",

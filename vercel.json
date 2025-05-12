@@ -1,13 +1,16 @@
 {
-  "buildCommand": "expo export -p web",
-  "outputDirectory": "dist",
-  "devCommand": "expo",
-  "cleanUrls": true,
-  "framework": null,
-  "rewrites": [
+  "version": 2,
+  "name": "smartscan-rivai",
+  "builds": [
     {
-      "source": "/:path*",
-      "destination": "/"
+      "src": "dist/server/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/dist/server/index.html"
     }
   ]
 }
