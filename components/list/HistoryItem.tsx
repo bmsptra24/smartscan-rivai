@@ -9,6 +9,7 @@ import {
   IsMobileScreen,
 } from "@/constants/Styles";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import IconButton from "../base/IconButton";
 
 interface HistoryItemProps {
   id: string;
@@ -90,13 +91,18 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
         </View>
       </Pressable>
       {!IsMobileScreen && (
-        <TouchableOpacity onPress={() => onDelete(id)}>
-          <MaterialCommunityIcons
-            name="delete-outline"
-            size={24}
-            color={Color.text}
-          />
-        </TouchableOpacity>
+        <IconButton
+          onPress={() => onDelete(id)}
+          size="small"
+          style={{ backgroundColor: Color.danger }}
+          icon={
+            <MaterialCommunityIcons
+              name="delete-outline"
+              size={24}
+              color={Color.white}
+            />
+          }
+        />
       )}
     </View>
   );
