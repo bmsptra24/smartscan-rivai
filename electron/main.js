@@ -26,7 +26,7 @@ function createWindow() {
 
   // Membuat server lokal dengan Express untuk melayani file statis
   const expressApp = express()
-  expressApp.use(express.static(path.join(__dirname, 'web-build', 'server'))) // Ganti 'web-build' dengan nama folder hasil build Expo
+  expressApp.use(express.static(path.join(__dirname, 'web-build'))) // Ganti 'web-build' dengan nama folder hasil build Expo
   const server = http.createServer(expressApp)
 
   server.listen(8081, () => {
