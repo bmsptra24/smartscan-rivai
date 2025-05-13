@@ -379,8 +379,6 @@ class DocumentService {
     */
     public handleScanDocument(): void {
         scannerService.scanDocument((scannedImages) => {
-            console.log({ scannedImages });
-
             const documentStore = useDocumentStore.getState()
             let groupId = useGroupStore.getState().selectedGroup?.id
 
@@ -403,19 +401,31 @@ class DocumentService {
 
             // Analize the document type
             newDocuments.forEach(async (doc) => {
+                // Mulai pengukuran waktu
+                const startTime = Date.now();
+
                 // OCR the image
-                let type, idpel
-                const ocrResult = await scannerService.extractTextFromImage(doc.image_url)
+                let type, idpel;
+                const ocrResult = await scannerService.extractTextFromImage(doc.image_url);
 
                 // Analize the text
-                if (!ocrResult) type = "Lainnya"
-                if (ocrResult) type = detectDocumentType(ocrResult)
+                if (!ocrResult) type = "Lainnya";
+                if (ocrResult) type = detectDocumentType(ocrResult);
                 if (ocrResult) idpel = detectCustomerId(ocrResult);
+                console.log({ type });
+
+                // Akhiri pengukuran waktu dan hitung durasi
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                console.log(`Waktu pemrosesan untuk dokumen ${doc.id}: ${duration} ms`);
 
                 // Set the document type
-                if (!doc.id || !type || !idpel) return
-                documentStore.updateDocumentCategory(doc.id, type)
-                documentStore.updateCustomerId(doc.id, idpel)
+                if (!doc.id || !type) return;
+                documentStore.updateDocumentCategory(doc.id, type);
+
+                if (!idpel) return;
+                documentStore.updateCustomerId(doc.id, idpel);
+
             });
 
             // documentStore.updateCustomerId(doc.id, idPelanggan)
@@ -427,9 +437,6 @@ class DocumentService {
             router.push("/(subtab)/edit")
         })
     }
-
-
-
 }
 
 export default DocumentService;

@@ -63,19 +63,34 @@ class ScannerService {
         }
     }
 
-    async extractTextFromImage(uri: string) {
-        try {
-            if (Platform.OS !== 'web') {
-                const result: MlkitOcrResult = await MlkitOcr.detectFromUri(uri);
-                const text = result.map(block => block.text).join('\n');
-                return text;
-            } else {
-                const { data: { text } } = await Tesseract.recognize(uri, 'ind');
-                return text;
+    async extractTextFromImage(uri: string): Promise<string> {
+        // Create timeout promise
+        const timeoutPromise = new Promise<string>((_, reject) => {
+            setTimeout(() => reject(new Error('OCR process timed out after 20 seconds')), 20000);
+        });
+
+        // OCR processing promise
+        const ocrPromise = (async () => {
+            try {
+                if (Platform.OS !== 'web') {
+                    const result: MlkitOcrResult = await MlkitOcr.detectFromUri(uri);
+                    return result.map(block => block.text).join('\n');
+                } else {
+                    const { data: { text } } = await Tesseract.recognize(uri, 'ind');
+                    return text;
+                }
+            } catch (error) {
+                console.error('Error during OCR:', error);
+                return '';
             }
+        })();
+
+        // Race between OCR and timeout
+        try {
+            return await Promise.race([ocrPromise, timeoutPromise]);
         } catch (error) {
-            console.error('Error during OCR:', error);
-            return undefined;
+            console.error('OCR failed:', error);
+            return '';
         }
     }
 }
