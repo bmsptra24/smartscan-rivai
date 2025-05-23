@@ -19,11 +19,11 @@ type FormData = {
   confirmPassword: string;
 } & Partial<UserProfile>;
 
-interface UsersPageState {
+interface EditSettingPageState {
   confirmPassword: string;
 }
 
-class UsersPage extends Component<StoreProps, UsersPageState> {
+class EditSettingPage extends Component<StoreProps, EditSettingPageState> {
   state = {
     confirmPassword: "",
   };
@@ -147,4 +147,4 @@ class UsersPage extends Component<StoreProps, UsersPageState> {
   }
 }
 
-export default useStore(UsersPage);
+export default useStore(EditSettingPage);

@@ -1,3 +1,4 @@
+export const APP_VERSION = '1.0.0';
 
 // Definisi tipe untuk kata kunci dan bobotnya
 export interface Keyword {

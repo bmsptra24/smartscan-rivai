@@ -3,7 +3,6 @@ import { storage } from "@/constants/MKKV";
 import { router } from "expo-router";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { UserProfile } from "./User";
-import { userService } from ".";
 import { createHashSHA1 } from "@/utils/generator";
 import { Platform } from "react-native";
 import { showAlert } from "@/utils/alert";
@@ -58,7 +57,7 @@ class AuthService {
 
                 if (Platform.OS === 'web' && userData.role === 'user') return showAlert('Gagal Login', 'Hanya admin yang bisa mengakses website.')
                 // Redirect ke halaman utama setelah login berhasil
-                router.push("/(tabs)/home");
+                router.push("/dashboard");
             } else {
                 throw new Error("Incorrect password"); // Jika password tidak cocok
             }
@@ -69,11 +68,11 @@ class AuthService {
     }
 
     // Method untuk mengecek apakah user sudah login
-    isLoggedIn(): boolean {
-        const userData: UserProfile | null = userService.getCurrentUser();
-        if (!userData) return false;
-        return !!userData
-    }
+    // isLoggedIn(): boolean {
+    //     const userData: UserProfile | null = userService.getCurrentUser();
+    //     if (!userData) return false;
+    //     return !!userData
+    // }
 }
 
 // Export instance dari AuthService

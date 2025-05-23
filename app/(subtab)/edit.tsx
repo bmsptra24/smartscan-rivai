@@ -21,9 +21,8 @@ import { documentService, groupService } from "@/services";
 import { cloudinaryService } from "@/services/Cloudinary";
 import { showAlert } from "@/utils/alert";
 import IconButton from "@/components/base/IconButton";
-import { Group } from "@/services/Group";
 
-export class Edit extends Component<StoreProps> {
+export class EditDokumenPage extends Component<StoreProps> {
   state = {
     isSaving: false,
   };
@@ -288,4 +287,4 @@ export class Edit extends Component<StoreProps> {
   }
 }
 
-export default useStore(Edit);
+export default useStore(EditDokumenPage);

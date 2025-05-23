@@ -85,29 +85,29 @@ class DocumentService {
         this.collectionName = 'documents';
     }
 
-    /**
-     * Create a new document
-     * @param documentData Document data to create
-     * @returns Promise with the created document
-     */
-    public async addDocument(documentData: CreateDocumentData): Promise<Document> {
-        try {
-            const docData: CreateDocumentData = {
-                ...documentData,
-                createdAt: documentData.createdAt instanceof Date
-                    ? Timestamp.fromDate(documentData.createdAt)
-                    : documentData.createdAt
-            };
+    // /**
+    //  * Create a new document
+    //  * @param documentData Document data to create
+    //  * @returns Promise with the created document
+    //  */
+    // public async addDocument(documentData: CreateDocumentData): Promise<Document> {
+    //     try {
+    //         const docData: CreateDocumentData = {
+    //             ...documentData,
+    //             createdAt: documentData.createdAt instanceof Date
+    //                 ? Timestamp.fromDate(documentData.createdAt)
+    //                 : documentData.createdAt
+    //         };
 
-            const collectionRef = collection(this.db, this.collectionName).withConverter(documentConverter);
-            const docRef = await addDoc(collectionRef, docData as Document);
+    //         const collectionRef = collection(this.db, this.collectionName).withConverter(documentConverter);
+    //         const docRef = await addDoc(collectionRef, docData as Document);
 
-            const newDoc = await this.getDocumentById(docRef.id);
-            return newDoc;
-        } catch (error) {
-            throw new Error(`Error adding document: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
+    //         const newDoc = await this.getDocumentById(docRef.id);
+    //         return newDoc;
+    //     } catch (error) {
+    //         throw new Error(`Error adding document: ${error instanceof Error ? error.message : String(error)}`);
+    //     }
+    // }
 
     /**
      * Get all documents
@@ -204,31 +204,31 @@ class DocumentService {
      * @param documentData Data to update
      * @returns Promise with the updated document
      */
-    public async updateDocument(documentId: string, documentData: UpdateDocumentData): Promise<Document> {
-        try {
-            const docRef = doc(this.db, this.collectionName, documentId).withConverter(documentConverter);
+    // public async updateDocument(documentId: string, documentData: UpdateDocumentData): Promise<Document> {
+    //     try {
+    //         const docRef = doc(this.db, this.collectionName, documentId).withConverter(documentConverter);
 
-            // Prepare update data with server timestamp
-            const updateData: Record<string, any> = {
-                ...documentData,
-                updatedAt: serverTimestamp()
-            };
+    //         // Prepare update data with server timestamp
+    //         const updateData: Record<string, any> = {
+    //             ...documentData,
+    //             updatedAt: serverTimestamp()
+    //         };
 
-            // Convert Date objects to Firestore Timestamps
-            Object.entries(updateData).forEach(([key, value]) => {
-                if (value instanceof Date) {
-                    updateData[key] = Timestamp.fromDate(value);
-                }
-            });
+    //         // Convert Date objects to Firestore Timestamps
+    //         Object.entries(updateData).forEach(([key, value]) => {
+    //             if (value instanceof Date) {
+    //                 updateData[key] = Timestamp.fromDate(value);
+    //             }
+    //         });
 
-            await updateDoc(docRef, updateData);
+    //         await updateDoc(docRef, updateData);
 
-            // Fetch and return the updated document
-            return await this.getDocumentById(documentId);
-        } catch (error) {
-            throw new Error(`Error updating document: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
+    //         // Fetch and return the updated document
+    //         return await this.getDocumentById(documentId);
+    //     } catch (error) {
+    //         throw new Error(`Error updating document: ${error instanceof Error ? error.message : String(error)}`);
+    //     }
+    // }
 
     /**
      * Delete document
@@ -326,52 +326,52 @@ class DocumentService {
 
 
 
-    /**
-     * Get documents by type
-     * @param type Document type to filter by
-     * @param userId Optional user ID to filter by
-     * @returns Promise with array of documents
-     */
-    public async getDocumentsByType(type: string, userId?: string): Promise<Document[]> {
-        try {
-            let q;
+    // /**
+    //  * Get documents by type
+    //  * @param type Document type to filter by
+    //  * @param userId Optional user ID to filter by
+    //  * @returns Promise with array of documents
+    //  */
+    // public async getDocumentsByType(type: string, userId?: string): Promise<Document[]> {
+    //     try {
+    //         let q;
 
-            if (userId) {
-                q = query(
-                    collection(this.db, this.collectionName).withConverter(documentConverter),
-                    where('type', '==', type),
-                    where('userId', '==', userId),
-                    orderBy('createdAt', 'desc')
-                );
-            } else {
-                q = query(
-                    collection(this.db, this.collectionName).withConverter(documentConverter),
-                    where('type', '==', type),
-                    orderBy('createdAt', 'desc')
-                );
-            }
+    //         if (userId) {
+    //             q = query(
+    //                 collection(this.db, this.collectionName).withConverter(documentConverter),
+    //                 where('type', '==', type),
+    //                 where('userId', '==', userId),
+    //                 orderBy('createdAt', 'desc')
+    //             );
+    //         } else {
+    //             q = query(
+    //                 collection(this.db, this.collectionName).withConverter(documentConverter),
+    //                 where('type', '==', type),
+    //                 orderBy('createdAt', 'desc')
+    //             );
+    //         }
 
-            const querySnapshot = await getDocs(q);
-            const documents: Document[] = [];
+    //         const querySnapshot = await getDocs(q);
+    //         const documents: Document[] = [];
 
-            querySnapshot.forEach((doc) => {
-                documents.push(doc.data());
-            });
+    //         querySnapshot.forEach((doc) => {
+    //             documents.push(doc.data());
+    //         });
 
-            return documents;
-        } catch (error) {
-            throw new Error(`Error fetching documents by type: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
+    //         return documents;
+    //     } catch (error) {
+    //         throw new Error(`Error fetching documents by type: ${error instanceof Error ? error.message : String(error)}`);
+    //     }
+    // }
 
-    /**
-     * Get document reference
-     * @param documentId Document ID to get reference for
-     * @returns Document reference
-     */
-    public getDocumentRef(documentId: string): DocumentReference<Document> {
-        return doc(this.db, this.collectionName, documentId).withConverter(documentConverter);
-    }
+    // /**
+    //  * Get document reference
+    //  * @param documentId Document ID to get reference for
+    //  * @returns Document reference
+    //  */
+    // public getDocumentRef(documentId: string): DocumentReference<Document> {
+    //     return doc(this.db, this.collectionName, documentId).withConverter(documentConverter);
+    // }
 
     /**
     * Handle scanning a document
@@ -412,7 +412,6 @@ class DocumentService {
                 if (!ocrResult) type = "Lainnya";
                 if (ocrResult) type = detectDocumentType(ocrResult);
                 if (ocrResult) idpel = detectCustomerId(ocrResult);
-                console.log({ type });
 
                 // Akhiri pengukuran waktu dan hitung durasi
                 const endTime = Date.now();

@@ -95,12 +95,12 @@ class UserService {
         return userData;
     }
 
-    /**
-     * Clear current user data from local storage
-     */
-    public clearCurrentUser(): void {
-        storage.delete('userData');
-    }
+    // /**
+    //  * Clear current user data from local storage
+    //  */
+    // public clearCurrentUser(): void {
+    //     storage.delete('userData');
+    // }
 
     /**
      * Get all user profiles
@@ -187,101 +187,101 @@ class UserService {
         }
     }
 
-    /**
-     * Update user profile
-     * @param userId User ID to update
-     * @param userData Data to update
-     * @returns Promise with the updated user profile
-     */
-    public async updateUserProfile(userId: string, userData: UpdateUserProfileData): Promise<UserProfile> {
-        try {
-            const userRef = doc(this.db, this.collectionName, userId).withConverter(userProfileConverter);
+    // /**
+    //  * Update user profile
+    //  * @param userId User ID to update
+    //  * @param userData Data to update
+    //  * @returns Promise with the updated user profile
+    //  */
+    // public async updateUserProfile(userId: string, userData: UpdateUserProfileData): Promise<UserProfile> {
+    //     try {
+    //         const userRef = doc(this.db, this.collectionName, userId).withConverter(userProfileConverter);
 
-            // Prepare update data with server timestamp
-            const updateData: Record<string, any> = {
-                ...userData,
-                updatedAt: serverTimestamp()
-            };
+    //         // Prepare update data with server timestamp
+    //         const updateData: Record<string, any> = {
+    //             ...userData,
+    //             updatedAt: serverTimestamp()
+    //         };
 
-            // Convert Date objects to Firestore Timestamps
-            Object.entries(updateData).forEach(([key, value]) => {
-                if (value instanceof Date) {
-                    updateData[key] = Timestamp.fromDate(value);
-                }
-            });
+    //         // Convert Date objects to Firestore Timestamps
+    //         Object.entries(updateData).forEach(([key, value]) => {
+    //             if (value instanceof Date) {
+    //                 updateData[key] = Timestamp.fromDate(value);
+    //             }
+    //         });
 
-            await updateDoc(userRef, updateData);
+    //         await updateDoc(userRef, updateData);
 
-            // Fetch and return the updated user profile
-            const updatedProfile = await this.getUserProfile(userId);
-            if (!updatedProfile) {
-                throw new Error(`User profile with ID ${userId} not found after update`);
-            }
-            return updatedProfile;
-        } catch (error) {
-            throw new Error(`Error updating user profile: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
+    //         // Fetch and return the updated user profile
+    //         const updatedProfile = await this.getUserProfile(userId);
+    //         if (!updatedProfile) {
+    //             throw new Error(`User profile with ID ${userId} not found after update`);
+    //         }
+    //         return updatedProfile;
+    //     } catch (error) {
+    //         throw new Error(`Error updating user profile: ${error instanceof Error ? error.message : String(error)}`);
+    //     }
+    // }
 
-    /**
-     * Update user's last login time
-     * @param userId User ID to update
-     * @returns Promise with the updated user profile
-     */
-    public async updateLastLogin(userId: string): Promise<UserProfile> {
-        try {
-            const userRef = doc(this.db, this.collectionName, userId).withConverter(userProfileConverter);
+    // /**
+    //  * Update user's last login time
+    //  * @param userId User ID to update
+    //  * @returns Promise with the updated user profile
+    //  */
+    // public async updateLastLogin(userId: string): Promise<UserProfile> {
+    //     try {
+    //         const userRef = doc(this.db, this.collectionName, userId).withConverter(userProfileConverter);
 
-            const updateData = {
-                lastLogin: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            };
+    //         const updateData = {
+    //             lastLogin: serverTimestamp(),
+    //             updatedAt: serverTimestamp()
+    //         };
 
-            await updateDoc(userRef, updateData);
+    //         await updateDoc(userRef, updateData);
 
-            // Fetch and return the updated user profile
-            const updatedProfile = await this.getUserProfile(userId);
-            if (!updatedProfile) {
-                throw new Error(`User profile with ID ${userId} not found after update`);
-            }
-            return updatedProfile;
-        } catch (error) {
-            throw new Error(`Error updating last login: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
+    //         // Fetch and return the updated user profile
+    //         const updatedProfile = await this.getUserProfile(userId);
+    //         if (!updatedProfile) {
+    //             throw new Error(`User profile with ID ${userId} not found after update`);
+    //         }
+    //         return updatedProfile;
+    //     } catch (error) {
+    //         throw new Error(`Error updating last login: ${error instanceof Error ? error.message : String(error)}`);
+    //     }
+    // }
 
-    /**
-     * Get user by username
-     * @param username Email to search for
-     * @returns Promise with the user profile or null if not found
-     */
-    public async getUserByEmail(username: string): Promise<UserProfile | null> {
-        try {
-            const q = query(
-                collection(this.db, this.collectionName).withConverter(userProfileConverter),
-                where('username', '==', username)
-            );
+    // /**
+    //  * Get user by username
+    //  * @param username Email to search for
+    //  * @returns Promise with the user profile or null if not found
+    //  */
+    // public async getUserByEmail(username: string): Promise<UserProfile | null> {
+    //     try {
+    //         const q = query(
+    //             collection(this.db, this.collectionName).withConverter(userProfileConverter),
+    //             where('username', '==', username)
+    //         );
 
-            const querySnapshot = await getDocs(q);
+    //         const querySnapshot = await getDocs(q);
 
-            if (!querySnapshot.empty) {
-                return querySnapshot.docs[0].data();
-            } else {
-                return null;
-            }
-        } catch (error) {
-            throw new Error(`Error getting user by username: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
+    //         if (!querySnapshot.empty) {
+    //             return querySnapshot.docs[0].data();
+    //         } else {
+    //             return null;
+    //         }
+    //     } catch (error) {
+    //         throw new Error(`Error getting user by username: ${error instanceof Error ? error.message : String(error)}`);
+    //     }
+    // }
 
-    /**
-     * Get user reference
-     * @param userId User ID to get reference for
-     * @returns User reference
-     */
-    public getUserRef(userId: string): DocumentReference<UserProfile> {
-        return doc(this.db, this.collectionName, userId).withConverter(userProfileConverter);
-    }
+    // /**
+    //  * Get user reference
+    //  * @param userId User ID to get reference for
+    //  * @returns User reference
+    //  */
+    // public getUserRef(userId: string): DocumentReference<UserProfile> {
+    //     return doc(this.db, this.collectionName, userId).withConverter(userProfileConverter);
+    // }
 
 
     /**

@@ -30,7 +30,9 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     <View style={styles.container}>
       <View style={styles.progressBar}>
         <Animated.View style={[styles.progress, { width: widthInterpolation }]}>
-          <Text style={styles.percentage}>{`${Math.round(progress)}%`}</Text>
+          <Text style={styles.percentage}>
+            {progress !== 0 ? `${Math.round(progress)}%` : "Sync"}
+          </Text>
         </Animated.View>
       </View>
     </View>

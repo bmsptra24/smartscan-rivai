@@ -30,12 +30,11 @@ class CloudinaryService {
     private readonly upload_preset: string;
     private readonly cloud_name: string;
 
-    private static readonly SUPPORTED_TYPES = ['jpg', 'jpeg', 'png', 'gif'];
+    private static readonly SUPPORTED_TYPES = ['jpg', 'jpeg', 'png'];
     private static readonly MIME_TYPE_MAP: Record<string, string> = {
         jpg: 'image/jpeg',
         jpeg: 'image/jpeg',
         png: 'image/png',
-        gif: 'image/gif',
     };
     private static readonly CLOUDINARY_URL_PREFIX = 'https://res.cloudinary.com/';
 
@@ -169,25 +168,25 @@ class CloudinaryService {
         }
     }
 
-    public async editFile(public_id: string, tags: string[]): Promise<void> {
-        try {
-            const timestamp = Math.floor(Date.now() / 1000).toString();
-            const params = { public_id, timestamp };
-            const signature = this.generateSignature(params);
+    // public async editFile(public_id: string, tags: string[]): Promise<void> {
+    //     try {
+    //         const timestamp = Math.floor(Date.now() / 1000).toString();
+    //         const params = { public_id, timestamp };
+    //         const signature = this.generateSignature(params);
 
-            const formData = new FormData();
-            formData.append('public_id', public_id);
-            formData.append('api_key', this.api_key);
-            formData.append('timestamp', timestamp);
-            formData.append('signature', signature);
-            formData.append('tags', tags.join(','));
+    //         const formData = new FormData();
+    //         formData.append('public_id', public_id);
+    //         formData.append('api_key', this.api_key);
+    //         formData.append('timestamp', timestamp);
+    //         formData.append('signature', signature);
+    //         formData.append('tags', tags.join(','));
 
-            await this.postToCloudinary('image/tags', formData);
-        } catch (error) {
-            console.error('Error editing file in Cloudinary:', error);
-            throw error;
-        }
-    }
+    //         await this.postToCloudinary('image/tags', formData);
+    //     } catch (error) {
+    //         console.error('Error editing file in Cloudinary:', error);
+    //         throw error;
+    //     }
+    // }
 
     public async upsertFile(public_id: string, url: string): Promise<CloudinaryAsset> {
         try {

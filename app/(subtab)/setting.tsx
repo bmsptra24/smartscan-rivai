@@ -12,7 +12,6 @@ import {
   systemService,
   userService,
 } from "@/services";
-import { cloudinaryService } from "@/services/Cloudinary";
 import { UserProfile } from "@/services/User";
 import { StoreProps, useStore } from "@/stores";
 import { showAlert, showConfirm } from "@/utils/alert";
@@ -24,12 +23,12 @@ import { router } from "expo-router";
 import React, { Component } from "react";
 import { View, Dimensions } from "react-native";
 
-interface UsersPageState {
+interface SettingPageState {
   screenWidth: number;
   path: string | undefined;
 }
 
-export class UsersPage extends Component<StoreProps, UsersPageState> {
+export class SettingPage extends Component<StoreProps, SettingPageState> {
   tableHead: string[] = ["Nama", "Username", "Role", "Aksi"];
 
   // We'll calculate widths dynamically based on screen size
@@ -219,6 +218,8 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
 
     const isMobile = this.state.screenWidth < 768;
 
+    const userRole = this.props.userStore.currentUser?.role;
+
     return (
       <Container>
         <View style={{ gap: isMobile ? 20 : 40 }}>
@@ -318,33 +319,35 @@ export class UsersPage extends Component<StoreProps, UsersPageState> {
             </View>
           </View>
 
-          <View
-            style={{
-              gap: isMobile ? 10 : 20,
-              paddingHorizontal: isMobile ? 15 : 25,
-            }}
-          >
-            <TextBase variant="title">Reset</TextBase>
+          {userRole === "superadmin" && (
             <View
               style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 10,
+                gap: isMobile ? 10 : 20,
+                paddingHorizontal: isMobile ? 15 : 25,
               }}
             >
-              <ButtonBase
-                onPress={this.handleResetSystem}
-                textStyle={{ color: Color.white }}
-                style={{ backgroundColor: Color.danger }}
-                title="Kosongkan Penyimpanan"
-              />
+              <TextBase variant="title">Reset</TextBase>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  gap: 10,
+                }}
+              >
+                <ButtonBase
+                  onPress={this.handleResetSystem}
+                  textStyle={{ color: Color.white }}
+                  style={{ backgroundColor: Color.danger }}
+                  title="Kosongkan Penyimpanan"
+                />
+              </View>
             </View>
-          </View>
+          )}
         </View>
       </Container>
     );
   }
 }
 
-const ConnectedUsersPage = useStore(UsersPage);
-export default ConnectedUsersPage;
+const ConnectedSettingPage = useStore(SettingPage);
+export default ConnectedSettingPage;

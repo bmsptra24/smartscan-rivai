@@ -29,7 +29,7 @@ interface ScrollEvent {
   };
 }
 
-export class Detail extends Component<StoreProps> {
+export class DetailDocument extends Component<StoreProps> {
   state = {
     currentIndex: 0,
     isLoading: false,
@@ -289,4 +289,4 @@ export class Detail extends Component<StoreProps> {
   }
 }
 
-export default useStore(Detail);
+export default useStore(DetailDocument);

@@ -11,6 +11,7 @@ interface InputBaseProps extends TextInputProps {
   variant?: "default" | "search";
   size?: "large" | "medium" | "small";
   style?: StyleProp<TextStyle>;
+  type?: "text" | "password"; // Tambahkan props type
 }
 
 export default class InputBase extends Component<InputBaseProps> {
@@ -19,6 +20,7 @@ export default class InputBase extends Component<InputBaseProps> {
       variant = "default",
       size = IsMobileScreen ? "small" : "medium",
       style,
+      type = "text", // Default type adalah "text"
       ...restProps
     } = this.props;
 
@@ -32,6 +34,7 @@ export default class InputBase extends Component<InputBaseProps> {
     return (
       <TextInput
         {...restProps}
+        secureTextEntry={type === "password"} // Atur secureTextEntry jika type adalah "password"
         style={[
           {
             backgroundColor: Color.greyLight,

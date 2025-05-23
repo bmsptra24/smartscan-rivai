@@ -1,5 +1,4 @@
-import { router } from "expo-router";
-import React, { Component } from "react";
+import React from "react";
 import {
   View,
   TouchableOpacity,
@@ -7,72 +6,80 @@ import {
   Text,
   Pressable,
 } from "react-native";
-import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Color } from "@/constants/Styles";
+import { BorderRadius, Color } from "@/constants/Styles";
 import { Image } from "expo-image";
 import { Images } from "@/constants/Images";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { Ionicons } from "@expo/vector-icons";
+import { router, usePathname } from "expo-router";
 
-export class Sidebar extends Component {
-  render() {
-    return (
-      <View style={styles.webTabBar}>
-        <TouchableOpacity
-          style={[styles.webTabItem, { justifyContent: "flex-start", gap: 15 }]}
-          onPress={() => router.push("/(tabs)/home")}
-        >
-          <Image
-            source={Images.logo.src}
-            style={{ width: 40, height: 40, borderRadius: 5 }}
-          />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "bold",
-              color: Color.black,
-            }}
-          >
-            SmartScan Rivai
-          </Text>
-        </TouchableOpacity>
-
-        <Pressable
-          style={({ hovered }) => [
-            styles.webTabItem,
-            hovered && { backgroundColor: Color.greyLight },
-          ]}
-          onPress={() => router.push("/home")}
-        >
-          <Entypo size={24} name="home" color={Color.black} />
-          <Text>Beranda</Text>
-        </Pressable>
-
-        <Pressable
-          style={({ hovered }) => [
-            styles.webTabItem,
-            hovered && { backgroundColor: Color.greyLight },
-          ]}
-          onPress={() => router.push("/setting")}
-        >
-          <AntDesign size={24} name="setting" color={Color.black} />
-          <Text>Pengaturan</Text>
-        </Pressable>
-
-        <Pressable
-          style={({ hovered }) => [
-            styles.webTabItem,
-            hovered && { backgroundColor: Color.greyLight },
-          ]}
-          onPress={() => router.push("/profile")}
-        >
-          <AntDesign size={24} name="user" color={Color.black} />
-          <Text>Profil</Text>
-        </Pressable>
-      </View>
-    );
-  }
+interface NavItem {
+  path: "/dashboard" | "/home" | "/setting" | "/profile";
+  icon: React.ReactNode;
+  label: string;
 }
+
+const Sidebar = () => {
+  const pathname = usePathname();
+  const navItems: NavItem[] = [
+    {
+      path: "/dashboard",
+      icon: <Ionicons size={24} name="home-outline" color={Color.black} />,
+      label: "Beranda",
+    },
+    {
+      path: "/home",
+      icon: <Ionicons size={24} name="document-outline" color={Color.black} />,
+      label: "Dokumen",
+    },
+    {
+      path: "/setting",
+      icon: <AntDesign size={24} name="setting" color={Color.black} />,
+      label: "Pengaturan",
+    },
+    {
+      path: "/profile",
+      icon: <AntDesign size={24} name="user" color={Color.black} />,
+      label: "Profil",
+    },
+  ];
+
+  return (
+    <View style={styles.webTabBar}>
+      <TouchableOpacity
+        style={[styles.webTabItem, { justifyContent: "flex-start", gap: 15 }]}
+        onPress={() => router.push("/dashboard")}
+      >
+        <Image
+          source={Images.logo.src}
+          style={{ width: 40, height: 40, borderRadius: 5 }}
+        />
+        <Text style={{ fontSize: 16, fontWeight: "bold", color: Color.black }}>
+          SmartScan Rivai
+        </Text>
+      </TouchableOpacity>
+
+      {navItems.map((item) => (
+        <Pressable
+          key={item.path}
+          style={({ hovered }) => [
+            styles.webTabItem,
+            {
+              backgroundColor:
+                pathname === item.path ? Color.primary : Color.white,
+            },
+            hovered &&
+              pathname !== item.path && { backgroundColor: Color.greyLight },
+          ]}
+          onPress={() => pathname !== item.path && router.push(item.path)}
+        >
+          {item.icon}
+          <Text>{item.label}</Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+};
 
 export default Sidebar;
 
@@ -82,11 +89,14 @@ const styles = StyleSheet.create({
     backgroundColor: Color.white,
     borderRightWidth: 1,
     borderRightColor: Color.grey,
+    gap: 10,
+    paddingHorizontal: 10,
   },
   webTabItem: {
     padding: 10,
     alignItems: "center",
     flexDirection: "row",
+    borderRadius: BorderRadius.full,
     gap: 10,
   },
 });

@@ -2,7 +2,6 @@ import {
     collection,
     getDocs,
     getDoc,
-    addDoc,
     updateDoc,
     deleteDoc,
     doc,
@@ -16,7 +15,6 @@ import {
     SnapshotOptions,
     DocumentData,
     WithFieldValue,
-    DocumentReference,
     setDoc
 } from 'firebase/firestore';
 import firebaseInstance from './Firebase';
@@ -80,29 +78,29 @@ class GroupService {
         this.collectionName = 'groups';
     }
 
-    /**
-     * Create a new group
-     * @param groupData Group data to create
-     * @returns Promise with the created group
-     */
-    public async createGroup(groupData: CreateGroupData): Promise<Group> {
-        try {
-            const docData: CreateGroupData = {
-                ...groupData,
-                createdAt: groupData.createdAt instanceof Date
-                    ? Timestamp.fromDate(groupData.createdAt)
-                    : groupData.createdAt
-            };
+    // /**
+    //  * Create a new group
+    //  * @param groupData Group data to create
+    //  * @returns Promise with the created group
+    //  */
+    // public async createGroup(groupData: CreateGroupData): Promise<Group> {
+    //     try {
+    //         const docData: CreateGroupData = {
+    //             ...groupData,
+    //             createdAt: groupData.createdAt instanceof Date
+    //                 ? Timestamp.fromDate(groupData.createdAt)
+    //                 : groupData.createdAt
+    //         };
 
-            const collectionRef = collection(this.db, this.collectionName).withConverter(groupConverter);
-            const docRef = await addDoc(collectionRef, docData as Group);
+    //         const collectionRef = collection(this.db, this.collectionName).withConverter(groupConverter);
+    //         const docRef = await addDoc(collectionRef, docData as Group);
 
-            const newGroup = await this.getGroupById(docRef.id);
-            return newGroup;
-        } catch (error) {
-            throw new Error(`Error creating group: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
+    //         const newGroup = await this.getGroupById(docRef.id);
+    //         return newGroup;
+    //     } catch (error) {
+    //         throw new Error(`Error creating group: ${error instanceof Error ? error.message : String(error)}`);
+    //     }
+    // }
 
     /**
      * Get all groups
@@ -182,30 +180,30 @@ class GroupService {
         }
     }
 
-    /**
-     * Get all groups for a customer ID
-     * @param customerId Customer ID to get groups for
-     * @returns Promise with array of groups
-     */
-    public async getGroupsByCustomerId(customerId: string): Promise<Group[]> {
-        try {
-            const q = query(
-                collection(this.db, this.collectionName).withConverter(groupConverter),
-                where('customerId', '==', customerId),
-            );
+    // /**
+    //  * Get all groups for a customer ID
+    //  * @param customerId Customer ID to get groups for
+    //  * @returns Promise with array of groups
+    //  */
+    // public async getGroupsByCustomerId(customerId: string): Promise<Group[]> {
+    //     try {
+    //         const q = query(
+    //             collection(this.db, this.collectionName).withConverter(groupConverter),
+    //             where('customerId', '==', customerId),
+    //         );
 
-            const querySnapshot = await getDocs(q);
-            const groups: Group[] = [];
+    //         const querySnapshot = await getDocs(q);
+    //         const groups: Group[] = [];
 
-            querySnapshot.forEach((doc) => {
-                groups.push(doc.data());
-            });
+    //         querySnapshot.forEach((doc) => {
+    //             groups.push(doc.data());
+    //         });
 
-            return groups;
-        } catch (error) {
-            throw new Error(`Error fetching groups: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
+    //         return groups;
+    //     } catch (error) {
+    //         throw new Error(`Error fetching groups: ${error instanceof Error ? error.message : String(error)}`);
+    //     }
+    // }
 
     /**
      * Search groups by customer ID
@@ -288,37 +286,37 @@ class GroupService {
         }
     }
 
-    /**
-     * Update group
-     * @param groupId Group ID to update
-     * @param groupData Data to update
-     * @returns Promise with the updated group
-     */
-    public async updateGroup(groupId: string, groupData: UpdateGroupData): Promise<Group> {
-        try {
-            const docRef = doc(this.db, this.collectionName, groupId).withConverter(groupConverter);
+    // /**
+    //  * Update group
+    //  * @param groupId Group ID to update
+    //  * @param groupData Data to update
+    //  * @returns Promise with the updated group
+    //  */
+    // public async updateGroup(groupId: string, groupData: UpdateGroupData): Promise<Group> {
+    //     try {
+    //         const docRef = doc(this.db, this.collectionName, groupId).withConverter(groupConverter);
 
-            // Prepare update data with server timestamp
-            const updateData: Record<string, any> = {
-                ...groupData,
-                updatedAt: serverTimestamp()
-            };
+    //         // Prepare update data with server timestamp
+    //         const updateData: Record<string, any> = {
+    //             ...groupData,
+    //             updatedAt: serverTimestamp()
+    //         };
 
-            // Convert Date objects to Firestore Timestamps
-            Object.entries(updateData).forEach(([key, value]) => {
-                if (value instanceof Date) {
-                    updateData[key] = Timestamp.fromDate(value);
-                }
-            });
+    //         // Convert Date objects to Firestore Timestamps
+    //         Object.entries(updateData).forEach(([key, value]) => {
+    //             if (value instanceof Date) {
+    //                 updateData[key] = Timestamp.fromDate(value);
+    //             }
+    //         });
 
-            await updateDoc(docRef, updateData);
+    //         await updateDoc(docRef, updateData);
 
-            // Fetch and return the updated group
-            return await this.getGroupById(groupId);
-        } catch (error) {
-            throw new Error(`Error updating group: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
+    //         // Fetch and return the updated group
+    //         return await this.getGroupById(groupId);
+    //     } catch (error) {
+    //         throw new Error(`Error updating group: ${error instanceof Error ? error.message : String(error)}`);
+    //     }
+    // }
 
     /**
      * Delete group
@@ -361,43 +359,43 @@ class GroupService {
         }
     }
 
-    /**
-     * Get groups by type
-     * @param type Group type to filter by
-     * @param customerId Optional customer ID to filter by
-     * @returns Promise with array of groups
-     */
-    public async getGroupsByType(type: string, customerId?: string): Promise<Group[]> {
-        try {
-            let q;
+    // /**
+    //  * Get groups by type
+    //  * @param type Group type to filter by
+    //  * @param customerId Optional customer ID to filter by
+    //  * @returns Promise with array of groups
+    //  */
+    // public async getGroupsByType(type: string, customerId?: string): Promise<Group[]> {
+    //     try {
+    //         let q;
 
-            if (customerId) {
-                q = query(
-                    collection(this.db, this.collectionName).withConverter(groupConverter),
-                    where('type', '==', type),
-                    where('customerId', '==', customerId),
-                    orderBy('createdAt', 'desc')
-                );
-            } else {
-                q = query(
-                    collection(this.db, this.collectionName).withConverter(groupConverter),
-                    where('type', '==', type),
-                    orderBy('createdAt', 'desc')
-                );
-            }
+    //         if (customerId) {
+    //             q = query(
+    //                 collection(this.db, this.collectionName).withConverter(groupConverter),
+    //                 where('type', '==', type),
+    //                 where('customerId', '==', customerId),
+    //                 orderBy('createdAt', 'desc')
+    //             );
+    //         } else {
+    //             q = query(
+    //                 collection(this.db, this.collectionName).withConverter(groupConverter),
+    //                 where('type', '==', type),
+    //                 orderBy('createdAt', 'desc')
+    //             );
+    //         }
 
-            const querySnapshot = await getDocs(q);
-            const groups: Group[] = [];
+    //         const querySnapshot = await getDocs(q);
+    //         const groups: Group[] = [];
 
-            querySnapshot.forEach((doc) => {
-                groups.push(doc.data());
-            });
+    //         querySnapshot.forEach((doc) => {
+    //             groups.push(doc.data());
+    //         });
 
-            return groups;
-        } catch (error) {
-            throw new Error(`Error fetching groups by type: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
+    //         return groups;
+    //     } catch (error) {
+    //         throw new Error(`Error fetching groups by type: ${error instanceof Error ? error.message : String(error)}`);
+    //     }
+    // }
 
     /**
      * Get groups created by a specific user
@@ -427,14 +425,14 @@ class GroupService {
         }
     }
 
-    /**
-     * Get group reference
-     * @param groupId Group ID to get reference for
-     * @returns Group reference
-     */
-    public getGroupRef(groupId: string): DocumentReference<Group> {
-        return doc(this.db, this.collectionName, groupId).withConverter(groupConverter);
-    }
+    // /**
+    //  * Get group reference
+    //  * @param groupId Group ID to get reference for
+    //  * @returns Group reference
+    //  */
+    // public getGroupRef(groupId: string): DocumentReference<Group> {
+    //     return doc(this.db, this.collectionName, groupId).withConverter(groupConverter);
+    // }
 }
 
 export default GroupService;

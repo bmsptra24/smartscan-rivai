@@ -9,7 +9,7 @@ import { BlurView } from "expo-blur";
 import { authService, userService } from "@/services";
 import { router } from "expo-router";
 
-class LoginScreen extends Component {
+class LoginPage extends Component {
   animation = React.createRef<LottieView>();
 
   state = {
@@ -118,6 +118,7 @@ class LoginScreen extends Component {
                 placeholder="Masukan username anda"
               />
               <InputBase
+                type="password"
                 value={password}
                 onChangeText={this.handlePasswordChange}
                 placeholder="Masukan kata sandi anda"
@@ -136,4 +137,4 @@ class LoginScreen extends Component {
   }
 }
 
-export default LoginScreen;
+export default LoginPage;

@@ -87,6 +87,7 @@ class LoginScreen extends Component {
               placeholderTextColor="#999"
             />
             <InputBase
+              type="password"
               style={styles.input}
               value={password}
               onChangeText={this.handlePasswordChange}
