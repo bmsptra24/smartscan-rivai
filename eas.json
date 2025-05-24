@@ -2,14 +2,59 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyBavklpdG8rknPWh2FPHmluimvwXTYX6Dg",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "smartscan-rivai.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "smartscan-rivai",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "smartscan-rivai.firebasestorage.app",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "217826953875",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:217826953875:web:3883133eb2cb6aae50db66",
+
+        "EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME": "duyzfabe3",
+        "EXPO_PUBLIC_CLOUDINARY_API_KEY": "799722272133585",
+        "EXPO_PUBLIC_CLOUDINARY_API_SECRET": "Py5LpRtqEpRMpn3kJIiZF2eFv_E",
+        "EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET": "smartscan-rivai",
+
+        "EXPO_PUBLIC_API_ENDPOINT": "https://smartscan-rivai.vercel.app"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyBavklpdG8rknPWh2FPHmluimvwXTYX6Dg",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "smartscan-rivai.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "smartscan-rivai",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "smartscan-rivai.firebasestorage.app",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "217826953875",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:217826953875:web:3883133eb2cb6aae50db66",
+
+        "EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME": "duyzfabe3",
+        "EXPO_PUBLIC_CLOUDINARY_API_KEY": "799722272133585",
+        "EXPO_PUBLIC_CLOUDINARY_API_SECRET": "Py5LpRtqEpRMpn3kJIiZF2eFv_E",
+        "EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET": "smartscan-rivai",
+
+        "EXPO_PUBLIC_API_ENDPOINT": "https://smartscan-rivai.vercel.app"
+      }
     },
     "production": {
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyBavklpdG8rknPWh2FPHmluimvwXTYX6Dg",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "smartscan-rivai.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "smartscan-rivai",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "smartscan-rivai.firebasestorage.app",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "217826953875",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:217826953875:web:3883133eb2cb6aae50db66",
+
+        "EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME": "duyzfabe3",
+        "EXPO_PUBLIC_CLOUDINARY_API_KEY": "799722272133585",
+        "EXPO_PUBLIC_CLOUDINARY_API_SECRET": "Py5LpRtqEpRMpn3kJIiZF2eFv_E",
+        "EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET": "smartscan-rivai",
+
+        "EXPO_PUBLIC_API_ENDPOINT": "https://smartscan-rivai.vercel.app"
       }
     }
   }

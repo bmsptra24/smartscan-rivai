@@ -125,6 +125,7 @@ class EditSettingPage extends Component<StoreProps, EditSettingPageState> {
             />
             <InputBase
               placeholder="Password"
+              type="password"
               onChangeText={(text: string) =>
                 this.handleInputChange("password", text)
               }
@@ -133,6 +134,7 @@ class EditSettingPage extends Component<StoreProps, EditSettingPageState> {
             />
             <InputBase
               placeholder="Ulangi password"
+              type="password"
               onChangeText={(text: string) =>
                 this.setState({ confirmPassword: text })
               }

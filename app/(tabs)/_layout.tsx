@@ -1,10 +1,10 @@
 import { Tabs } from "expo-router";
 import React, { Component } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Color, IsMobileScreen } from "@/constants/Styles";
+import { Color } from "@/constants/Styles"; // Remove IsMobileScreen if using Platform
 import { StoreProps, useStore } from "@/stores";
 import { documentService, userService } from "@/services";
 import ProviderWrapper from "@/contexts/ProviderWrapper";
@@ -18,25 +18,24 @@ class TabLayout extends Component<StoreProps> {
   }
 
   render() {
-    const isMobile = IsMobileScreen;
+    const user = userService.getCurrentUser();
+    const isNotAdmin = user?.role === "user";
 
     return (
       <ProviderWrapper>
-        <View style={{ flex: 1, flexDirection: isMobile ? "column" : "row" }}>
-          {/* Tab bar kustom untuk web (sisi kiri) */}
-          {!isMobile && <Sidebar />}
+        <View style={{ flex: 1, flexDirection: isNotAdmin ? "column" : "row" }}>
+          {/* Sidebar only on web */}
+          {!isNotAdmin && <Sidebar />}
 
-          {/* Konten utama */}
+          {/* Main content */}
           <View style={{ flex: 1 }}>
             <Tabs
               screenOptions={{
                 headerShown: false,
-                tabBarStyle: isMobile
-                  ? { position: "relative" }
-                  : { display: "none" },
+                tabBarStyle: { display: isNotAdmin ? "flex" : "none" },
                 tabBarActiveTintColor: Color.black,
                 tabBarInactiveTintColor: Color.grey,
-                tabBarShowLabel: isMobile,
+                tabBarShowLabel: isNotAdmin,
                 tabBarLabelPosition: "beside-icon",
               }}
             >
@@ -49,21 +48,6 @@ class TabLayout extends Component<StoreProps> {
                   ),
                 }}
               />
-              {/* {this.props.userStore.currentUser.role !== "user" && (
-                <Tabs.Screen
-                  name="users"
-                  options={{
-                    title: "Pengguna",
-                    tabBarIcon: ({ color, size }) => (
-                      <FontAwesome5
-                        size={size - 6}
-                        name="users-cog"
-                        color={color}
-                      />
-                    ),
-                  }}
-                />
-              )} */}
               <Tabs.Screen
                 name="profile"
                 options={{
@@ -76,8 +60,8 @@ class TabLayout extends Component<StoreProps> {
             </Tabs>
           </View>
 
-          {/* Tombol scan */}
-          {isMobile && (
+          {/* Scan button only on mobile */}
+          {isNotAdmin && (
             <View style={styles.cameraButtonContainer}>
               <TouchableOpacity
                 style={styles.scanButton}
@@ -98,25 +82,11 @@ class TabLayout extends Component<StoreProps> {
 }
 
 const styles = StyleSheet.create({
-  webTabBar: {
-    width: 225,
-    backgroundColor: Color.white,
-    borderRightWidth: 1,
-    borderRightColor: Color.grey,
-  },
-  webTabItem: {
-    padding: 10,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 10,
-  },
   cameraButtonContainer: {
     position: "absolute",
-    bottom: 20, //! center
+    bottom: 20,
     left: "50%",
     marginLeft: -30,
-    // bottom: 80, //! left
-    // right: "10%",
     zIndex: 1,
   },
   scanButton: {

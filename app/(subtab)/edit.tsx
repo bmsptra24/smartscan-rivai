@@ -14,7 +14,6 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import PickerActionSheet from "@/components/base/PickerActionSheet";
-import { showToastable } from "react-native-toastable";
 import { StoreProps, useStore } from "@/stores";
 import { DOCUMENT_TYPE } from "@/constants/Config";
 import { documentService, groupService } from "@/services";
@@ -133,17 +132,11 @@ export class EditDokumenPage extends Component<StoreProps> {
         })
       );
 
-      showToastable({
-        message: "Perubahan Berhasil Disimpan",
-        status: "success",
-      });
+      showAlert("Success", "Perubahan Berhasil Disimpan");
       router.replace("/(tabs)/home");
     } catch (error) {
       console.error("Failed to save changes", error);
-      showToastable({
-        message: "Failed to save changes",
-        status: "danger",
-      });
+      showAlert("Error", "Gagal menyimpan perubahan. Silakan coba lagi.");
     } finally {
       this.setState({ isSaving: false });
     }

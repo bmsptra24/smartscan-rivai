@@ -123,6 +123,8 @@ export class HomeHistory extends Component<StoreProps> {
 
     const pageNumbers = getPageNumbers();
 
+    const userRole = userService.getCurrentUser()?.role;
+
     return (
       <View>
         <View
@@ -137,7 +139,7 @@ export class HomeHistory extends Component<StoreProps> {
         >
           <TextBase variant="header">Riwayat</TextBase>
 
-          {!IsMobileScreen && (
+          {userRole !== "user" && (
             <IconButton
               onPress={this.handleAddNew}
               icon={

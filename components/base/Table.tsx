@@ -154,9 +154,9 @@ const Table: React.FC<TableProps> = ({
 const styles = StyleSheet.create({
   tableContainer: {
     flexDirection: "column",
-    borderWidth: 1,
+    borderWidth: !IsMobileScreen ? 1 : 0,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
+    shadowOpacity: !IsMobileScreen ? 0.1 : 0,
     shadowRadius: 7,
     elevation: 5,
     padding: IsMobileScreen ? 8 : 15,

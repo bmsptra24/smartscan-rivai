@@ -5,7 +5,7 @@ import InputBase from "@/components/base/Input";
 import Navbar from "@/components/base/Navbar";
 import Table from "@/components/base/Table";
 import TextBase from "@/components/base/Text";
-import { Color } from "@/constants/Styles";
+import { Color, IsMobileScreen } from "@/constants/Styles";
 import {
   documentService,
   groupService,
@@ -21,7 +21,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
 
 import React, { Component } from "react";
-import { View, Dimensions } from "react-native";
+import { View, Dimensions, Platform } from "react-native";
 
 interface SettingPageState {
   screenWidth: number;
@@ -223,48 +223,52 @@ export class SettingPage extends Component<StoreProps, SettingPageState> {
     return (
       <Container>
         <View style={{ gap: isMobile ? 20 : 40 }}>
-          <Navbar title="Setting" />
-          <View
-            style={{
-              gap: isMobile ? 10 : 20,
-              paddingHorizontal: isMobile ? 15 : 25,
-            }}
-          >
-            <TextBase variant="title">Lokasi Penyimpanan</TextBase>
+          <Navbar title="Pengaturan" />
+          {Platform.OS === "web" && (
             <View
               style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 10,
+                gap: isMobile ? 10 : 20,
+                paddingHorizontal: isMobile ? 15 : 25,
               }}
             >
-              <InputBase
-                style={{ width: "100%" }}
-                value={systemService.getPath()}
-                placeholder="Pilih lokasi..."
-              />
-              <IconButton
-                onPress={this.handleChooseStorageLocation}
-                icon={
-                  <MaterialCommunityIcons
-                    name="pencil"
-                    size={isMobile ? 18 : 24}
-                    color="black"
-                  />
-                }
-              />
-              <IconButton
-                onPress={this.handleOpenFileExplorer}
-                icon={
-                  <Ionicons
-                    name="open-outline"
-                    size={isMobile ? 18 : 24}
-                    color="black"
-                  />
-                }
-              />
+              <TextBase variant={IsMobileScreen ? "header" : "title"}>
+                Lokasi Penyimpanan
+              </TextBase>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  gap: 10,
+                }}
+              >
+                <InputBase
+                  style={{ width: "100%" }}
+                  value={systemService.getPath()}
+                  placeholder="Pilih lokasi..."
+                />
+                <IconButton
+                  onPress={this.handleChooseStorageLocation}
+                  icon={
+                    <MaterialCommunityIcons
+                      name="pencil"
+                      size={isMobile ? 18 : 24}
+                      color="black"
+                    />
+                  }
+                />
+                <IconButton
+                  onPress={this.handleOpenFileExplorer}
+                  icon={
+                    <Ionicons
+                      name="open-outline"
+                      size={isMobile ? 18 : 24}
+                      color="black"
+                    />
+                  }
+                />
+              </View>
             </View>
-          </View>
+          )}
 
           <View
             style={{
@@ -279,12 +283,15 @@ export class SettingPage extends Component<StoreProps, SettingPageState> {
                 alignItems: "center",
               }}
             >
-              <TextBase variant="title">Akun Pengguna</TextBase>
+              <TextBase variant={IsMobileScreen ? "header" : "title"}>
+                Akun Pengguna
+              </TextBase>
               <IconButton
                 onPress={() => {
                   this.props.userStore.clearSelectedUserState();
                   router.push("/(subtab)/edit-setting");
                 }}
+                size={IsMobileScreen ? "small" : "medium"}
                 icon={
                   <FontAwesome6
                     name="add"
@@ -326,7 +333,9 @@ export class SettingPage extends Component<StoreProps, SettingPageState> {
                 paddingHorizontal: isMobile ? 15 : 25,
               }}
             >
-              <TextBase variant="title">Reset</TextBase>
+              <TextBase variant={IsMobileScreen ? "header" : "title"}>
+                Reset
+              </TextBase>
               <View
                 style={{
                   flexDirection: "row",

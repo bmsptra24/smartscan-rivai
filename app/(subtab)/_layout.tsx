@@ -16,12 +16,15 @@ class RootLayout extends Component<StoreProps> {
   }
 
   render() {
+    const user = userService.getCurrentUser();
+    const isNotAdmin = user?.role === "user";
+
     return (
       <ProviderWrapper>
         <View
           style={{ flex: 1, flexDirection: IsMobileScreen ? "column" : "row" }}
         >
-          {!IsMobileScreen && <Sidebar />}
+          {!isNotAdmin && <Sidebar />}
 
           <Stack screenOptions={{ headerShown: false, animation: "none" }}>
             <Stack.Screen name="detail" options={{ headerShown: false }} />

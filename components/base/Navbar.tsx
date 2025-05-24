@@ -13,33 +13,31 @@ interface NavbarProps {
 export class Navbar extends Component<StoreProps & NavbarProps> {
   render() {
     return (
-      !IsMobileScreen && (
-        <View
-          style={{
-            gap: 10,
-            flexDirection: IsMobileScreen ? "column" : "row-reverse",
-            justifyContent: "space-between",
-            alignItems: IsMobileScreen ? "flex-start" : "center",
-            paddingVertical: 10,
-            paddingHorizontal: 25,
-            backgroundColor: Color.white,
-            borderBottomWidth: 1,
-            borderBottomColor: Color.grey,
-          }}
-        >
-          <ProfileCard />
+      <View
+        style={{
+          gap: 10,
+          flexDirection: IsMobileScreen ? "column" : "row-reverse",
+          justifyContent: "space-between",
+          alignItems: IsMobileScreen ? "flex-start" : "center",
+          paddingVertical: 10,
+          paddingHorizontal: 25,
+          backgroundColor: Color.white,
+          borderBottomWidth: 1,
+          borderBottomColor: Color.grey,
+        }}
+      >
+        {!IsMobileScreen && <ProfileCard />}
 
-          {/* Cari File Description */}
-          <View>
-            <TextBase variant={this.props.description ? "title" : "titlepage"}>
-              {this.props.title}
-            </TextBase>
-            {this.props.description && (
-              <TextBase variant="content">{this.props.description}</TextBase>
-            )}
-          </View>
+        {/* Cari File Description */}
+        <View>
+          <TextBase variant={this.props.description ? "title" : "titlepage"}>
+            {this.props.title}
+          </TextBase>
+          {this.props.description && (
+            <TextBase variant="content">{this.props.description}</TextBase>
+          )}
         </View>
-      )
+      </View>
     );
   }
 }

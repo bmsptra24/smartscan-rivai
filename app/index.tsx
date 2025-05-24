@@ -13,8 +13,8 @@ class LoginPage extends Component {
   animation = React.createRef<LottieView>();
 
   state = {
-    username: "bima",
-    password: "123",
+    username: "",
+    password: "",
     isLoading: false,
   };
 

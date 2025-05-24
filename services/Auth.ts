@@ -56,8 +56,10 @@ class AuthService {
                 storage.set('userData', JSON.stringify(userWithId));
 
                 if (Platform.OS === 'web' && userData.role === 'user') return showAlert('Gagal Login', 'Hanya admin yang bisa mengakses website.')
+
                 // Redirect ke halaman utama setelah login berhasil
-                router.push("/dashboard");
+                if (userData.role === 'user') router.push("/home");
+                if (userData.role !== 'user') router.push("/dashboard");
             } else {
                 throw new Error("Incorrect password"); // Jika password tidak cocok
             }

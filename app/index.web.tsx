@@ -22,8 +22,8 @@ const { width, height } = Dimensions.get("window");
 
 class LoginScreen extends Component {
   state = {
-    username: "bima",
-    password: "123",
+    username: "",
+    password: "",
     isLoading: false,
   };
   animation = React.createRef<LottieView>();
@@ -140,18 +140,22 @@ class LoginScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {
+    flex: 1,
+    alignItems: IsMobileScreen ? "center" : "flex-start",
+    backgroundColor: Color.white,
+  },
   scrollContainer: { flexDirection: "row", minHeight: height },
   loginSection: {
     width: Size.screen.width < 1550 ? (IsMobileScreen ? "100%" : "50%") : "25%",
-    padding: "3%",
+    padding: IsMobileScreen ? "auto" : "3%",
     backgroundColor: "white",
     justifyContent: "center",
   },
   promoSection: {
     display: IsMobileScreen ? "none" : "flex",
     position: "relative",
-    width: Size.screen.width < 1550 ? "50%" : "75%",
+    width: Size.screen.width,
     backgroundColor: Color.primary,
     // padding: "3%",
     justifyContent: "space-between",
