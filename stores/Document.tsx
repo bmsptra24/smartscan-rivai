@@ -8,7 +8,6 @@ interface DocumentState {
 
 interface DocumentActions {
   updateDocumentCategory: (docId: string, category: string) => void;
-  updateCustomerId: (docId: string, customerId: string) => void;
   addDocuments: (newDocuments: Document[]) => void;
   clearDocuments: () => void;
   deleteDocument: (docId: string) => void;
@@ -32,13 +31,6 @@ const useDocumentStore = create<DocumentStore>((set) => ({
     set((state) => ({
       documents: state.documents.map((doc) =>
         doc.id === docId ? ({ ...doc, type } as Document) : doc
-      ),
-    }));
-  },
-  updateCustomerId: (docId: string, customerId: string) => {
-    set((state) => ({
-      documents: state.documents.map((doc) =>
-        doc.id === docId ? ({ ...doc, customerId } as Document) : doc
       ),
     }));
   },

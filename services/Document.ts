@@ -418,13 +418,15 @@ class DocumentService {
                 const duration = endTime - startTime;
                 console.log(`Waktu pemrosesan untuk dokumen ${doc.id}: ${duration} ms`);
 
-                // Set the document type
-                if (!doc.id || !type) return;
-                documentStore.updateDocumentCategory(doc.id, type);
+                if (!doc.id) return
 
-                if (!idpel) return;
-                documentStore.updateCustomerId(doc.id, idpel);
+                if (type) {
+                    documentStore.updateDocumentCategory(doc.id, type);
+                }
 
+                if (idpel) {
+                    useGroupStore.getState().updateSelectedGroupCustomerId(idpel);
+                }
             });
 
             // documentStore.updateCustomerId(doc.id, idPelanggan)
