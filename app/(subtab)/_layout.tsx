@@ -17,7 +17,7 @@ class RootLayout extends Component<StoreProps> {
 
   render() {
     const user = userService.getCurrentUser();
-    const isNotAdmin = user?.role === "user";
+    const isNotAdmin = user?.role === "pegawai";
 
     return (
       <ProviderWrapper>

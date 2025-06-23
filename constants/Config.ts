@@ -61,4 +61,4 @@ export const DOC_TYPE_WITH_KEYWORDS: DocumentTypeKeywords = {
 
 export const DOCUMENT_TYPE = [...Object.keys(DOC_TYPE_WITH_KEYWORDS), 'Lainnya']
 
-export const ROLE = ['admin', 'user', 'superadmin']
+export const ROLE = ['admin', 'pengelola', 'pegawai']

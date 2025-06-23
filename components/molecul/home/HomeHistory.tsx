@@ -24,9 +24,9 @@ export class HomeHistory extends Component<StoreProps> {
       return console.error("User data is missing or incomplete.");
 
     let groups;
-    if (userData.role === "user")
+    if (userData.role === "pegawai")
       groups = await groupService.getGroupsByCreator(userData.id);
-    if (userData.role !== "user") groups = await groupService.getAllGroups();
+    if (userData.role !== "pegawai") groups = await groupService.getAllGroups();
     if (!groups) return console.error("No groups found.");
     this.props.groupStore.setGroups(groups);
   }
@@ -139,7 +139,7 @@ export class HomeHistory extends Component<StoreProps> {
         >
           <TextBase variant="header">Riwayat</TextBase>
 
-          {userRole !== "user" && (
+          {userRole !== "pegawai" && (
             <IconButton
               onPress={this.handleAddNew}
               icon={

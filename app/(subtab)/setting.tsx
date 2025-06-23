@@ -326,7 +326,7 @@ export class SettingPage extends Component<StoreProps, SettingPageState> {
             </View>
           </View>
 
-          {userRole === "superadmin" && (
+          {userRole === "admin" && (
             <View
               style={{
                 gap: isMobile ? 10 : 20,

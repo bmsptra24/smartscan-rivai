@@ -130,6 +130,10 @@ class LoginScreen extends Component {
                 <br />
                 efisien melalui lintas-platform.
               </TextBase>
+              <Image
+                source={Images.qrcode.src}
+                style={{ width: 150, height: 150, borderRadius: 5 }}
+              />
             </View>
             <View style={styles.illustrationsContainer}></View>
           </View>

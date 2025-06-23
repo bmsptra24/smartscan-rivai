@@ -48,3 +48,5 @@ ios/
 /dist
 # @end @expo/electron-adapter
 .vercel
+*.AppImage
+*.exe

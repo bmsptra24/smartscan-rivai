@@ -29,7 +29,7 @@ export interface UserProfile {
     password?: string;
     createdAt?: Date | Timestamp;
     updatedAt?: Date | Timestamp;
-    role?: 'admin' | 'user' | 'superadmin';
+    role?: 'pegawai' | 'pengelola' | 'admin';
 }
 
 // Type for creating a new user profile

@@ -11,4 +11,8 @@ export const Images = {
         src: 'https://res.cloudinary.com/duyzfabe3/image/upload/v1746334057/smartscan-rivai/assets/nqvtqljvmztiduy6twmo.png',
         placeholder: 'Logo'
     },
+    qrcode: {
+        src: require('@/assets/images/qrcode.png'),
+        placeholder: 'QR Code'
+    }
 } 

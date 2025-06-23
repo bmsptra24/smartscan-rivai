@@ -68,7 +68,7 @@ const AdminDashboard = () => {
         // Process user roles
         const roles: Record<string, number> = {};
         users.forEach((user) => {
-          const role = user.role || "user";
+          const role = user.role || "pegawai";
           roles[role] = (roles[role] || 0) + 1;
         });
 

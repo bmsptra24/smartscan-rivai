@@ -55,11 +55,11 @@ class AuthService {
                 // Simpan data credential (termasuk ID) ke MMKV
                 storage.set('userData', JSON.stringify(userWithId));
 
-                if (Platform.OS === 'web' && userData.role === 'user') return showAlert('Gagal Login', 'Hanya admin yang bisa mengakses website.')
+                if (Platform.OS === 'web' && userData.role === 'pegawai') return showAlert('Gagal Login', 'Hanya admin dan pengelola yang bisa mengakses website.')
 
                 // Redirect ke halaman utama setelah login berhasil
-                if (userData.role === 'user') router.push("/home");
-                if (userData.role !== 'user') router.push("/dashboard");
+                if (userData.role === 'pegawai') router.push("/home");
+                if (userData.role !== 'pegawai') router.push("/dashboard");
             } else {
                 throw new Error("Incorrect password"); // Jika password tidak cocok
             }
