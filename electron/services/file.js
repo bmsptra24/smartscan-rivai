@@ -64,8 +64,8 @@ async function saveFileWithPathFromLocal(folderName, fileName, content) {
       return false
     }
 
-    // Gabungkan path folder dengan subdirektori Documents dan folderName
-    const targetDir = path.join(folderPath, 'Documents', folderName)
+    // Gabungkan path folder dengan folderName
+    const targetDir = path.join(folderPath, folderName)
     const filePath = path.join(targetDir, fileName)
 
     // Buat direktori jika belum ada
@@ -146,8 +146,7 @@ async function getFolders() {
       throw new Error('Path folder tidak ditemukan')
     }
 
-    // Gabungkan path folder dengan subdirektori Documents
-    const dirPath = path.join(folderPath, 'Documents')
+    const dirPath = path.join(folderPath)
     const items = await fs.readdir(dirPath, { withFileTypes: true })
 
     // Filter hanya folder dan ambil namanya
