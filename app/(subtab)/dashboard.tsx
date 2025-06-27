@@ -4,20 +4,23 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   ActivityIndicator,
   Platform,
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BarChart, LineChart, PieChart } from "react-native-chart-kit";
+import { BarChart, PieChart } from "react-native-chart-kit"; // LineChart is not used in original, keeping BarChart and PieChart
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient"; // Import for gradients
+// --- MOCK DATA & SERVICES (replace with your actual imports) ---
+// Since the original services are external, we mock them for a runnable example.
+// Replace these with your actual service and type imports:
 import { documentService } from "@/services";
 import { groupService } from "@/services";
 import { userService } from "@/services";
 import { Document } from "@/services/Document";
 import { Group } from "@/services/Group";
-import { Color } from "@/constants/Styles";
+import { Color as COLORS } from "@/constants/Styles";
 import Navbar from "@/components/base/Navbar";
 
 const AdminDashboard = () => {
@@ -34,18 +37,28 @@ const AdminDashboard = () => {
 
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === "web";
+
+  // Calculate cardWidth for 3 columns on web, accounting for padding and gaps
+  // scrollViewContent has paddingHorizontal: 16 (total 32px)
+  // statsContainer has gap: 16 (total 2 gaps = 32px)
+  const contentPaddingHorizontal = 16;
+  const statCardGap = 16;
+  const totalHorizontalSpace =
+    contentPaddingHorizontal * 2 + statCardGap * 2 + 230; // 32px padding + 32px gaps
+
+  // Using Math.floor to ensure integer pixel values, which can prevent unexpected wrapping
   const cardWidth = isWeb
-    ? width > 1200
-      ? width / 4 - 30
-      : width > 768
-      ? width / 2 - 30
-      : width - 40
-    : width - 40;
+    ? Math.floor((width - totalHorizontalSpace) / 3) // Always 3 cards per row on web
+    : width - contentPaddingHorizontal * 2; // Full width on mobile (adjusted to use contentPaddingHorizontal)
+
+  // chartWidth calculation remains the same, adjusted for common practices
   const chartWidth = isWeb
-    ? width > 768
-      ? width / 2 - 40
-      : width - 40
-    : width - 40;
+    ? Math.floor(
+        width > 768
+          ? (width - totalHorizontalSpace) / 2 // Half width for charts on larger web screens if in a two-column layout
+          : width - totalHorizontalSpace
+      ) // Full width for charts on smaller web screens
+    : width - contentPaddingHorizontal * 2; // Full width on mobile (adjusted)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,11 +81,11 @@ const AdminDashboard = () => {
         // Process user roles
         const roles: Record<string, number> = {};
         users.forEach((user) => {
-          const role = user.role || "pegawai";
+          const role = user.role || "pegawai"; // Default role if not defined
           roles[role] = (roles[role] || 0) + 1;
         });
 
-        // Sort recent items
+        // Sort recent items (latest first)
         const sortedGroups = [...groups].sort((a, b) => {
           const dateA =
             a.createdAt instanceof Date ? a.createdAt : a.createdAt.toDate();
@@ -95,8 +108,8 @@ const AdminDashboard = () => {
           totalGroups: groups.length,
           documentsByType: docTypes,
           usersByRole: roles,
-          recentGroups: sortedGroups.slice(0, 5),
-          recentDocuments: sortedDocuments.slice(0, 5),
+          recentGroups: sortedGroups.slice(0, 5), // Show top 5 recent groups
+          recentDocuments: sortedDocuments.slice(0, 5), // Show top 5 recent documents
         });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -106,84 +119,105 @@ const AdminDashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, []); // Empty dependency array means this effect runs once after initial render
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Color.primary} />
+        <ActivityIndicator size="large" color={COLORS.primaryBlue} />
         <Text style={styles.loadingText}>Loading dashboard data...</Text>
       </View>
     );
   }
 
-  // Prepare chart data
-  const documentTypeData = {
-    labels: Object.keys(stats.documentsByType).slice(0, 5),
-    datasets: [
-      {
-        data: Object.values(stats.documentsByType).slice(0, 5),
-      },
-    ],
-  };
+  // Prepare chart data for PieChart (Documents by Type)
+  // Ensure enough distinct colors for pie slices
+  const pieChartColors = [
+    COLORS.accentBlue1,
+    COLORS.accentBlue2,
+    COLORS.accentBlue3,
+    COLORS.primaryBlue,
+    COLORS.lightBlue,
+    COLORS.darkBlue,
+  ];
 
+  const pieChartData = Object.keys(stats.documentsByType).map((type, index) => {
+    return {
+      name: type,
+      population: stats.documentsByType[type],
+      color: pieChartColors[index % pieChartColors.length], // Cycle through defined colors
+      legendFontColor: COLORS.textPrimary,
+      legendFontSize: 12,
+    };
+  });
+
+  // Prepare chart data for BarChart (User Roles Distribution)
   const userRoleData = {
     labels: Object.keys(stats.usersByRole),
     datasets: [
       {
         data: Object.values(stats.usersByRole),
+        colors: Object.keys(stats.usersByRole).map(
+          (_, index) =>
+            (opacity = 1) =>
+              pieChartColors[index % pieChartColors.length] // Use same color palette for bars
+        ),
       },
     ],
   };
 
-  const pieChartData = Object.keys(stats.documentsByType).map((type, index) => {
-    const colors = [
-      Color.accent1,
-      Color.accent2,
-      Color.accent3,
-      Color.accent4,
-      Color.accent5,
-    ];
-    return {
-      name: type,
-      population: stats.documentsByType[type],
-      color: colors[index % colors.length],
-      legendFontColor: Color.text,
-      legendFontSize: 12,
-    };
-  });
-
   return (
     <SafeAreaView style={styles.container}>
-      <Navbar title="Dashboard" />
+      <Navbar title="Admin Dashboard" />
 
-      <ScrollView style={styles.scrollView}>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        {/* Statistics Cards */}
         <View style={styles.statsContainer}>
-          <View style={[styles.statCard, { width: cardWidth }]}>
+          <LinearGradient
+            colors={[COLORS.gradientStart, COLORS.gradientEnd]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.statCard, { width: cardWidth }]}
+          >
             <View style={styles.statIconContainer}>
-              <Ionicons name="people" size={24} color={Color.text} />
+              <Ionicons name="people" size={28} color={COLORS.darkBlue} />
             </View>
             <Text style={styles.statValue}>{stats.totalUsers}</Text>
             <Text style={styles.statLabel}>Total Users</Text>
-          </View>
+          </LinearGradient>
 
-          <View style={[styles.statCard, { width: cardWidth }]}>
+          <LinearGradient
+            colors={[COLORS.gradientStart, COLORS.gradientEnd]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.statCard, { width: cardWidth }]}
+          >
             <View style={styles.statIconContainer}>
-              <Ionicons name="document-text" size={24} color={Color.text} />
+              <Ionicons
+                name="document-text"
+                size={28}
+                color={COLORS.darkBlue}
+              />
             </View>
             <Text style={styles.statValue}>{stats.totalDocuments}</Text>
             <Text style={styles.statLabel}>Total Documents</Text>
-          </View>
+          </LinearGradient>
 
-          <View style={[styles.statCard, { width: cardWidth }]}>
+          <LinearGradient
+            colors={[COLORS.gradientStart, COLORS.gradientEnd]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.statCard, { width: cardWidth }]}
+          >
             <View style={styles.statIconContainer}>
-              <Ionicons name="folder" size={24} color={Color.text} />
+              <Ionicons name="folder" size={28} color={COLORS.darkBlue} />
             </View>
             <Text style={styles.statValue}>{stats.totalGroups}</Text>
             <Text style={styles.statLabel}>Total Groups</Text>
-          </View>
+          </LinearGradient>
         </View>
 
+        {/* Documents by Type Chart */}
         <View style={styles.chartSection}>
           <Text style={styles.sectionTitle}>Documents by Type</Text>
           <View style={styles.chartContainer}>
@@ -193,16 +227,21 @@ const AdminDashboard = () => {
                 width={chartWidth}
                 height={220}
                 chartConfig={{
-                  backgroundColor: "#ffffff",
-                  backgroundGradientFrom: "#ffffff",
-                  backgroundGradientTo: "#ffffff",
+                  backgroundColor: COLORS.cardBackground, // Background of the chart area
+                  backgroundGradientFrom: COLORS.cardBackground,
+                  backgroundGradientTo: COLORS.cardBackground,
                   decimalPlaces: 0,
-                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Default color for labels
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  propsForLabels: {
+                    fontSize: 10, // Adjust label font size
+                    fill: COLORS.textPrimary,
+                  },
                 }}
                 accessor="population"
-                backgroundColor="transparent"
+                backgroundColor="transparent" // Pie chart itself has transparent background
                 paddingLeft="15"
-                absolute
+                absolute // Show absolute values in legend
               />
             ) : (
               <Text style={styles.noDataText}>
@@ -212,62 +251,87 @@ const AdminDashboard = () => {
           </View>
         </View>
 
-        {/* <View style={styles.chartSection}>
+        {/* User Roles Distribution Chart (Uncomment if needed) */}
+        <View style={styles.chartSection}>
           <Text style={styles.sectionTitle}>User Roles Distribution</Text>
           <View style={styles.chartContainer}>
             {Object.keys(stats.usersByRole).length > 0 ? (
               <BarChart
                 data={userRoleData}
                 width={chartWidth}
-                height={220}
-                yAxisLabel=""
-                yAxisSuffix=""
+                height={250}
+                yAxisLabel="" // No y-axis label
+                yAxisSuffix="" // No y-axis suffix
                 chartConfig={{
-                  backgroundColor: "#ffffff",
-                  backgroundGradientFrom: "#ffffff",
-                  backgroundGradientTo: "#ffffff",
-                  decimalPlaces: 0,
-                  color: (opacity = 1) => `rgba(0, 102, 204, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  style: {
-                    borderRadius: 16,
+                  backgroundColor: COLORS.cardBackground,
+                  backgroundGradientFrom: COLORS.cardBackground,
+                  backgroundGradientTo: COLORS.cardBackground,
+                  decimalPlaces: 0, // No decimal places for counts
+                  color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`, // Blue color for bars
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Black labels for axis
+                  barPercentage: 0.8, // Make bars a bit wider
+                  propsForBackgroundLines: {
+                    strokeDasharray: "", // Solid background lines
+                    stroke: COLORS.divider, // Light blue lines
+                  },
+                  propsForLabels: {
+                    fontSize: 10, // Adjust label font size
+                    fill: COLORS.textSecondary,
                   },
                 }}
                 style={{
                   marginVertical: 8,
                   borderRadius: 16,
                 }}
+                verticalLabelRotation={30} // Rotate labels if they overlap
               />
             ) : (
               <Text style={styles.noDataText}>No user role data available</Text>
             )}
           </View>
-        </View> */}
+        </View>
 
+        {/* Recent Documents Section */}
         <View style={styles.recentSection}>
           <Text style={styles.sectionTitle}>Recent Documents</Text>
           {stats.recentDocuments.length > 0 ? (
             stats.recentDocuments.map((doc, index) => (
-              <View key={doc.id || index} style={styles.recentItem}>
-                <View style={styles.recentItemIcon}>
-                  <Ionicons name="document-text" size={24} color={Color.text} />
-                </View>
+              <View key={doc.id || `doc-${index}`} style={styles.recentItem}>
+                <LinearGradient
+                  colors={[COLORS.accentBlue1, COLORS.accentBlue2]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.recentItemIcon}
+                >
+                  <Ionicons
+                    name="document-text"
+                    size={22}
+                    color={COLORS.textLight}
+                  />
+                </LinearGradient>
                 <View style={styles.recentItemContent}>
                   <Text style={styles.recentItemTitle}>
                     {doc.type || "Unknown Type"}
                   </Text>
+                  {/* Find customerId from recentGroups based on doc.groupId */}
                   <Text style={styles.recentItemSubtitle}>
                     ID Pelanggan:{" "}
-                    {
-                      stats.recentGroups.find(
-                        (group) => group.id === doc.groupId
-                      )?.customerId
-                    }
+                    {stats.recentGroups.find(
+                      (group) => group.id === doc.groupId
+                    )?.customerId || "N/A"}
                   </Text>
                   <Text style={styles.recentItemDate}>
                     {doc.createdAt instanceof Date
-                      ? doc.createdAt.toLocaleDateString()
-                      : doc.createdAt.toDate().toLocaleDateString()}
+                      ? doc.createdAt.toLocaleDateString("id-ID", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : doc.createdAt.toDate().toLocaleDateString("id-ID", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
                   </Text>
                 </View>
               </View>
@@ -277,14 +341,23 @@ const AdminDashboard = () => {
           )}
         </View>
 
+        {/* Recent Groups Section */}
         <View style={styles.recentSection}>
           <Text style={styles.sectionTitle}>Recent Groups</Text>
           {stats.recentGroups.length > 0 ? (
             stats.recentGroups.map((group, index) => (
-              <View key={group.id || index} style={styles.recentItem}>
-                <View style={styles.recentItemIcon}>
-                  <Ionicons name="folder" size={24} color={Color.text} />
-                </View>
+              <View
+                key={group.id || `group-${index}`}
+                style={styles.recentItem}
+              >
+                <LinearGradient
+                  colors={[COLORS.accentBlue2, COLORS.accentBlue3]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.recentItemIcon}
+                >
+                  <Ionicons name="folder" size={22} color={COLORS.textLight} />
+                </LinearGradient>
                 <View style={styles.recentItemContent}>
                   <Text style={styles.recentItemTitle}>
                     ID Pelanggan: {group.customerId || "Tidak ada ID Pelanggan"}
@@ -294,8 +367,16 @@ const AdminDashboard = () => {
                   </Text>
                   <Text style={styles.recentItemDate}>
                     {group.createdAt instanceof Date
-                      ? group.createdAt.toLocaleDateString()
-                      : group.createdAt.toDate().toLocaleDateString()}
+                      ? group.createdAt.toLocaleDateString("id-ID", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : group.createdAt.toDate().toLocaleDateString("id-ID", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
                   </Text>
                 </View>
               </View>
@@ -312,147 +393,165 @@ const AdminDashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: COLORS.backgroundLight, // Light blue background
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  // Navbar Styles
+  navbar: {
+    width: "100%",
+    paddingVertical: 20,
+    paddingHorizontal: 16,
     alignItems: "center",
+    justifyContent: "center",
+    borderBottomLeftRadius: 25, // Rounded corners for professional look
+    borderBottomRightRadius: 25,
+    shadowColor: COLORS.shadowColor,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 12,
+    marginBottom: 20, // Add space below navbar
+  },
+  navbarTitle: {
+    fontSize: 24,
+    fontWeight: "700", // Bolder title
+    color: COLORS.textLight,
+    letterSpacing: 0.5,
+  },
+  scrollViewContent: {
     padding: 16,
-    backgroundColor: "#ffffff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333333",
-  },
-  refreshButton: {
-    padding: 8,
-  },
-  scrollView: {
-    flex: 1,
+    paddingBottom: 30, // Extra padding at the bottom
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: COLORS.backgroundLight,
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: "#666666",
+    color: COLORS.textSecondary,
+    fontWeight: "500",
   },
   statsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
-    padding: 16,
+    justifyContent: "flex-start", // Tetap flex-start untuk packing rapat
+    marginBottom: 20,
+    gap: 16, // Gunakan gap untuk spasi antar kartu
   },
   statCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderRadius: 15, // Lebih banyak sudut membulat
+    padding: 20,
+    marginBottom: 0, // Gap menangani spasi vertikal sekarang
+    alignItems: "flex-start", // Sejajarkan konten ke awal
+    shadowColor: COLORS.shadowColor,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 8,
+    flexGrow: 0, // Pastikan kartu tidak tumbuh melebihi lebar yang dihitung
+    flexShrink: 0, // Pastikan kartu tidak menyusut, memaksa mereka tetap satu baris
   },
   statIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: Color.primary,
+    width: 55, // Wadah ikon sedikit lebih besar
+    height: 55,
+    borderRadius: 27.5,
+    backgroundColor: COLORS.textLight, // Latar belakang putih untuk ikon agar kontras dengan gradien
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 15,
   },
   statValue: {
-    fontSize: 24,
+    fontSize: 32, // Ukuran teks nilai lebih besar
     fontWeight: "bold",
-    color: "#333333",
+    color: COLORS.textLight, // Teks putih untuk kontras
     marginBottom: 4,
   },
   statLabel: {
-    fontSize: 14,
-    color: "#666666",
+    fontSize: 15,
+    color: COLORS.textLight, // Teks putih
+    fontWeight: "500",
   },
   chartSection: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    padding: 16,
-    margin: 16,
-    marginTop: 0,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: 15,
+    padding: 20,
+    marginVertical: 10,
+    shadowColor: COLORS.shadowColor,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 6,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20, // Judul bagian lebih besar
     fontWeight: "bold",
-    color: "#333333",
-    marginBottom: 16,
+    color: COLORS.textPrimary,
+    marginBottom: 18,
+    borderBottomWidth: 1, // Garis pembatas halus
+    borderBottomColor: COLORS.divider,
+    paddingBottom: 10,
   },
   chartContainer: {
     alignItems: "center",
     justifyContent: "center",
   },
   recentSection: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    padding: 16,
-    margin: 16,
-    marginTop: 0,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: 15,
+    padding: 20,
+    marginVertical: 10,
+    shadowColor: COLORS.shadowColor,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 6,
   },
   recentItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    borderBottomColor: COLORS.divider, // Pembatas biru muda
   },
   recentItemIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Color.accent1,
+    width: 48,
+    height: 48,
+    borderRadius: 24, // Ikon melingkar
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 15,
+    shadowColor: COLORS.shadowColor, // Bayangan juga untuk ikon
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   recentItemContent: {
     flex: 1,
   },
   recentItemTitle: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#333333",
+    fontSize: 17,
+    fontWeight: "600", // Sedikit lebih tebal
+    color: COLORS.textPrimary,
   },
   recentItemSubtitle: {
     fontSize: 14,
-    color: "#666666",
-    marginTop: 2,
+    color: COLORS.textSecondary,
+    marginTop: 3,
   },
   recentItemDate: {
     fontSize: 12,
-    color: "#999999",
-    marginTop: 2,
+    color: COLORS.textSecondary,
+    marginTop: 3,
   },
   noDataText: {
-    fontSize: 14,
-    color: "#999999",
+    fontSize: 15,
+    color: COLORS.textSecondary,
     textAlign: "center",
-    padding: 20,
+    paddingVertical: 30,
+    fontStyle: "italic",
   },
 });
 

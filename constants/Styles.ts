@@ -15,6 +15,7 @@ export const Distance = {
   large: 35,
 };
 
+
 export const Color = {
   white: '#FFFFFF',
   black: '#07314A',
@@ -28,7 +29,7 @@ export const Color = {
   accent4: '#B6F399',
   accent5: '#FF9FB0',
 
-  primary: '#A2E1FE',
+  primary: '#64B5F6',
   primaryMedium: '#34C4FC',
   secondary: '#FFD16C',
 
@@ -41,7 +42,26 @@ export const Color = {
   success: '#B6F399',
   danger: '#F66666',
   primaryGradient: ["#40D5CD", "#A2E1FE"],
-  primaryBackdropGradient: ["#1F6B85", "#357F79"]
+  primaryBackdropGradient: ["#1F6B85", "#357F79"],
+
+  // Dashboard Color
+  primaryBlue: "#2196F3", // Main Blue
+  darkBlue: "#1976D2", // Darker shade for contrast/gradients
+  lightBlue: "#64B5F6", // Lighter shade for accents
+  accentBlue1: "#42A5F5", // Accent blue for charts/icons
+  accentBlue2: "#1E88E5", // Deeper accent blue
+  accentBlue3: "#1565C0", // Even deeper accent blue
+  gradientStart: "#1976D2", // Gradient starting color (dark blue)
+  gradientEnd: "#2196F3", // Gradient ending color (primary blue)
+  cardBackground: "#FFFFFF", // White for card backgrounds
+  textPrimary: "#263238", // Dark grey for primary text
+  textSecondary: "#607D8B", // Medium grey for secondary text
+  textLight: "#FFFFFF", // White for text on blue backgrounds
+  backgroundLight: "#E3F2FD", // Very light blue for overall background
+  shadowColor: "rgba(0, 0, 0, 0.15)", // More pronounced shadow
+  divider: "#BBDEFB", // Light blue for dividers
+
+  border: "#E0E0E0",
 };
 
 export const AccentColors = [
@@ -95,6 +115,17 @@ export const ScreenContentHeight = Dimensions.get("window").height - 49
 
 export const Size = {
   screen: Dimensions.get('window'),
+  font: {
+    small: 12,
+    medium: 16,
+    large: 20,
+    extraLarge: 28,
+  },
+  radius: {
+    small: 4,
+    medium: 8,
+    large: 12,
+  },
 }
 
 export const TABBAR_HEIGHT = 49

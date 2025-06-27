@@ -42,14 +42,22 @@ export class HomeHeader extends Component<StoreProps> {
   })();
 
   handleFilterDate = async (startDate: Date | null, endDate: Date | null) => {
-    if (!startDate || !endDate) {
-      await this.handleGetAll();
+    const allGroups = await this.handleGetAll(); // Ini mengupdate this.props.groupStore.groups
+
+    if (!startDate || !endDate || !allGroups) {
       return;
     }
+    // Atur startDate ke awal hari
+    const adjustedStartDate = new Date(startDate);
+    adjustedStartDate.setHours(0, 0, 0, 0);
 
-    const filteredGroups = this.props.groupStore.groups.filter((group) => {
+    // Atur endDate ke akhir hari (23:59:59.999)
+    const adjustedEndDate = new Date(endDate);
+    adjustedEndDate.setHours(23, 59, 59, 999);
+
+    const filteredGroups = allGroups.filter((group) => {
       const groupDate = new Date(group.createdAt.toDate());
-      return groupDate >= startDate && groupDate <= endDate;
+      return groupDate >= adjustedStartDate && groupDate <= adjustedEndDate;
     });
 
     this.props.groupStore.setGroups(filteredGroups);

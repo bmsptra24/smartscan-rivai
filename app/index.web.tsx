@@ -17,14 +17,32 @@ import {
   StatusBar,
   Dimensions,
 } from "react-native";
+import Carousel from "react-native-reanimated-carousel";
 
 const { width, height } = Dimensions.get("window");
+
+// Data untuk carousel dengan tambahan background
+const carouselData = [
+  {
+    image: Images.qrcode.src,
+    header: "SmartScan Rivai",
+    text: "Aplikasi pemindaian dengan pengenalan dokumen otomatis dan data terintegrasi dengan komputer pengelola.",
+    background: require("@/assets/images/carousel-1.png"),
+  },
+  {
+    image: Images.qrcode.src,
+    header: "SmartScan Rivai",
+    text: "Download aplikasinya sekarang!",
+    background: require("@/assets/images/carousel-2.png"),
+  },
+];
 
 class LoginScreen extends Component {
   state = {
     username: "",
     password: "",
     isLoading: false,
+    hoveredCarouselIndex: -1, // State baru untuk melacak item carousel yang di-hover
   };
   animation = React.createRef<LottieView>();
 
@@ -61,13 +79,22 @@ class LoginScreen extends Component {
   };
 
   render() {
-    const { username, password } = this.state;
+    const { username, password, hoveredCarouselIndex } = this.state; // Ambil hoveredCarouselIndex dari state
+
+    // Hitung lebar promoSection secara dinamis
+    const loginSectionWidth =
+      Size.screen.width < 1550
+        ? IsMobileScreen
+          ? width
+          : width * 0.5
+        : width * 0.25;
+    const promoSectionWidth = IsMobileScreen ? 0 : width - loginSectionWidth; // 0 untuk mobile karena display: 'none'
 
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" />
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.loginSection}>
+          <View style={[styles.loginSection, { width: loginSectionWidth }]}>
             <View style={styles.logoContainer}>
               <ImageBackground
                 source={Images.logo.src}
@@ -75,7 +102,6 @@ class LoginScreen extends Component {
               />
               <TextBase style={styles.logoText}>SmartScan Rivai</TextBase>
             </View>
-            {/* <Text style={styles.loginHeader}>Masuk ke akun mu</Text> */}
             <View style={styles.signUpContainer}>
               <TextBase style={styles.noAccountText}>Masuk ke akun mu</TextBase>
             </View>
@@ -98,7 +124,6 @@ class LoginScreen extends Component {
               title="Lanjutkan"
               onPress={this.handleLogin}
               style={{
-                // width: 200,
                 backgroundColor: "#F2F2F2",
                 borderWidth: 1,
                 borderColor: "#DDD",
@@ -107,36 +132,59 @@ class LoginScreen extends Component {
               textStyle={{ fontSize: Math.max(14, width * 0.01) }}
             />
           </View>
-          <View style={styles.promoSection}>
-            <View
-              style={{
-                position: "absolute",
-                inset: 0,
-              }}
-            >
-              <Image
-                source={require("@/assets/images/grainy-1.jpeg")}
-                style={{ width: "auto", height: Size.screen.height, inset: 0 }}
+          {/* Promo Section */}
+          {!IsMobileScreen && ( // Hanya tampilkan di non-mobile (desktop)
+            <View style={[styles.promoSection, { width: promoSectionWidth }]}>
+              {/* Carousel Section */}
+              <Carousel
+                loop
+                width={promoSectionWidth} // Lebar carousel sama dengan promoSection
+                height={height} // Tinggi carousel mengisi seluruh tinggi layar
+                autoPlay={true}
+                data={carouselData}
+                scrollAnimationDuration={4000}
+                renderItem={({ item, index }) => (
+                  <ImageBackground
+                    source={item.background} // Gunakan background dari data
+                    style={styles.carouselBackground}
+                    imageStyle={styles.carouselBackgroundImage}
+                  >
+                    {/* Overlay untuk efek gelap/terang */}
+                    <View
+                      style={[
+                        styles.darkenOverlay,
+                        {
+                          // Opacity berubah berdasarkan apakah item ini di-hover
+                          backgroundColor: `rgba(0,0,0, ${
+                            hoveredCarouselIndex === index ? 0.1 : 0.3
+                          })`, // 0.6 default (gelap), 0.2 saat hover (terang)
+                        },
+                      ]}
+                    />
+                    {/* Konten carousel */}
+                    <View
+                      style={styles.carouselContent}
+                      // Event hover hanya berfungsi di lingkungan web
+                      onPointerEnter={() =>
+                        this.setState({ hoveredCarouselIndex: index })
+                      }
+                      onPointerLeave={() =>
+                        this.setState({ hoveredCarouselIndex: -1 })
+                      }
+                    >
+                      <TextBase style={styles.promoHeaderCarousel}>
+                        {item.header}
+                      </TextBase>
+                      <TextBase style={styles.promoTextCarousel}>
+                        {item.text}
+                      </TextBase>
+                      <Image source={item.image} style={styles.carouselImage} />
+                    </View>
+                  </ImageBackground>
+                )}
               />
             </View>
-            <View style={styles.promoContent}>
-              <TextBase style={styles.promoHeader}>SmartScan Rivai</TextBase>
-              <TextBase style={styles.promoText}>
-                Aplikasi ini memungkinkan pemindaian,
-                <br />
-                pengenalan teks otomatis, dan
-                <br />
-                pengelolaan dokumen secara
-                <br />
-                efisien melalui lintas-platform.
-              </TextBase>
-              <Image
-                source={Images.qrcode.src}
-                style={{ width: 150, height: 150, borderRadius: 5 }}
-              />
-            </View>
-            <View style={styles.illustrationsContainer}></View>
-          </View>
+          )}
         </ScrollView>
       </SafeAreaView>
     );
@@ -149,20 +197,23 @@ const styles = StyleSheet.create({
     alignItems: IsMobileScreen ? "center" : "flex-start",
     backgroundColor: Color.white,
   },
-  scrollContainer: { flexDirection: "row", minHeight: height },
+  scrollContainer: {
+    flexDirection: "row", // Tetap row untuk desktop, di mobile carousel tidak terlihat
+    minHeight: height,
+    flexGrow: 1,
+  },
   loginSection: {
-    width: Size.screen.width < 1550 ? (IsMobileScreen ? "100%" : "50%") : "25%",
     padding: IsMobileScreen ? "auto" : "3%",
+    alignItems: IsMobileScreen ? "center" : "flex-start",
     backgroundColor: "white",
     justifyContent: "center",
   },
   promoSection: {
-    display: IsMobileScreen ? "none" : "flex",
+    display: "flex",
     position: "relative",
-    width: Size.screen.width,
     backgroundColor: Color.primary,
-    // padding: "3%",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    alignItems: "center",
   },
   logoContainer: {
     flexDirection: "row",
@@ -188,20 +239,60 @@ const styles = StyleSheet.create({
     marginBottom: "4%",
     fontSize: Math.max(14, width * 0.01),
   },
-  promoContent: { flex: 0.4, padding: 80 },
-  promoHeader: {
+  // Styles for Carousel
+  carouselBackground: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  carouselBackgroundImage: {
+    resizeMode: "cover",
+  },
+  // Overlay untuk membuat gambar gelap/terang
+  darkenOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    // BackgroundColor akan diatur secara inline untuk perubahan opacity
+    zIndex: 1, // Pastikan overlay di atas gambar tetapi di bawah konten teks
+    // --- Tambahkan properti ini untuk animasi fade ---
+    transitionProperty: "background-color",
+    transitionDuration: "300ms", // Durasi animasi 300 milidetik
+    transitionTimingFunction: "ease-in-out", // Fungsi timing animasi
+    // ------------------------------------------------
+  },
+  carouselContent: {
+    padding: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    maxWidth: "60%",
+    zIndex: 2, // Pastikan konten teks di atas overlay
+  },
+  promoHeaderCarousel: {
     fontSize: Math.max(24, width * 0.025),
     fontWeight: "bold",
-    color: Color.text,
+    color: Color.white,
     marginBottom: "4%",
+    textAlign: "center",
   },
-  promoText: {
+  promoTextCarousel: {
     fontSize: Math.max(14, width * 0.012),
-    color: Color.text,
+    color: Color.white,
     lineHeight: Math.max(20, width * 0.018),
     marginBottom: "4%",
+    textAlign: "center",
   },
-  illustrationsContainer: { flex: 0.6, justifyContent: "space-between" },
+  carouselImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 5,
+    resizeMode: "contain",
+    backgroundColor: Color.white,
+  },
 });
 
 export default LoginScreen;

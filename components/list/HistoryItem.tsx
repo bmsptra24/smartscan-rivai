@@ -10,6 +10,7 @@ import {
 } from "@/constants/Styles";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import IconButton from "../base/IconButton";
+import { userService } from "@/services";
 
 interface HistoryItemProps {
   id: string;
@@ -33,7 +34,8 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
   onDelete,
 }) => {
   // Hitung warna berdasarkan indeks item
-  const iconColor = AccentColors[index % AccentColors.length];
+  // const iconColor = AccentColors[index % AccentColors.length];
+  const userRole = userService.getCurrentUser()?.role;
 
   return (
     <View
@@ -90,11 +92,11 @@ const HistoryItem: React.FC<HistoryItemProps> = ({
           </View>
         </View>
       </Pressable>
-      {!IsMobileScreen && (
+      {userRole !== "pegawai" && (
         <IconButton
           onPress={() => onDelete(id)}
           size="small"
-          style={{ backgroundColor: Color.danger }}
+          style={{ backgroundColor: Color.danger, marginRight: 20 }}
           icon={
             <MaterialCommunityIcons
               name="delete-outline"

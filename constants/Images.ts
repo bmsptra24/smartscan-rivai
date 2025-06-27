@@ -14,5 +14,14 @@ export const Images = {
     qrcode: {
         src: require('@/assets/images/qrcode.png'),
         placeholder: 'QR Code'
-    }
+    },
+    qrCodeBg: {
+        src: 'https://res.cloudinary.com/duyzfabe3/image/upload/v1746334057/smartscan-rivai/assets/nqvtqljvmztiduy6twmo.png',
+    },
+    illustration1: {
+        src: 'https://res.cloudinary.com/duyzfabe3/image/upload/v1746334057/smartscan-rivai/assets/nqvtqljvmztiduy6twmo.png',
+    },
+    illustration2: {
+        src: 'https://res.cloudinary.com/duyzfabe3/image/upload/v1746334057/smartscan-rivai/assets/nqvtqljvmztiduy6twmo.png',
+    },
 } 

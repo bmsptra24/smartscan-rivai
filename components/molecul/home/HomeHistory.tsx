@@ -8,7 +8,7 @@ import useGroupStore from "@/stores/Group";
 import { router } from "expo-router";
 import { StoreProps, useStore } from "@/stores";
 import NotFound from "@/components/base/NotFound";
-import { showConfirm } from "@/utils/alert";
+import { showAlert, showConfirm } from "@/utils/alert";
 import { BorderRadius, Color, IsMobileScreen } from "@/constants/Styles";
 import IconButton from "@/components/base/IconButton";
 import Feather from "@expo/vector-icons/Feather";
@@ -38,40 +38,51 @@ export class HomeHistory extends Component<StoreProps> {
     );
     if (!confirmed) return;
 
-    // Fetch all documents for the group and delete them in parallel
-    const docs = await documentService.getDocumentsByGroupId(id);
+    try {
+      // Fetch all documents for the group and delete them in parallel
+      const docs = await documentService.getDocumentsByGroupId(id);
 
-    // delete the image in cloudinary
-    await Promise.all(
-      docs.map((doc) => {
-        if (doc.image_public_id) {
-          // delete using server
-          fetch(
-            `${
-              process.env.EXPO_PUBLIC_API_ENDPOINT
-            }/cloudinary?public_id=${encodeURIComponent(doc.image_public_id)}`,
-            {
-              method: "DELETE",
-            }
-          );
-          return;
-        }
-        return Promise.resolve();
-      })
-    );
+      // delete the image in cloudinary
+      await Promise.all(
+        docs.map((doc) => {
+          if (doc.image_public_id) {
+            // delete using server
+            fetch(
+              `${
+                process.env.EXPO_PUBLIC_API_ENDPOINT
+              }/cloudinary?public_id=${encodeURIComponent(
+                doc.image_public_id
+              )}`,
+              {
+                method: "DELETE",
+              }
+            );
+            return;
+          }
+          return Promise.resolve();
+        })
+      );
 
-    // delete the doc
-    await documentService.deleteDocumentsByGroupId(id);
+      // delete the doc
+      await documentService.deleteDocumentsByGroupId(id);
 
-    await groupService.deleteGroup(id);
-    this.props.groupStore.removeGroup(id);
+      await groupService.deleteGroup(id);
+      this.props.groupStore.removeGroup(id);
 
-    const itemsPerPage = 10;
-    const totalPages = Math.ceil(
-      this.props.groupStore.groups.length / itemsPerPage
-    );
-    if (this.state.currentPage > totalPages) {
-      this.setState({ currentPage: totalPages });
+      const itemsPerPage = 10;
+      const totalPages = Math.ceil(
+        this.props.groupStore.groups.length / itemsPerPage
+      );
+      if (this.state.currentPage > totalPages) {
+        this.setState({ currentPage: totalPages });
+      }
+
+      showAlert("Berhasil", "Riwayat berhasil dihapus.");
+    } catch (error) {
+      showAlert(
+        "Gagal",
+        "Terjadi kesalahan saat menghapus riwayat. Silakan coba lagi."
+      );
     }
   };
 
