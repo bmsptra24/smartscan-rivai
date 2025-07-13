@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartScan Rivai - Solusi Pemindaian Dokumen Modern</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Splide CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+    <style>
+        :root {
+            --primary-color: #4A90E2; /* Blue */
+            --secondary-color: #50E3C2; /* Teal */
+            --text-dark: #2C3E50; /* Dark Blue */
+            --text-light: #ECF0F1; /* Light Gray */
+            --bg-light: #F7F9FC; /* Off-white */
+            --bg-dark: #34495E; /* Dark Gray Blue */
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 20px 0;
+            text-align: center;
+            background: var(--bg-light);
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark); /* Changed to neutral dark color */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px; /* Adjust logo size */
+            width: auto;
+            border-radius: 8px; /* Slightly rounded corners for the logo */
+        }
+
+        /* Hero Section */
+        .hero {
+            /* Updated to a clean and aesthetic light blue and lime green gradient */
+            background: linear-gradient(135deg, #87CEEB, #98FB98); /* Light blue to Lime green */
+            color: var(--text-light);
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 50px 50px; /* Rounded bottom corners */
+            box-shadow: 0 10px 30px var(--shadow-medium);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #000; /* Changed to black */
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 300;
+            color: #000; /* Changed to black */
+        }
+
+        .download-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 50px;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+
+        .download-btn {
+            background-color: var(--secondary-color);
+            color: var(--text-dark);
+            border: none;
+            padding: 18px 35px;
+            border-radius: 50px; /* Pill shape */
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .download-btn:hover {
+            background-color: #42C2A8; /* Darker teal */
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Font Awesome icons use 'color' instead of 'fill' */
+        .btn-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--text-dark); /* Set icon color */
+        }
+
+        /* Splide Carousel Customizations */
+        .splide {
+            margin: 40px auto 0;
+            max-width: 700px; /* Match previous max-width for container */
+        }
+
+        .splide__track {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
+            background-color: rgba(255, 255, 255, 0.15); /* Background for the track */
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            height: 400px; /* Fixed height for the carousel track */
+            display: flex; /* Ensure flex behavior for slides */
+            align-items: center; /* Center slides vertically */
+            justify-content: center; /* Center slides horizontally */
+        }
+
+        .splide__slide {
+            display: flex; /* Make slide a flex container */
+            align-items: center; /* Center image vertically */
+            justify-content: center; /* Center image horizontally */
+            width: 100%;
+            height: 100%; /* Ensure slide fills its parent */
+        }
+
+        .splide__slide img {
+            width: 100%;
+            height: 100%; /* Make image fill the slide height */
+            object-fit: cover; /* Changed to 'cover' to fill the area, cropping if necessary */
+            border-radius: 10px; /* Inner border radius */
+            /* Removed background-color here as 'cover' will fill it */
+        }
+
+        .splide__arrow {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            opacity: 1; /* Make arrows always visible */
+        }
+
+        .splide__arrow svg {
+            fill: white;
+        }
+
+        .splide__arrow:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .splide__pagination__page.is-active {
+            background: white;
+        }
+
+        .splide__pagination__page {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 80px 0;
+            background-color: var(--bg-light);
+            text-align: center;
+        }
+
+        .features-section h2 {
+            font-size: 2.5rem;
+            color: var(--text-dark);
+            margin-bottom: 60px;
+            font-weight: 600;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-item {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px var(--shadow-light);
+            text-align: left;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow-medium);
+        }
+
+        /* Font Awesome icons use 'color' instead of 'fill' */
+        .feature-icon-svg {
+            width: 48px;
+            height: 48px;
+            color: var(--primary-color); /* Set icon color */
+            margin-bottom: 20px;
+        }
+
+        .feature-item h3 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .feature-item p {
+            color: #555;
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            padding: 40px 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #fff;
+        }
+
+        .social-links {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .social-link {
+            display: inline-block;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Font Awesome icons use 'color' instead of 'fill' */
+        .social-icon {
+            width: 28px;
+            height: 28px;
+            color: var(--text-light); /* Set icon color */
+            transition: color 0.3s ease;
+        }
+
+        .social-link:hover .social-icon {
+            color: var(--secondary-color);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 900px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            .hero p {
+                font-size: 1.1rem;
+            }
+            .download-btn {
+                padding: 15px 30px;
+                font-size: 1rem;
+            }
+            .splide__track {
+                height: 300px; /* Adjust height for smaller screens */
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 15px;
+            }
+            .hero {
+                padding: 60px 0;
+                border-radius: 0 0 30px 30px;
+            }
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .download-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .download-btn {
+                width: 80%; /* Make buttons wider on mobile */
+                margin: 0 auto; /* Center buttons */
+            }
+            .features-section {
+                padding: 60px 0;
+            }
+            .features-section h2 {
+                font-size: 2rem;
+                margin-bottom: 40px;
+            }
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            .splide__track {
+                height: 250px; /* Further adjust height for mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="#" class="logo">
+                <img src="https://raw.githubusercontent.com/bmsptra24/smartscan-rivai/main/assets/images/icon.png" alt="SmartScan Rivai Logo">
+                SmartScan Rivai
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Pemindaian Dokumen Cerdas & Terintegrasi</h1>
+                <p>Ubah dokumen fisik menjadi digital dengan mudah menggunakan teknologi OCR canggih. Dirancang khusus untuk efisiensi PT PLN ULP Rivai.</p>
+                <div class="download-buttons">
+                    <a href="https://github.com/bmsptra24/smartscan-rivai/releases/download/1.1.0/SmartScan-Rivai-v1.1.0.apk" target="_blank" class="download-btn">
+                        <i class="fab fa-android btn-icon"></i>
+                        Unduh untuk Android
+                    </a>
+                    <a href="https://github.com/bmsptra24/smartscan-rivai/releases/download/1.1.0/SmartScan-Rivai-v1.1.0.exe" target="_blank" class="download-btn">
+                        <i class="fab fa-windows btn-icon"></i>
+                        Unduh untuk Windows
+                    </a>
+                    <a href="https://github.com/bmsptra24/smartscan-rivai/releases/download/1.1.0/SmartScan-Rivai-v1.1.0.AppImage" target="_blank" class="download-btn">
+                        <i class="fab fa-linux btn-icon"></i>
+                        Unduh untuk Linux
+                    </a>
+                </div>
+                <!-- Splide Carousel Structure -->
+                <section id="image-carousel" class="splide" aria-label="Tangkapan Layar SmartScan Rivai">
+                    <div class="splide__track">
+                        <ul class="splide__list">
+                            <li class="splide__slide">
+                                <img src="https://raw.githubusercontent.com/bmsptra24/smartscan-rivai/main/doc/images/1.jpg" alt="Tangkapan Layar SmartScan Rivai 1">
+                            </li>
+                            <li class="splide__slide">
+                                <img src="https://raw.githubusercontent.com/bmsptra24/smartscan-rivai/main/doc/images/2.jpg" alt="Tangkapan Layar SmartScan Rivai 2">
+                            </li>
+                            <li class="splide__slide">
+                                <img src="https://raw.githubusercontent.com/bmsptra24/smartscan-rivai/main/doc/images/3.png" alt="Tangkapan Layar SmartScan Rivai 3">
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="container">
+                <h2>Fitur Unggulan SmartScan Rivai</h2>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-text-width feature-icon-svg"></i>
+                        <h3>Pengenalan Dokumen Otomatis (OCR)</h3>
+                        <p>Deteksi ID Pelanggan dan kategori dokumen secara otomatis, mengurangi input manual dan mengurasi kesalahan input.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-database feature-icon-svg"></i>
+                        <h3>Integrasi Dashboard Admin</h3>
+                        <p>Dokumen yang dipindai langsung tersimpan ke komputer admin, memudahkan akses dan pengelolaan oleh admin.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt feature-icon-svg"></i>
+                        <h3>Bebas Iklan & Gangguan</h3>
+                        <p>Nikmati pengalaman pemindaian yang mulus tanpa interupsi iklan, fokus pada produktivitas kerja.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 SmartScan Rivai. Hak Cipta Dilindungi.</p>
+            <p>Dikembangkan untuk PT PLN (Persero) Unit Layanan Pelanggan Rivai.</p>
+            <p>Dibuat oleh Bima Saputra.</p>
+            <div class="social-links">
+                <a href="https://github.com/bmsptra24" target="_blank" class="social-link" title="GitHub">
+                    <i class="fab fa-github social-icon"></i>
+                </a>
+                <a href="https://linkedin.com/in/bmsptra24" target="_blank" class="social-link" title="LinkedIn">
+                    <i class="fab fa-linkedin social-icon"></i>
+                </a>
+                <a href="mailto:sbima2432@gmail.com" class="social-link" title="Email">
+                    <i class="fas fa-envelope social-icon"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Splide JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Splide carousel
+            new Splide('#image-carousel', {
+                type: 'loop',       // Loop the carousel
+                autoplay: true,     // Autoplay slides
+                interval: 5000,     // Change slide every 5 seconds
+                pauseOnHover: true, // Pause autoplay on hover
+                perPage: 1,         // Show one slide at a time
+                arrows: true,       // Show navigation arrows
+                pagination: true,   // Show pagination dots
+                height: 400,        // Fixed height for desktop carousel
+                breakpoints: {
+                    900: {
+                        height: 300, // Adjust height for smaller desktop/tablet screens
+                    },
+                    600: {
+                        height: 250, // Adjust height for mobile screens
+                    },
+                }
+            }).mount();
+        });
+    </script>
+</body>
+</html>
