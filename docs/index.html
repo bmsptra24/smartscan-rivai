@@ -135,7 +135,7 @@
             text-decoration: none;
             transition: all 0.3s ease;
             display: inline-flex;
-            align-items: center;
+            align-items: center; /* Ensures vertical centering of content */
             gap: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
@@ -151,6 +151,10 @@
             width: 24px;
             height: 24px;
             color: var(--text-dark); /* Set icon color */
+            display: flex; /* Make icon itself a flex container */
+            align-items: center; /* Vertically center icon content */
+            justify-content: center; /* Horizontally center icon content */
+            line-height: 1; /* Reset line-height to prevent extra space */
         }
 
         /* Splide Carousel Customizations */
