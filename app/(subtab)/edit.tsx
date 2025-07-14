@@ -1,4 +1,11 @@
-import { Pressable, ScrollView, TextInput, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  TextInput,
+  View,
+  Modal,
+  TouchableOpacity,
+} from "react-native";
 import React, { Component } from "react";
 import Container from "@/components/base/Container";
 import {
@@ -24,6 +31,8 @@ import IconButton from "@/components/base/IconButton";
 export class EditDokumenPage extends Component<StoreProps> {
   state = {
     isSaving: false,
+    isModalVisible: false,
+    selectedImageUri: "",
   };
 
   validateData() {
@@ -73,7 +82,6 @@ export class EditDokumenPage extends Component<StoreProps> {
     try {
       this.setState({ isSaving: true });
 
-      // Update the group and doc
       const updatedData = {
         ...this.props.groupStore.selectedGroup,
         documentCount: this.props.documentStore.documents.length,
@@ -112,18 +120,15 @@ export class EditDokumenPage extends Component<StoreProps> {
 
       this.props.groupStore.updateGrup(groupResponse);
 
-      // Delete doc in firestore that deleted in state
       const docsInFirestore = await documentService.getDocumentsByGroupId(
         groupResponse.id
       );
-      // 1. Check documents that are in Firestore but not in the state
       const stateDocumentIds = this.props.documentStore.documents.map(
         (doc) => doc.id
       );
       const documentsToDelete = docsInFirestore.filter(
         (firestoreDoc) => !stateDocumentIds.includes(firestoreDoc.id)
       );
-      // 2. Delete the documents
       await Promise.all(
         documentsToDelete.map(async (doc) => {
           if (!doc.id || !doc.image_public_id) return;
@@ -142,6 +147,14 @@ export class EditDokumenPage extends Component<StoreProps> {
     }
   };
 
+  openImageModal = (imageUri: string) => {
+    this.setState({ isModalVisible: true, selectedImageUri: imageUri });
+  };
+
+  closeImageModal = () => {
+    this.setState({ isModalVisible: false, selectedImageUri: "" });
+  };
+
   render() {
     return (
       <Container>
@@ -153,7 +166,6 @@ export class EditDokumenPage extends Component<StoreProps> {
             gap: Distance.default,
           }}
         >
-          {/* Header */}
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Pressable
               onPress={() => router.back()}
@@ -199,7 +211,6 @@ export class EditDokumenPage extends Component<StoreProps> {
             </View>
           </View>
 
-          {/* Gambar Document */}
           <ScrollView
             contentContainerStyle={{
               flexDirection: "row",
@@ -224,16 +235,18 @@ export class EditDokumenPage extends Component<StoreProps> {
                     zIndex: 2,
                   }}
                 />
-                <Image
-                  source={{ uri: doc.image_url }}
-                  style={{
-                    width: 150,
-                    aspectRatio: ASPECT_RATIO.A4,
-                    borderWidth: 1,
-                    borderColor: Color.black,
-                    borderRadius: BorderRadius.default,
-                  }}
-                />
+                <Pressable onPress={() => this.openImageModal(doc.image_url)}>
+                  <Image
+                    source={{ uri: doc.image_url }}
+                    style={{
+                      width: 150,
+                      aspectRatio: ASPECT_RATIO.A4,
+                      borderWidth: 1,
+                      borderColor: Color.black,
+                      borderRadius: BorderRadius.default,
+                    }}
+                  />
+                </Pressable>
                 <PickerActionSheet
                   title={doc.type}
                   options={[...DOCUMENT_TYPE, "Cancel"]}
@@ -266,7 +279,6 @@ export class EditDokumenPage extends Component<StoreProps> {
             </View>
           </ScrollView>
 
-          {/* Tombol Aksi */}
           <ButtonBase
             isLoading={this.state.isSaving}
             style={{ width: "100%" }}
@@ -275,6 +287,52 @@ export class EditDokumenPage extends Component<StoreProps> {
             onPress={this.handleSave}
           />
         </View>
+
+        <Modal
+          visible={this.state.isModalVisible}
+          transparent={true}
+          onRequestClose={this.closeImageModal}
+        >
+          <Pressable
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0,0,0,0.3)",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            onPress={this.closeImageModal}
+          >
+            <TouchableOpacity
+              activeOpacity={1}
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={{ uri: this.state.selectedImageUri }}
+                style={{
+                  width: Size.screen.width * 0.9,
+                  height: Size.screen.height * 0.9,
+                  resizeMode: "contain",
+                }}
+              />
+            </TouchableOpacity>
+            <View style={{ position: "absolute", top: 50, right: 20 }}>
+              <IconButton
+                icon={
+                  <MaterialCommunityIcons
+                    name="close-circle"
+                    size={30}
+                    color={Color.white}
+                  />
+                }
+                onPress={this.closeImageModal}
+              />
+            </View>
+          </Pressable>
+        </Modal>
       </Container>
     );
   }

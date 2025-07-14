@@ -19,32 +19,27 @@ import {
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 
-const { width, height } = Dimensions.get("window");
+interface LoginScreenState {
+  username: string;
+  password: string;
+  isLoading: boolean;
+  hoveredCarouselIndex: number;
+  windowWidth: number; // Tambahkan state untuk lebar jendela
+  windowHeight: number; // Tambahkan state untuk tinggi jendela
+}
 
-// Data untuk carousel dengan tambahan background
-const carouselData = [
-  {
-    image: Images.qrcode.src,
-    header: "SmartScan Rivai",
-    text: "Aplikasi pemindaian dengan pengenalan dokumen otomatis dan data terintegrasi dengan komputer pengelola.",
-    background: require("@/assets/images/carousel-1.png"),
-  },
-  {
-    image: Images.qrcode.src,
-    header: "SmartScan Rivai",
-    text: "Download aplikasinya sekarang!",
-    background: require("@/assets/images/carousel-2.png"),
-  },
-];
-
-class LoginScreen extends Component {
-  state = {
+class LoginScreen extends Component<{}, LoginScreenState> {
+  state: LoginScreenState = {
     username: "",
     password: "",
     isLoading: false,
-    hoveredCarouselIndex: -1, // State baru untuk melacak item carousel yang di-hover
+    hoveredCarouselIndex: -1,
+    windowWidth: Dimensions.get("window").width, // Inisialisasi dengan lebar jendela awal
+    windowHeight: Dimensions.get("window").height, // Inisialisasi dengan tinggi jendela awal
   };
+
   animation = React.createRef<LottieView>();
+  private dimensionsSubscription: any; // Tambahkan properti untuk menyimpan langganan
 
   componentDidMount(): void {
     const user = userService.getCurrentUser();
@@ -52,6 +47,24 @@ class LoginScreen extends Component {
       setTimeout(() => {
         router.push("/(tabs)/home");
       }, 0);
+    }
+
+    // Tambahkan event listener untuk perubahan dimensi jendela
+    this.dimensionsSubscription = Dimensions.addEventListener(
+      "change",
+      ({ window }) => {
+        this.setState({
+          windowWidth: window.width,
+          windowHeight: window.height,
+        });
+      }
+    );
+  }
+
+  componentWillUnmount(): void {
+    // Hapus event listener saat komponen dilepas
+    if (this.dimensionsSubscription) {
+      this.dimensionsSubscription.remove();
     }
   }
 
@@ -79,16 +92,40 @@ class LoginScreen extends Component {
   };
 
   render() {
-    const { username, password, hoveredCarouselIndex } = this.state; // Ambil hoveredCarouselIndex dari state
+    const {
+      username,
+      password,
+      hoveredCarouselIndex,
+      windowWidth,
+      windowHeight,
+    } = this.state;
 
-    // Hitung lebar promoSection secara dinamis
+    // Hitung lebar promoSection secara dinamis berdasarkan windowWidth
     const loginSectionWidth =
-      Size.screen.width < 1550
+      windowWidth < 1550
         ? IsMobileScreen
-          ? width
-          : width * 0.5
-        : width * 0.25;
-    const promoSectionWidth = IsMobileScreen ? 0 : width - loginSectionWidth; // 0 untuk mobile karena display: 'none'
+          ? windowWidth
+          : windowWidth * 0.5
+        : windowWidth * 0.25;
+    const promoSectionWidth = IsMobileScreen
+      ? 0
+      : windowWidth - loginSectionWidth;
+
+    // Data untuk carousel dengan tambahan background
+    const carouselData = [
+      {
+        image: Images.qrcode.src,
+        header: "SmartScan Rivai",
+        text: "Aplikasi pemindaian dengan pengenalan dokumen otomatis dan data terintegrasi dengan komputer pengelola.",
+        background: require("@/assets/images/carousel-1.png"),
+      },
+      {
+        image: Images.qrcode.src,
+        header: "SmartScan Rivai",
+        text: "Download aplikasinya sekarang!",
+        background: require("@/assets/images/carousel-2.png"),
+      },
+    ];
 
     return (
       <SafeAreaView style={styles.container}>
@@ -129,7 +166,7 @@ class LoginScreen extends Component {
                 borderColor: "#DDD",
               }}
               isLoading={this.state.isLoading}
-              textStyle={{ fontSize: Math.max(14, width * 0.01) }}
+              textStyle={{ fontSize: Math.max(14, windowWidth * 0.01) }}
             />
           </View>
           {/* Promo Section */}
@@ -139,7 +176,7 @@ class LoginScreen extends Component {
               <Carousel
                 loop
                 width={promoSectionWidth} // Lebar carousel sama dengan promoSection
-                height={height} // Tinggi carousel mengisi seluruh tinggi layar
+                height={windowHeight} // Tinggi carousel mengisi seluruh tinggi layar
                 autoPlay={true}
                 data={carouselData}
                 scrollAnimationDuration={4000}
@@ -157,7 +194,7 @@ class LoginScreen extends Component {
                           // Opacity berubah berdasarkan apakah item ini di-hover
                           backgroundColor: `rgba(0,0,0, ${
                             hoveredCarouselIndex === index ? 0.1 : 0.3
-                          })`, // 0.6 default (gelap), 0.2 saat hover (terang)
+                          })`,
                         },
                       ]}
                     />
@@ -198,8 +235,8 @@ const styles = StyleSheet.create({
     backgroundColor: Color.white,
   },
   scrollContainer: {
-    flexDirection: "row", // Tetap row untuk desktop, di mobile carousel tidak terlihat
-    minHeight: height,
+    flexDirection: "row",
+    minHeight: Dimensions.get("window").height, // Gunakan Dimensions.get('window').height secara langsung
     flexGrow: 1,
   },
   loginSection: {
@@ -211,7 +248,6 @@ const styles = StyleSheet.create({
   promoSection: {
     display: "flex",
     position: "relative",
-    backgroundColor: Color.primary,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -222,22 +258,25 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   logoText: {
-    fontSize: Math.max(16, width * 0.015),
+    fontSize: Math.max(16, Dimensions.get("window").width * 0.015),
     color: Color.text,
   },
   loginHeader: {
-    fontSize: Math.max(20, width * 0.02),
+    fontSize: Math.max(20, Dimensions.get("window").width * 0.02),
     fontWeight: "bold",
     color: Color.text,
     marginBottom: "2%",
   },
   signUpContainer: { flexDirection: "row", marginBottom: "5%" },
-  noAccountText: { color: "#555", fontSize: Math.max(14, width * 0.01) },
+  noAccountText: {
+    color: "#555",
+    fontSize: Math.max(14, Dimensions.get("window").width * 0.01),
+  },
   input: {
     borderWidth: 1,
     borderColor: "#DDD",
     marginBottom: "4%",
-    fontSize: Math.max(14, width * 0.01),
+    fontSize: Math.max(14, Dimensions.get("window").width * 0.01),
   },
   // Styles for Carousel
   carouselBackground: {
@@ -257,32 +296,29 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    // BackgroundColor akan diatur secara inline untuk perubahan opacity
-    zIndex: 1, // Pastikan overlay di atas gambar tetapi di bawah konten teks
-    // --- Tambahkan properti ini untuk animasi fade ---
+    zIndex: 1,
     transitionProperty: "background-color",
-    transitionDuration: "300ms", // Durasi animasi 300 milidetik
-    transitionTimingFunction: "ease-in-out", // Fungsi timing animasi
-    // ------------------------------------------------
+    transitionDuration: "300ms",
+    transitionTimingFunction: "ease-in-out",
   },
   carouselContent: {
     padding: 20,
     justifyContent: "center",
     alignItems: "center",
     maxWidth: "60%",
-    zIndex: 2, // Pastikan konten teks di atas overlay
+    zIndex: 2,
   },
   promoHeaderCarousel: {
-    fontSize: Math.max(24, width * 0.025),
+    fontSize: Math.max(24, Dimensions.get("window").width * 0.025),
     fontWeight: "bold",
     color: Color.white,
     marginBottom: "4%",
     textAlign: "center",
   },
   promoTextCarousel: {
-    fontSize: Math.max(14, width * 0.012),
+    fontSize: Math.max(14, Dimensions.get("window").width * 0.012),
     color: Color.white,
-    lineHeight: Math.max(20, width * 0.018),
+    lineHeight: Math.max(20, Dimensions.get("window").width * 0.018),
     marginBottom: "4%",
     textAlign: "center",
   },

@@ -1,4 +1,10 @@
-import { View, FlatList, Image } from "react-native";
+import {
+  View,
+  FlatList,
+  Modal,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
 import { Component } from "react";
 import Container from "@/components/base/Container";
 import TextBase from "@/components/base/Text";
@@ -20,6 +26,7 @@ import { timeFormatter } from "@/utils/formatter";
 import NotFound from "@/components/base/NotFound";
 import { generateAndSharePdf } from "@/utils/PDF";
 import { SpinnerIcon } from "@/components/animation/SpinnerIcon";
+import { Image } from "expo-image";
 
 interface ScrollEvent {
   nativeEvent: {
@@ -33,6 +40,8 @@ export class DetailDocument extends Component<StoreProps> {
   state = {
     currentIndex: 0,
     isLoading: false,
+    isModalVisible: false,
+    selectedImageUri: "",
   };
 
   async componentDidMount() {
@@ -54,9 +63,16 @@ export class DetailDocument extends Component<StoreProps> {
     this.setState({ isLoading: false });
   };
 
+  openImageModal = (imageUri: string) => {
+    this.setState({ isModalVisible: true, selectedImageUri: imageUri });
+  };
+
+  closeImageModal = () => {
+    this.setState({ isModalVisible: false, selectedImageUri: "" });
+  };
+
   render() {
-    const screenWidth = Size.screen.width - Distance.default * 2; // Account for horizontal padding
-    // A4 aspect ratio is 1:√2 (approximately 1:1.414)
+    const screenWidth = Size.screen.width - Distance.default * 2;
     const a4Height = screenWidth * 1.414;
 
     return (
@@ -64,23 +80,20 @@ export class DetailDocument extends Component<StoreProps> {
         <Container>
           <View
             style={{
-              // height: Size.screen.height,
               paddingVertical: Distance.default,
               paddingHorizontal: Distance.default,
               gap: Distance.default,
             }}
           >
-            {/* Header */}
             <Header title="Detail" />
 
-            {/* Preview Image Section */}
             {IsMobileScreen &&
               (this.props.documentStore.documents.length > 0 ? (
                 <View
                   style={{
                     width: screenWidth,
                     height: a4Height,
-                    aspectRatio: 1 / 1.414, // A4 aspect ratio (width:height)
+                    aspectRatio: 1 / 1.414,
                     alignSelf: "center",
                   }}
                 >
@@ -92,7 +105,8 @@ export class DetailDocument extends Component<StoreProps> {
                     onMomentumScrollEnd={this.handleScrollEnd}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
-                      <View
+                      <Pressable
+                        onPress={() => this.openImageModal(item.image_url)}
                         style={{
                           width: screenWidth,
                           height: a4Height,
@@ -110,32 +124,18 @@ export class DetailDocument extends Component<StoreProps> {
                             height: "100%",
                             resizeMode: "cover",
                           }}
-                          onError={(error) =>
-                            console.error("Error loading image:", error)
-                          }
                         />
                         <View
                           style={{
                             height: 40,
-                            // backgroundColor: Color.primary,
                           }}
                         >
-                          <TextBase
-                            variant="subcontent"
-                            style={
-                              {
-                                // color: Color.white,
-                              }
-                            }
-                          >
-                            {item.type}
-                          </TextBase>
+                          <TextBase variant="subcontent">{item.type}</TextBase>
                         </View>
-                      </View>
+                      </Pressable>
                     )}
                   />
 
-                  {/* Page Indicator */}
                   <View
                     style={{
                       position: "absolute",
@@ -170,52 +170,46 @@ export class DetailDocument extends Component<StoreProps> {
             <View style={{ flexDirection: "row", gap: 25, flexWrap: "wrap" }}>
               {!IsMobileScreen &&
                 this.props.documentStore.documents.length > 0 &&
-                this.props.documentStore.documents.map((item) => (
-                  <>
+                this.props.documentStore.documents.map((item, index) => (
+                  <Pressable
+                    key={index}
+                    onPress={() => this.openImageModal(item.image_url)}
+                    style={{
+                      width: 150,
+                      aspectRatio: ASPECT_RATIO.A4,
+                      backgroundColor: Color.greyLight,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      borderRadius: BorderRadius.default,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Image
+                      source={{ uri: item.image_url }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        resizeMode: "cover",
+                      }}
+                    />
                     <View
                       style={{
-                        width: 150,
-                        aspectRatio: ASPECT_RATIO.A4,
-                        backgroundColor: Color.greyLight,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        borderRadius: BorderRadius.default,
-                        overflow: "hidden",
+                        height: 40,
                       }}
                     >
-                      <Image
-                        source={{ uri: item.image_url }}
+                      <TextBase
+                        variant="subcontent"
                         style={{
-                          width: "100%",
-                          height: "100%",
-                          resizeMode: "cover",
-                        }}
-                        onError={(error) =>
-                          console.error("Error loading image:", error)
-                        }
-                      />
-                      <View
-                        style={{
-                          height: 40,
-                          // backgroundColor: Color.primary,
+                          textAlign: "center",
                         }}
                       >
-                        <TextBase
-                          variant="subcontent"
-                          style={{
-                            // color: Color.white,
-                            textAlign: "center",
-                          }}
-                        >
-                          {item.type}
-                        </TextBase>
-                      </View>
+                        {item.type}
+                      </TextBase>
                     </View>
-                  </>
+                  </Pressable>
                 ))}
             </View>
 
-            {/* Detail Informasi */}
             <View
               style={{
                 flex: 1,
@@ -249,7 +243,6 @@ export class DetailDocument extends Component<StoreProps> {
             </View>
           </View>
         </Container>
-        {/* Tombol Aksi */}
         <View
           style={{
             flexDirection: "row",
@@ -284,6 +277,52 @@ export class DetailDocument extends Component<StoreProps> {
             onPress={this.handleShare}
           />
         </View>
+
+        <Modal
+          visible={this.state.isModalVisible}
+          transparent={true}
+          onRequestClose={this.closeImageModal}
+        >
+          <Pressable
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0,0,0,0.3)",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            onPress={this.closeImageModal}
+          >
+            <TouchableOpacity
+              activeOpacity={1}
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={{ uri: this.state.selectedImageUri }}
+                style={{
+                  height: Size.screen.height * 0.9,
+                  width: Size.screen.width * 0.9,
+                  resizeMode: "contain",
+                }}
+              />
+            </TouchableOpacity>
+            <View style={{ position: "absolute", top: 50, right: 20 }}>
+              <IconButton
+                icon={
+                  <MaterialCommunityIcons
+                    name="close-circle"
+                    size={30}
+                    color={Color.white}
+                  />
+                }
+                onPress={this.closeImageModal}
+              />
+            </View>
+          </Pressable>
+        </Modal>
       </>
     );
   }

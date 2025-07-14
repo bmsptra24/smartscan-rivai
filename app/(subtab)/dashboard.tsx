@@ -48,7 +48,7 @@ const AdminDashboard = () => {
 
   // Using Math.floor to ensure integer pixel values, which can prevent unexpected wrapping
   const cardWidth = isWeb
-    ? Math.floor((width - totalHorizontalSpace) / 3) // Always 3 cards per row on web
+    ? Math.floor((width - totalHorizontalSpace) / 3.05) // Always 3 cards per row on web
     : width - contentPaddingHorizontal * 2; // Full width on mobile (adjusted to use contentPaddingHorizontal)
 
   // chartWidth calculation remains the same, adjusted for common practices

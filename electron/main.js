@@ -22,6 +22,7 @@ function createWindow() {
       enableRemoteModule: false,
       nodeIntegration: false,
     },
+    autoHideMenuBar: true,
   })
 
   // Membuat server lokal dengan Express untuk melayani file statis
