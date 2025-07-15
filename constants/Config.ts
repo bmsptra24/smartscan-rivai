@@ -52,8 +52,8 @@ export const DOC_TYPE_WITH_KEYWORDS: DocumentTypeKeywords = {
         { keyword: "dapat disetujui dengan ketentuan", weight: 4 },
         { keyword: "pln", weight: 2 }
     ],
-    "Surat Permintaan Pasang Baru": [
-        { keyword: "permintaan pasang baru", weight: 10 },
+    "Surat Permintaan Perubahan Daya": [
+        { keyword: "permintaan perubahan daya", weight: 10 },
         { keyword: "yang bertanda tangan dibawah ini", weight: 5 },
         { keyword: "tidak dipungut biaya", weight: 5 },
         { keyword: "rekening listrik", weight: 4 },
