@@ -197,13 +197,15 @@ export class EditDokumenPage extends Component<StoreProps> {
                   color: Color.text,
                   width: 120,
                 }}
+                keyboardType="numeric"
                 onChangeText={(customerId) => {
+                  const numericValue = customerId.replace(/[^0-9]/g, "");
                   if (!this.props.groupStore.selectedGroup)
                     return console.error("Selected group is undefined");
 
                   this.props.groupStore.setSelectedGroup({
                     ...this.props.groupStore.selectedGroup,
-                    customerId,
+                    customerId: numericValue,
                   });
                 }}
               />

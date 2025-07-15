@@ -258,7 +258,7 @@ export class DetailDocument extends Component<StoreProps> {
             title="Edit"
             onPress={() => router.push("/(subtab)/edit")}
           />
-          <IconButton
+          {/* <IconButton
             style={{
               backgroundColor: Color.secondary,
               opacity: this.state.isLoading ? 0.5 : 1,
@@ -275,7 +275,7 @@ export class DetailDocument extends Component<StoreProps> {
               )
             }
             onPress={this.handleShare}
-          />
+          /> */}
         </View>
 
         <Modal

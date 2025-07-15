@@ -1,7 +1,7 @@
 {
   "name": "smartscan-rivai",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "scripts": {
     "dev": "npx expo start",
     "prod:android:dev-client": "sudo mount -o remount,size=10G /tmp && eas build --platform android --profile development --local",
