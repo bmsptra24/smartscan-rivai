@@ -1,5 +1,3 @@
------
-
 # ✨ SmartScan Rivai ✨
 
 Seamless document scanning and management for PT PLN ULP Rivai.
@@ -56,6 +54,25 @@ Make sure you have Node.js and npm/yarn installed.
     yarn install
     ```
 
+### Configuration
+
+Before running the application, you need to set up your environment variables and configuration files.
+
+1.  **Duplicate environment files:**
+
+      * In the project root directory, rename `.env.template` to `.env`.
+      * Inside the `server/` directory, rename `server/.env.template` to `server/.env`.
+
+2.  **Update `eas.json` and `app.json`:**
+
+      * Open `eas.json` and `app.json` in the project root.
+      * Replace all occurrences of `"your key"` with your actual keys or desired values. These typically include sensitive information like API keys, project IDs, or other configuration values. Be careful not to expose sensitive information directly in version control.
+
+3.  **Fill in `.env` files:**
+
+      * **`.env` (in the project root):** Open this file and fill in all the required key-value pairs. These keys are typically used by the client-side application (Expo React Native).
+      * **`server/.env` (inside the `server/` directory):** Open this file and fill in all the required key-value pairs. These keys are typically used by the backend server.
+
 ### Running the Application
 
 This project uses **Expo React Native** and **Electron.js** for desktop builds.
@@ -108,9 +125,9 @@ This project uses **Expo React Native** and **Electron.js** for desktop builds.
 Contributions are welcome\! If you have suggestions or find issues, please open an issue or submit a pull request.
 
 -----
- 
+
 ## 📞 Contact
 
 For any inquiries, please reach out to **[Bima Saputra](mailto:sbima2432@gmail.com)**.
- 
+
 -----
